@@ -21,6 +21,8 @@ const EnvSchema = z.object({
   /** Modelo de voz a texto de Groq. */
   MODEL_STT: z.string().default('whisper-large-v3-turbo'),
 
+  /** auto = Supabase si hay llaves; memoria = base en memoria (solo local). */
+  BASE_DATOS: z.enum(['auto', 'supabase', 'memoria']).default('auto'),
   NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: opcional,
 
@@ -92,6 +94,7 @@ export function hayLLM(): boolean {
 
 export function haySupabase(): boolean {
   const e = env();
+  if (e.BASE_DATOS === 'memoria') return false;
   return Boolean(e.NEXT_PUBLIC_SUPABASE_URL && e.SUPABASE_SERVICE_ROLE_KEY);
 }
 

@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Sin cacheComponents: casi todas las páginas leen la base en cada petición
+  // (chat del alumno, panel del maestro), así que el render dinámico clásico
+  // es más simple y no exige envolver cada lectura en <Suspense>.
   turbopack: {
     rules: {
       "*.css": {

@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -127,4 +127,41 @@
   html {
     @apply font-sans;
   }
+}
+/* ── Marca de Pepe ─────────────────────────────────── */
+:root {
+  --primary: oklch(0.52 0.12 172);
+  --primary-foreground: oklch(0.99 0 0);
+  --ring: oklch(0.52 0.12 172);
+  --chat-fondo: oklch(0.955 0.018 165);
+  --burbuja-pepe: oklch(1 0 0);
+  --burbuja-alumno: oklch(0.92 0.07 155);
+  --aviso: oklch(0.75 0.15 75);
+  --peligro: oklch(0.6 0.2 25);
+  --exito: oklch(0.6 0.14 155);
+}
+.dark {
+  --primary: oklch(0.7 0.12 172);
+  --primary-foreground: oklch(0.15 0 0);
+  --chat-fondo: oklch(0.2 0.015 200);
+  --burbuja-pepe: oklch(0.27 0.01 220);
+  --burbuja-alumno: oklch(0.38 0.07 165);
+}
+@theme inline {
+  --color-chat-fondo: var(--chat-fondo);
+  --color-burbuja-pepe: var(--burbuja-pepe);
+  --color-burbuja-alumno: var(--burbuja-alumno);
+  --color-aviso: var(--aviso);
+  --color-peligro: var(--peligro);
+  --color-exito: var(--exito);
+}
+@keyframes escribiendo {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+.punto-escribiendo { animation: escribiendo 1.2s infinite; }
+.punto-escribiendo:nth-child(2) { animation-delay: 0.15s; }
+.punto-escribiendo:nth-child(3) { animation-delay: 0.3s; }
+@media (prefers-reduced-motion: reduce) {
+  .punto-escribiendo { animation: none; opacity: 0.6; }
 }
