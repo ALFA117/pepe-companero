@@ -64,7 +64,8 @@ export class CanalTwilio implements Canal {
       headers: { Authorization: this.auth, 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ From: this.config.desde, To: conWhatsApp(destino), Body: cuerpo }),
     });
-    if (!res.ok) throw new Error(`Twilio ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    // Sin el cuerpo de la respuesta: los errores de Twilio incluyen el número destino.
+    if (!res.ok) throw new Error(`Twilio respondió ${res.status} al enviar`);
   }
 
   enviarTexto(destino: string, texto: string): Promise<void> {

@@ -207,6 +207,15 @@ describe('carreras (bloqueo optimista)', () => {
   });
 });
 
+describe('una sola sesión activa', () => {
+  it('dos mensajes simultáneos de un alumno nuevo no crean dos sesiones', async () => {
+    preparar(llmConGuion(['incorrecta']));
+    await Promise.all([procesar(deps, texto('hola', 'm1')), procesar(deps, texto('oye', 'm2'))]);
+    expect(repo.datos.sesiones).toHaveLength(1);
+    expect(repo.datos.turnos.filter((t) => t.rol === 'alumno')).toHaveLength(2);
+  });
+});
+
 describe('sin LLM (caído o sin llaves)', () => {
   it('Pepe contesta con el ejemplo del paso y la conversación sigue', async () => {
     preparar(llmFalso({ pepe: () => { throw new Error('caído'); }, juez: () => { throw new Error('caído'); } }));

@@ -64,7 +64,7 @@ pnpm dev
 
 | Comando | Qué hace |
 |---|---|
-| `pnpm test` | 285 tests: máquina (todos los caminos y miles de conversaciones aleatorias), Juez, Pepe, filtro, fluidez, WhatsApp y panel |
+| `pnpm test` | 295 tests: máquina (todos los caminos y miles de conversaciones aleatorias), Juez, Pepe, filtro, fluidez, WhatsApp y panel |
 | `pnpm typecheck` / `pnpm lint` / `pnpm build` | Revisión de tipos, ESLint y build |
 | `pnpm simular [--reto <id>] [--audio nota.m4a]` | Conversación con Pepe en la terminal, con el LLM real |
 | `pnpm evaluar-juez` | 23 casos fijos contra el Juez real (gasta tokens) |
@@ -76,7 +76,8 @@ Corre en el **SQL Editor**, en orden:
 
 1. `supabase/migrations/20261123000000_inicial.sql`: tablas, restricciones y RLS.
 2. `supabase/migrations/20261123000001_permisos.sql`: permisos para `service_role`. Sin esta migración, el servidor recibe `permission denied`.
-3. `supabase/seed.sql`: grupo de pruebas.
+3. `supabase/migrations/20261123000002_sesion_activa_unica.sql`: una sola sesión activa por alumno.
+4. `supabase/seed.sql`: grupo de pruebas.
 
 Después corre `pnpm seed-demo` y cambia `BASE_DATOS=auto`.
 
@@ -101,4 +102,5 @@ Con el plan gratis de Groq hay un límite de 8K tokens por minuto **por modelo**
 
 - **Precisión de lectura:** es *estimada*. La transcripción tiende a "corregir" los errores del alumno.
 - **"Asignar reto" por WhatsApp:** solo escribe dentro de las 24 h desde el último mensaje del alumno (regla de WhatsApp). Fuera de esa ventana la sesión queda pendiente hasta que el alumno escriba.
+- **Códigos de alumno:** funcionan como acceso (web y vinculación de WhatsApp). Para alumnos reales conviene un sufijo aleatorio (p. ej. `PEPE-1B-07-K3F9`) en vez de números seguidos.
 - **Sandbox de Kapso:** solo responde al número registrado. Para el jurado, la web es la puerta principal.

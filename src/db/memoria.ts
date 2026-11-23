@@ -4,17 +4,18 @@
  * para que los tests y el simulador se comporten como producción.
  */
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
-import type {
-  Alumno,
-  DatosPanel,
-  EvaluacionFinalGuardada,
-  FluidezGuardada,
-  Grupo,
-  MetricasFluidez,
-  NuevoTurno,
-  Repositorio,
-  SesionGuardada,
-  TurnoGuardado,
+import {
+  SesionActivaDuplicadaError,
+  type Alumno,
+  type DatosPanel,
+  type EvaluacionFinalGuardada,
+  type FluidezGuardada,
+  type Grupo,
+  type MetricasFluidez,
+  type NuevoTurno,
+  type Repositorio,
+  type SesionGuardada,
+  type TurnoGuardado,
 } from './repositorio';
 
 export interface DatosMemoria {
@@ -116,6 +117,10 @@ export class RepositorioMemoria implements Repositorio {
 
   async insertarSesion(s: Sesion) {
     if (this.datos.sesiones.some((x) => x.id === s.id)) throw new Error('Sesión duplicada');
+    // Igual que el índice único parcial de la base: una sola sesión activa por alumno.
+    if (s.fase !== 'terminado' && this.datos.sesiones.some((x) => x.alumno_id === s.alumno_id && x.fase !== 'terminado')) {
+      throw new SesionActivaDuplicadaError(s.alumno_id);
+    }
     const t = this.ahora();
     const guardada: SesionGuardada = { ...s, creado_en: t, actualizado_en: t };
     this.datos.sesiones.push(guardada);

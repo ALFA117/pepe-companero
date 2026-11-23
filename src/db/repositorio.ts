@@ -83,6 +83,14 @@ export interface DatosPanel {
   brechas_turno: { sesion_id: string; brecha: string }[];
 }
 
+/** Ya hay una sesión activa (no terminada) para ese alumno. */
+export class SesionActivaDuplicadaError extends Error {
+  constructor(readonly alumnoId: string) {
+    super('El alumno ya tiene una sesión activa');
+    this.name = 'SesionActivaDuplicadaError';
+  }
+}
+
 export interface Repositorio {
   // Alumnos
   alumnoPorCodigo(codigo: string): Promise<Alumno | null>;
@@ -96,6 +104,7 @@ export interface Repositorio {
   sesionActiva(alumnoId: string): Promise<SesionGuardada | null>;
   ultimaSesion(alumnoId: string): Promise<SesionGuardada | null>;
   sesionPorId(id: string): Promise<SesionGuardada | null>;
+  /** Lanza `SesionActivaDuplicadaError` si el alumno ya tiene una sesión no terminada. */
   insertarSesion(s: Sesion): Promise<SesionGuardada>;
   /**
    * Guarda `nueva` solo si la versión en la base sigue siendo `anterior.version`

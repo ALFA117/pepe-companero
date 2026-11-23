@@ -6,6 +6,35 @@
 
 ---
 
+## 0. Estado (lunes 23 de noviembre, tarde)
+
+Las 8 fases están hechas y cada una tiene su commit. Pasan 295 tests, la revisión de tipos, lint y `pnpm build`.
+
+| Fase | Estado | Probado contra servicios reales |
+|---|---|---|
+| 0 Base | ✅ | — |
+| 1 Motor | ✅ | — (puro) |
+| 2 Juez + Pepe | ✅ | Groq: conversación completa; Juez 23/23 en `pnpm evaluar-juez` |
+| 3 Chat web | ✅ | Navegador (móvil), con Groq |
+| 4 WhatsApp | ✅ código + tests | ❌ falta el webhook en Kapso (necesita la URL de producción) |
+| 5 Voz | ✅ | Groq whisper con notas de voz reales |
+| 6 Panel | ✅ | Navegador, con datos de demo en memoria |
+| 7 Contenido + demo | ✅ | — |
+
+**Cambios al plan original:**
+- Proveedor de IA: Groq (`gpt-oss-20b` para Pepe y `gpt-oss-120b` para el Juez) y Google de respaldo, en vez de Anthropic.
+- Transcripción con Groq en vez de OpenAI.
+
+**Pendientes para la noche:**
+1. Correr `supabase/migrations/20261123000001_permisos.sql` y `20261123000002_sesion_activa_unica.sql` (hoy Supabase responde `permission denied`), luego `pnpm seed-demo` y cambiar `BASE_DATOS=auto`.
+2. Cambiar la identidad de git por la personal, hacer el push y el deploy en Vercel con las variables.
+3. Crear el webhook de Kapso apuntando al dominio de producción, con `KAPSO_WEBHOOK_SECRET`.
+4. La llave de Google no tiene créditos: el respaldo final no sirve hasta que se recargue o se cambie de modelo.
+5. Decidir si los códigos de alumno reales llevan sufijo aleatorio (hoy son adivinables: PEPE-1B-01, -02…).
+6. Groq gratis: 8K tokens por minuto por modelo. Con varios alumnos a la vez se va a llegar al límite; Pepe cae al `ejemplo` y el Juez a `parcial`.
+
+---
+
 ## 1. Fechas clave (hora de CDMX)
 
 | Cuándo | Qué |

@@ -1,3 +1,4 @@
+import { exigirDocente } from '@/lib/docente';
 import Link from 'next/link';
 import { dependenciasMotor } from '@/motor/servidor';
 import { generarHojas, type Hojas } from '@/panel/hojas';
@@ -10,6 +11,7 @@ export const maxDuration = 60;
 const NOMBRE_NIVEL = { basico: 'Básico', medio: 'Medio', avanzado: 'Avanzado' } as const;
 
 export default async function PaginaHojas({ searchParams }: { searchParams: Promise<{ grupo?: string; generar?: string }> }) {
+  await exigirDocente();
   const { grupo, generar } = await searchParams;
   const { grupoId } = await grupoElegido(grupo);
   const resumen = grupoId ? await resumenDelGrupo(grupoId) : null;

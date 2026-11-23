@@ -213,6 +213,8 @@ describe('asignarReto', () => {
       throw new Error('Kapso caído');
     };
     expect(await asignarReto(deps, ALUMNO, MATE)).toMatchObject({ estado: 'pendiente', motivo: 'error_envio' });
+    // La sesión NO arrancó: el siguiente "hola" del alumno la inicia en vez de evaluarse.
+    expect((await deps.motor.repo.sesionActiva(ALUMNO))?.fase).toBe('pendiente');
   });
 
   it('ventanaAbierta', () => {

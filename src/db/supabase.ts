@@ -3,20 +3,35 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
-import type {
-  Alumno,
-  DatosPanel,
-  EvaluacionFinalGuardada,
-  FluidezGuardada,
-  Grupo,
-  MetricasFluidez,
-  NuevoTurno,
-  Repositorio,
-  SesionGuardada,
-  TurnoGuardado,
+import {
+  SesionActivaDuplicadaError,
+  type Alumno,
+  type DatosPanel,
+  type EvaluacionFinalGuardada,
+  type FluidezGuardada,
+  type Grupo,
+  type MetricasFluidez,
+  type NuevoTurno,
+  type Repositorio,
+  type SesionGuardada,
+  type TurnoGuardado,
 } from './repositorio';
 
 const VIOLACION_UNIQUE = '23505';
+/** PostgREST devuelve como máximo 1000 filas por petición: se pide por páginas. */
+const TAMANO_PAGINA = 1000;
+
+type Pagina = PromiseLike<{ data: unknown[] | null; error: { message: string; code?: string } | null }>;
+
+async function todasLasFilas(donde: string, pedir: (desde: number, hasta: number) => Pagina): Promise<unknown[]> {
+  const filas: unknown[] = [];
+  for (let desde = 0; ; desde += TAMANO_PAGINA) {
+    const { data, error } = await pedir(desde, desde + TAMANO_PAGINA - 1);
+    if (error) falla(donde, error);
+    filas.push(...(data ?? []));
+    if (!data || data.length < TAMANO_PAGINA) return filas;
+  }
+}
 
 function falla(donde: string, error: { message: string; code?: string }): never {
   throw new Error(`[supabase] ${donde}: ${error.message}${error.code ? ` (${error.code})` : ''}`);
@@ -116,6 +131,9 @@ export class RepositorioSupabase implements Repositorio {
 
   async insertarSesion(s: Sesion) {
     const { data, error } = await this.sb.from('sesiones').insert(columnasSesion(s)).select('*').single();
+    if (error?.code === VIOLACION_UNIQUE && error.message.includes('sesiones_una_activa_idx')) {
+      throw new SesionActivaDuplicadaError(s.alumno_id);
+    }
     if (error) falla('insertarSesion', error);
     return data as SesionGuardada;
   }
@@ -212,43 +230,59 @@ export class RepositorioSupabase implements Repositorio {
 
     // Filtros por grupo con joins (!inner), para no mandar cientos de ids en la URL.
     const [alumnos, sesiones, finales, fluidez, evaluaciones] = await Promise.all([
-      this.sb.from('alumnos').select('*').eq('grupo_id', grupoId),
-      this.sb.from('sesiones').select('*, alumnos!inner(grupo_id)').eq('alumnos.grupo_id', grupoId),
-      this.sb
-        .from('evaluaciones_finales')
-        .select('*, sesiones!inner(alumnos!inner(grupo_id))')
-        .eq('sesiones.alumnos.grupo_id', grupoId),
-      this.sb.from('fluidez').select('*, sesiones!inner(alumnos!inner(grupo_id))').eq('sesiones.alumnos.grupo_id', grupoId),
-      this.sb
-        .from('evaluaciones')
-        .select('sesion_id, juez->>brecha_probable, sesiones!inner(alumnos!inner(grupo_id))')
-        .eq('sesiones.alumnos.grupo_id', grupoId)
-        .not('juez->>brecha_probable', 'is', null),
+      todasLasFilas('datosPanel alumnos', (a, b) =>
+        this.sb.from('alumnos').select('*').eq('grupo_id', grupoId).order('id').range(a, b),
+      ),
+      todasLasFilas('datosPanel sesiones', (a, b) =>
+        this.sb.from('sesiones').select('*, alumnos!inner(grupo_id)').eq('alumnos.grupo_id', grupoId).order('id').range(a, b),
+      ),
+      todasLasFilas('datosPanel finales', (a, b) =>
+        this.sb
+          .from('evaluaciones_finales')
+          .select('*, sesiones!inner(alumnos!inner(grupo_id))')
+          .eq('sesiones.alumnos.grupo_id', grupoId)
+          .order('sesion_id')
+          .range(a, b),
+      ),
+      todasLasFilas('datosPanel fluidez', (a, b) =>
+        this.sb
+          .from('fluidez')
+          .select('*, sesiones!inner(alumnos!inner(grupo_id))')
+          .eq('sesiones.alumnos.grupo_id', grupoId)
+          .order('sesion_id')
+          .range(a, b),
+      ),
+      todasLasFilas('datosPanel evaluaciones', (a, b) =>
+        this.sb
+          .from('evaluaciones')
+          .select('id, sesion_id, juez->>brecha_probable, sesiones!inner(alumnos!inner(grupo_id))')
+          .eq('sesiones.alumnos.grupo_id', grupoId)
+          .not('juez->>brecha_probable', 'is', null)
+          .order('id')
+          .range(a, b),
+      ),
     ]);
-    for (const [nombre, r] of Object.entries({ alumnos, sesiones, finales, fluidez, evaluaciones })) {
-      if (r.error) falla(`datosPanel ${nombre}`, r.error);
-    }
     const sinJoin = <T,>(filas: unknown[] | null, clave: string) =>
       (filas ?? []).map((f) => {
         const { [clave]: _quitado, ...resto } = f as Record<string, unknown>;
         void _quitado;
         return resto as T;
       });
-    const finalesPlanos = sinJoin<Record<string, unknown>>(finales.data, 'sesiones').map(
+    const finalesPlanos = sinJoin<Record<string, unknown>>(finales, 'sesiones').map(
       (f) => ({ ...(f.juez as object), sesion_id: f.sesion_id, creado_en: f.creado_en }) as EvaluacionFinalGuardada,
     );
     return {
       grupo: grupo as Grupo,
-      alumnos: (alumnos.data ?? []) as Alumno[],
-      sesiones: sinJoin<SesionGuardada>(sesiones.data, 'alumnos'),
+      alumnos: alumnos as Alumno[],
+      sesiones: sinJoin<SesionGuardada>(sesiones, 'alumnos'),
       finales: finalesPlanos,
-      fluidez: sinJoin<FluidezGuardada>(fluidez.data, 'sesiones').map((f) => ({
+      fluidez: sinJoin<FluidezGuardada>(fluidez, 'sesiones').map((f) => ({
         ...f,
         duracion_voz_s: Number(f.duracion_voz_s),
         ppm: Number(f.ppm),
         precision_est: f.precision_est === null ? null : Number(f.precision_est),
       })),
-      brechas_turno: (evaluaciones.data ?? [])
+      brechas_turno: evaluaciones
         .map((e) => ({ sesion_id: (e as { sesion_id: string }).sesion_id, brecha: (e as { brecha_probable: string | null }).brecha_probable ?? '' }))
         .filter((b) => b.brecha),
     };

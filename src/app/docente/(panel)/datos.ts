@@ -1,10 +1,12 @@
 import 'server-only';
+import { exigirDocente } from '@/lib/docente';
 import { repositorio } from '@/motor/servidor';
 import { calcularPanel, infoDeRetos } from '@/panel/calcular';
 import { listarRetos } from '@/retos/cargar';
 
 /** Grupo a mostrar: el pedido, o el que tiene más alumnos (el de demo, normalmente). */
 export async function grupoElegido(pedido?: string) {
+  await exigirDocente();
   const repo = repositorio();
   const grupos = await repo.grupos();
   if (grupos.length === 0) return { grupos, grupoId: null };
@@ -17,6 +19,7 @@ export async function grupoElegido(pedido?: string) {
 }
 
 export async function resumenDelGrupo(grupoId: string) {
+  await exigirDocente();
   const datos = await repositorio().datosPanel(grupoId);
   if (!datos) return null;
   return calcularPanel(datos, infoDeRetos(listarRetos()));

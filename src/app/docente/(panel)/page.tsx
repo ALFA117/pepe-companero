@@ -1,3 +1,4 @@
+import { exigirDocente } from '@/lib/docente';
 import Link from 'next/link';
 import { GraficaBrechas, TablaAlumnos } from './componentes';
 import { grupoElegido, resumenDelGrupo } from './datos';
@@ -15,6 +16,7 @@ function Indicador({ titulo, valor, detalle }: { titulo: string; valor: string; 
 }
 
 export default async function Panel({ searchParams }: { searchParams: Promise<{ grupo?: string }> }) {
+  await exigirDocente();
   const { grupo } = await searchParams;
   const { grupos, grupoId } = await grupoElegido(grupo);
   if (!grupoId) {

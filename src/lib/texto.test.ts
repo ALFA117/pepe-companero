@@ -28,6 +28,17 @@ describe('frasesProhibidasEn', () => {
     expect(frasesProhibidasEn('¿Cuántos pedacitos son?', prohibidas)).toEqual([]);
   });
 
+  it('no se deja engañar por espacios alrededor de operadores ni barras Unicode', () => {
+    expect(frasesProhibidasEn('creo que da 5 / 6', ['5/6'])).toEqual(['5/6']);
+    expect(frasesProhibidasEn('creo que da 5⁄6', ['5/6'])).toEqual(['5/6']);
+    expect(frasesProhibidasEn('entonces x =5', ['x = 5'])).toEqual(['x = 5']);
+    expect(frasesProhibidasEn('3/6+2/6', ['3/6 + 2/6'])).toEqual(['3/6 + 2/6']);
+  });
+
+  it('no confunde números más grandes', () => {
+    expect(frasesProhibidasEn('3x + 5 = 20', ['x = 5'])).toEqual([]);
+  });
+
   it('ignora frases prohibidas vacías', () => {
     expect(frasesProhibidasEn('hola', ['   '])).toEqual([]);
   });

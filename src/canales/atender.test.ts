@@ -85,6 +85,29 @@ describe('vinculación por código', () => {
   });
 });
 
+describe('vincular con un reto ya en curso', () => {
+  it('no evalúa un "hola" falso: repite la última pregunta de Pepe', async () => {
+    // Empezó en la web y ya va en el nivel 1.
+    await repo.insertarSesion({
+      id: 's-web', alumno_id: '00000000-0000-0000-0000-000000000103', reto_id: mate.id, canal: 'web', fase: 'nivel',
+      nivel: 1, paso: 0, nivel_max: 1, pidio_justificacion: false, insistio_lectura: false, contador_pide_respuesta: 0,
+      requiere_docente: false, siguiente_reto_id: null, version: 3,
+    });
+    await repo.agregarTurno({ sesion_id: 's-web', rol: 'pepe', tipo: 'texto', texto: '¿Cuál te late que está mal?' });
+    await atenderMensaje(deps, msg('PEPE-1B-03'));
+    expect(repo.datos.evaluaciones).toHaveLength(0);
+    expect((await repo.sesionPorId('s-web'))?.version).toBe(3);
+    expect(canal.enviados.at(-1)).toMatchObject({ texto: '¿Cuál te late que está mal?', botones: ['A', 'B', 'Las dos están bien'] });
+  });
+});
+
+describe('logs', () => {
+  it('enmascara teléfonos en los errores', async () => {
+    const { enmascarar } = await import('./atender');
+    expect(enmascarar(new Error('To +52 1 55 1234 5678 no es válido'))).toBe('Error: To [tel] no es válido');
+  });
+});
+
 describe('conversación por WhatsApp', () => {
   beforeEach(async () => {
     await atenderMensaje(deps, msg('PEPE-1B-01'));

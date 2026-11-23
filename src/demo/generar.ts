@@ -138,9 +138,12 @@ export function generarDemo({ banco, ahora = new Date(), semilla = 20261123 }: O
     const leeLento = r.sig() < 0.12;
     const numSesiones = r.sig() < 0.07 ? 0 : r.entero(1, 6);
 
+    // Inicios en orden cronológico: solo la última sesión puede quedar en curso.
+    const inicios = Array.from({ length: numSesiones }, () => r.entero(2, 7 * 24 * 60)).sort((a, b) => b - a);
     for (let k = 0; k < numSesiones; k++) {
+      const esUltima = k === numSesiones - 1;
       const reto = r.elegir(r.sig() < 0.55 ? mate : lectura);
-      const inicio = new Date(ahora.getTime() - r.entero(2, 7 * 24 * 60) * 60_000);
+      const inicio = new Date(ahora.getTime() - inicios[k]! * 60_000);
       let t = inicio.getTime();
       const tick = () => {
         t += r.entero(15, 90) * 1000;
@@ -235,7 +238,7 @@ export function generarDemo({ banco, ahora = new Date(), semilla = 20261123 }: O
       }
 
       // ~1 de cada 6 sesiones se queda a la mitad (en curso).
-      const enCurso = (!atorado && !resuelto) || (resuelto && r.sig() < 0.12);
+      const enCurso = esUltima && ((!atorado && !resuelto) || (resuelto && r.sig() < 0.12));
       let fase: SesionGuardada['fase'] = 'terminado';
       if (resuelto && !enCurso) {
         turno('pepe', '¡Me salvaste! 🙌 ¿Me explicas con tus palabras qué estaba mal?');
@@ -257,7 +260,7 @@ export function generarDemo({ banco, ahora = new Date(), semilla = 20261123 }: O
         datos.evaluaciones_finales.push({ ...final, sesion_id: sesionId, creado_en: new Date(t).toISOString() });
       } else if (atorado) {
         turno('pepe', 'Uf, este nos costó mucho a los dos 😅 Le voy a pedir a la profe que nos eche la mano.');
-      } else {
+      } else if (enCurso) {
         fase = resuelto ? 'cierre' : 'nivel';
       }
 

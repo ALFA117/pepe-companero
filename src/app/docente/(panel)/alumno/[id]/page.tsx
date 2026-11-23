@@ -71,6 +71,7 @@ export default async function DetalleAlumno({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ sesion?: string; asignado?: string }>;
 }) {
+  await exigirDocente();
   const { id } = await params;
   const { sesion: sesionPedida, asignado } = await searchParams;
   const repo = repositorio();

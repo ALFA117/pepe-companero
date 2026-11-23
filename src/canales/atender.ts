@@ -6,6 +6,7 @@
  *   4. Manda una burbuja por mensaje; la última con botones si los hay.
  */
 import type { Repositorio } from '@/db/repositorio';
+import { pasoActual } from '@/motor/maquina';
 import { procesar, type DependenciasMotor } from '@/motor/procesar';
 import type { EntradaAlumno } from '@/motor/tipos';
 import type { Canal, MensajeEntrante } from './tipos';
@@ -64,6 +65,12 @@ async function vincular(
   return { alumnoId: alumno.id, nombre: alumno.nombre.split(' ')[0] ?? alumno.nombre };
 }
 
+/** Para los logs: nunca imprimir números de teléfono. */
+export function enmascarar(err: unknown): string {
+  const texto = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  return texto.replace(/\+?\d[\d\s-]{7,}\d/g, '[tel]');
+}
+
 export async function atenderMensaje(deps: DependenciasAtender, m: MensajeEntrante): Promise<void> {
   const { canal } = deps;
   const repo = deps.motor.repo;
@@ -83,6 +90,21 @@ export async function atenderMensaje(deps: DependenciasAtender, m: MensajeEntran
 
     await repo.marcarMensajeWhatsApp(alumno.id, deps.ahora?.() ?? new Date());
     await canal.indicarEscribiendo?.(m.de, m.id_externo).catch(() => undefined);
+
+    // Recién vinculado con un reto ya en curso (p. ej. empezó en la web): no se
+    // evalúa nada; Pepe solo repite su última pregunta.
+    if (saludo) {
+      const activa = await repo.sesionActiva(alumno.id);
+      if (activa && activa.fase !== 'pendiente') {
+        const turnos = await repo.ultimosTurnos(activa.id, 10);
+        const ultimas: string[] = [];
+        for (let i = turnos.length - 1; i >= 0 && turnos[i]!.rol === 'pepe'; i--) ultimas.unshift(turnos[i]!.texto);
+        const reto = deps.motor.banco.find((r) => r.id === activa.reto_id);
+        const botones = reto ? pasoActual(reto, activa)?.botones : undefined;
+        await mandar(canal, m.de, [saludo, 'Sigamos donde nos quedamos 👇', ...ultimas.slice(-3)], botones);
+        return;
+      }
+    }
 
     let entrada: EntradaAlumno;
     if (saludo) {
@@ -105,7 +127,7 @@ export async function atenderMensaje(deps: DependenciasAtender, m: MensajeEntran
     if (r.duplicado) return;
     await mandar(canal, m.de, saludo ? [saludo, ...r.mensajes] : r.mensajes, r.botones);
   } catch (err) {
-    console.error('[whatsapp] error atendiendo mensaje:', err);
+    console.error('[whatsapp] error atendiendo mensaje:', enmascarar(err));
     await mandar(canal, m.de, MENSAJES_VINCULACION.error).catch(() => undefined);
   }
 }

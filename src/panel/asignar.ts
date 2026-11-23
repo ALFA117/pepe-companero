@@ -40,6 +40,9 @@ export async function asignarReto(deps: DependenciasAsignar, alumnoId: string, r
   if (!alumno) throw new Error('No existe el alumno');
 
   const ahora = deps.ahora?.() ?? new Date();
+  // Una sola sesión activa por alumno: el reto del maestro reemplaza al que estaba en curso.
+  const activa = await repo.sesionActiva(alumno.id);
+  if (activa) await repo.actualizarSesion(activa, { ...activa, fase: 'terminado' });
   const nueva = crearSesion({
     id: deps.nuevoId?.() ?? crypto.randomUUID(),
     alumno_id: alumno.id,
@@ -54,19 +57,26 @@ export async function asignarReto(deps: DependenciasAsignar, alumnoId: string, r
     return { estado: 'pendiente', sesion_id: pendiente.id, motivo: 'ventana_cerrada' };
   }
 
+  // Primero se envía y solo después se arranca la sesión: si el envío falla,
+  // la sesión sigue `pendiente` y el siguiente mensaje del alumno la inicia
+  // (en vez de evaluar su "hola" como respuesta a un reto que nunca vio).
+  const r = transicion(pendiente, { tipo: 'iniciar' }, { reto, banco });
+  const enviados: string[] = [];
   try {
-    const r = transicion(pendiente, { tipo: 'iniciar' }, { reto, banco });
-    const iniciada = (await repo.actualizarSesion(pendiente, r.sesion)) ?? pendiente;
-    const { salida } = await redactar(deps.motor.generar, { reto, sesion: iniciada, accion: r.accion, historial: [] });
-    const mensajes = [AVISO_RETO_NUEVO, ...salida.mensajes];
+    const { salida } = await redactar(deps.motor.generar, { reto, sesion: r.sesion, accion: r.accion, historial: [] });
     const tel = deps.descifrarTelefono(alumno.tel_cifrado);
-    for (const m of mensajes) {
+    for (const m of [AVISO_RETO_NUEVO, ...salida.mensajes]) {
       await deps.canal.enviarTexto(tel, m);
-      await repo.agregarTurno({ sesion_id: iniciada.id, rol: 'pepe', tipo: 'texto', texto: m });
+      enviados.push(m);
     }
-    return { estado: 'enviado', sesion_id: iniciada.id };
   } catch (err) {
-    console.error('[asignar] no se pudo enviar por WhatsApp:', err);
+    console.error('[asignar] no se pudo enviar por WhatsApp:', err instanceof Error ? err.name : 'error');
     return { estado: 'pendiente', sesion_id: pendiente.id, motivo: 'error_envio' };
   }
+
+  const iniciada = (await repo.actualizarSesion(pendiente, r.sesion)) ?? pendiente;
+  for (const m of enviados) {
+    await repo.agregarTurno({ sesion_id: iniciada.id, rol: 'pepe', tipo: 'texto', texto: m });
+  }
+  return { estado: 'enviado', sesion_id: iniciada.id };
 }

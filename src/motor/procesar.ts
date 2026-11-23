@@ -14,7 +14,13 @@
  */
 import type { GenerarJSON } from '@/ia/llm';
 import type { Transcripcion, Transcriptor } from '@/ia/transcribir';
-import type { MetricasFluidez, Repositorio, SesionGuardada, TipoTurno } from '@/db/repositorio';
+import {
+  SesionActivaDuplicadaError,
+  type MetricasFluidez,
+  type Repositorio,
+  type SesionGuardada,
+  type TipoTurno,
+} from '@/db/repositorio';
 import { calcularFluidez } from './fluidez';
 import { evaluarCierre, evaluarTurno, TURNOS_DE_CONTEXTO, type OrigenEvaluacion } from './juez';
 import { crearSesion, transicion } from './maquina';
@@ -140,10 +146,19 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
     const reto = elegirRetoInicial(deps.banco, ultima, hechos);
     if (!reto) return { duplicado: false, ...SIN_RETOS, sesion: null };
     const inicio = crearSesion({ id: nuevoId(), alumno_id: p.alumno_id, reto, canal: p.canal });
-    sesion = await repo.insertarSesion(inicio.sesion);
-    const turno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
-    if (!turno) return { duplicado: true, mensajes: [], sesion };
-    return responder(deps, { reto, sesion, accion: inicio.accion, ultimoMensaje: texto });
+    try {
+      sesion = await repo.insertarSesion(inicio.sesion);
+    } catch (err) {
+      // Otro mensaje del mismo alumno creó la sesión al mismo tiempo: se usa esa.
+      if (!(err instanceof SesionActivaDuplicadaError)) throw err;
+      sesion = await repo.sesionActiva(p.alumno_id);
+      if (!sesion) throw err;
+    }
+    if (sesion.id === inicio.sesion.id) {
+      const turno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
+      if (!turno) return { duplicado: true, mensajes: [], sesion };
+      return responder(deps, { reto, sesion, accion: inicio.accion, ultimoMensaje: texto });
+    }
   }
 
   const reto = retoDe(deps.banco, sesion.reto_id);
