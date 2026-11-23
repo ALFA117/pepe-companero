@@ -18,6 +18,7 @@
     "@ai-sdk/google": "^4.0.124",
     "@ai-sdk/groq": "^4.0.86",
     "@base-ui/react": "^1.9.0",
+    "@kapso/whatsapp-cloud-api": "^0.4.0",
     "@supabase/supabase-js": "^2.119.2",
     "ai": "^7.0.179",
     "class-variance-authority": "^0.7.1",

@@ -197,6 +197,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.9.0
         version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@kapso/whatsapp-cloud-api':
+        specifier: ^0.4.0
+        version: 0.4.0
       '@supabase/supabase-js':
         specifier: ^2.119.2
         version: 2.119.2
@@ -901,6 +904,10 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@kapso/whatsapp-cloud-api@0.4.0':
+    resolution: {integrity: sha512-N1P6G//TYMvV9sUiplHFoN+fFJ2oQgaHcIky3Eklr6nm9Y8qJHdIun6e/Nt5v5q/msoFCiMhqNnKi7zNDkYZVQ==}
+    engines: {node: '>=20.19'}
 
   '@modelcontextprotocol/core@2.4.0':
     resolution: {integrity: sha512-z8QBKqdfXLPzkLQuG4xp8hrVEMm1PZ1IgxMN2sMbJiFiAKOWXnAzogXn2W4aqIBlP1ea6U5yiqVquvUNM1Cj6Q==}
@@ -4238,6 +4245,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.3
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@kapso/whatsapp-cloud-api@0.4.0':
+    dependencies:
+      zod: 4.6.7
 
   '@modelcontextprotocol/core@2.4.0':
     dependencies:

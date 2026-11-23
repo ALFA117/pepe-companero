@@ -1,0 +1,151 @@
+import { createHmac } from 'node:crypto';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { RepositorioMemoria } from '@/db/memoria';
+import { cifrarTelefono, descifrarTelefono, hashTelefono } from '@/lib/telefono';
+import { listarRetos, obtenerReto } from '@/retos/cargar';
+import { juezCrudo, llmFalso } from '@/test/llm-falso';
+import { atenderMensaje, type DependenciasAtender } from './atender';
+import { firmaTwilio, textoConOpciones } from './twilio';
+import type { Canal, MensajeEntrante } from './tipos';
+
+const SAL = 'sal-de-prueba-123456';
+const LLAVE = Buffer.alloc(32, 7).toString('base64');
+const TEL = '5215512345678';
+const mate = obtenerReto('mate-suma-fracciones-01');
+
+class CanalFalso implements Canal {
+  readonly nombre = 'falso';
+  enviados: { a: string; texto: string; botones?: string[] }[] = [];
+  escribiendo: string[] = [];
+  async parsearEntrante() {
+    return [];
+  }
+  async enviarTexto(a: string, texto: string) {
+    this.enviados.push({ a, texto });
+  }
+  async enviarBotones(a: string, texto: string, botones: string[]) {
+    this.enviados.push({ a, texto, botones });
+  }
+  async descargarAudio() {
+    return { audio: new ArrayBuffer(4), mime: 'audio/ogg' };
+  }
+  async indicarEscribiendo(_: string, id: string) {
+    this.escribiendo.push(id);
+  }
+}
+
+let repo: RepositorioMemoria;
+let canal: CanalFalso;
+let deps: DependenciasAtender;
+let n = 0;
+
+const msg = (texto: string): MensajeEntrante => ({ id_externo: `wamid.${++n}`, de: TEL, tipo: 'texto', texto });
+
+beforeEach(() => {
+  repo = new RepositorioMemoria();
+  canal = new CanalFalso();
+  const llm = llmFalso({ pepe: () => ({ mensajes: ['Va 😅', '¿Cuál te late?'] }), juez: () => juezCrudo('incorrecta') });
+  deps = {
+    canal,
+    motor: { repo, generar: llm.generar, banco: listarRetos() },
+    hashTelefono: (t) => hashTelefono(t, SAL),
+    cifrarTelefono: (t) => cifrarTelefono(t, LLAVE),
+  };
+});
+
+describe('vinculación por código', () => {
+  it('sin vincular, Pepe pide el código', async () => {
+    await atenderMensaje(deps, msg('hola'));
+    expect(canal.enviados.map((e) => e.texto).join(' ')).toContain('PEPE-1B-07');
+    expect(repo.datos.sesiones).toHaveLength(0);
+  });
+
+  it('con un código válido vincula el teléfono (hash + cifrado) y arranca el reto', async () => {
+    await atenderMensaje(deps, msg('mi código es pepe-1b-02'));
+    const alumno = await repo.alumnoPorCodigo('PEPE-1B-02');
+    expect(alumno?.tel_hash).toBe(hashTelefono(TEL, SAL));
+    expect(alumno?.tel_hash).not.toContain(TEL);
+    expect(alumno?.tel_cifrado).not.toContain(TEL);
+    expect(descifrarTelefono(alumno!.tel_cifrado!, LLAVE)).toBe(TEL);
+    const textos = canal.enviados.map((e) => e.texto);
+    expect(textos[0]).toContain('¡Listo, Alumno!');
+    expect(textos.slice(1)).toEqual(mate.planteamiento_pepe);
+    expect(alumno?.ultimo_mensaje_wa_en).not.toBeNull();
+  });
+
+  it('con un código que no existe, avisa', async () => {
+    await atenderMensaje(deps, msg('PEPE-9Z-99'));
+    expect(canal.enviados[0]?.texto).toContain('no encontré el código PEPE-9Z-99');
+  });
+
+  it('no deja vincular un código que ya tiene otro teléfono', async () => {
+    await repo.vincularTelefono('00000000-0000-0000-0000-000000000101', 'otro-hash', 'x');
+    await atenderMensaje(deps, msg('PEPE-1B-01'));
+    expect(canal.enviados[0]?.texto).toContain('ya está conectado a otro número');
+  });
+});
+
+describe('conversación por WhatsApp', () => {
+  beforeEach(async () => {
+    await atenderMensaje(deps, msg('PEPE-1B-01'));
+    canal.enviados = [];
+  });
+
+  it('muestra escribiendo, responde y la última burbuja lleva los botones', async () => {
+    const m = msg('sí, está bien');
+    await atenderMensaje(deps, m);
+    expect(canal.escribiendo).toContain(m.id_externo);
+    expect(canal.enviados).toEqual([
+      { a: TEL, texto: 'Va 😅' },
+      { a: TEL, texto: '¿Cuál te late?', botones: ['A', 'B', 'Las dos están bien'] },
+    ]);
+  });
+
+  it('un mensaje duplicado del webhook no genera dos respuestas', async () => {
+    const m = msg('sí');
+    await atenderMensaje(deps, m);
+    const enviados = canal.enviados.length;
+    await atenderMensaje(deps, m);
+    expect(canal.enviados).toHaveLength(enviados);
+  });
+
+  it('si algo truena, manda un mensaje amable en vez de quedarse callado', async () => {
+    deps.motor.repo.ultimosTurnos = async () => {
+      throw new Error('base caída');
+    };
+    await atenderMensaje(deps, msg('hola'));
+    expect(canal.enviados.at(-1)?.texto).toContain('se me trabó');
+  });
+});
+
+describe('teléfono', () => {
+  it('el hash no depende del formato del número', () => {
+    expect(hashTelefono('whatsapp:+52 1 55 1234 5678', SAL)).toBe(hashTelefono(TEL, SAL));
+  });
+
+  it('cada cifrado es distinto pero descifra igual', () => {
+    const a = cifrarTelefono(TEL, LLAVE);
+    const b = cifrarTelefono(TEL, LLAVE);
+    expect(a).not.toBe(b);
+    expect(descifrarTelefono(a, LLAVE)).toBe(TEL);
+  });
+
+  it('un cifrado alterado no se puede descifrar', () => {
+    const c = cifrarTelefono(TEL, LLAVE).split(':');
+    c[3] = Buffer.from('000000000000').toString('base64');
+    expect(() => descifrarTelefono(c.join(':'), LLAVE)).toThrow();
+  });
+});
+
+describe('Twilio', () => {
+  it('firma URL + parámetros ordenados por nombre (HMAC-SHA1 en base64)', () => {
+    const url = 'https://pepe.test/api/whatsapp';
+    const firma = firmaTwilio('token', url, { To: 'b', Body: 'hola', From: 'a' });
+    const esperada = createHmac('sha1', 'token').update(`${url}BodyholaFromaTob`).digest('base64');
+    expect(firma).toBe(esperada);
+  });
+
+  it('los botones van como opciones en el texto', () => {
+    expect(textoConOpciones('¿Cuál?', ['A', 'B'])).toBe('¿Cuál?\n\n• A\n• B\n(Escribe tu opción)');
+  });
+});
