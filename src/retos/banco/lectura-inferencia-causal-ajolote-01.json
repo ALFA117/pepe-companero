@@ -19,7 +19,16 @@
   ],
   "error_plantado": "Inventa una causa (la pesca) que el texto no menciona.",
   "solucion_para_juez": "El texto (párrafo 2) da dos causas: la contaminación del agua y la llegada de peces como la tilapia, que se comen sus huevos. No menciona la pesca. Una mejor solución según el texto: refugios con agua limpia, como los de los chinamperos.",
-  "prohibido_para_pepe": ["las dos causas son", "son dos causas: la contaminación y la tilapia"],
+  "prohibido_para_pepe": [
+    "las dos causas son",
+    "son dos causas",
+    "hay dos causas",
+    "dos causas: la contaminación",
+    "contaminación y la tilapia",
+    "contaminación del agua y por la tilapia",
+    "por la contaminación del agua y",
+    "por la tilapia"
+  ],
   "rubrica": {
     "correcta": "Dice que el texto no habla de pesca Y menciona las dos causas (agua contaminada/sucia y tilapia), idealmente con evidencia del texto.",
     "parcial": "Corrige a Pepe pero menciona solo una causa, o no puede ubicar dónde lo dice el texto.",
@@ -36,11 +45,17 @@
             "Mmm, ahora que lo pienso, no sé si lo leí o me lo imaginé 😅",
             "¿En qué párrafo dice por qué se están acabando?"
           ],
-          "botones": ["Párrafo 1", "Párrafo 2", "No lo dice"]
+          "botones": [
+            "Párrafo 1",
+            "Párrafo 2",
+            "No lo dice"
+          ]
         },
         {
           "objetivo": "Volver al reto: ¿qué dice ese párrafo que los está acabando?",
-          "ejemplo": ["¿Y qué dice ahí que los está acabando?"]
+          "ejemplo": [
+            "¿Y qué dice ahí que los está acabando?"
+          ]
         }
       ]
     },
@@ -54,11 +69,17 @@
             "“La contaminación del agua y la llegada de peces como la tilapia, que se comen sus huevos, han reducido su población.”",
             "Pregunta fácil: ¿aquí dice algo de gente pescando ajolotes?"
           ],
-          "botones": ["Sí", "No"]
+          "botones": [
+            "Sí",
+            "No"
+          ]
         },
         {
           "objetivo": "Volver al reto: ¿qué los está acabando según la frase?",
-          "ejemplo": ["😳 Uy, entonces me lo inventé.", "¿Qué dice la frase que los está acabando?"]
+          "ejemplo": [
+            "😳 Uy, entonces me lo inventé.",
+            "¿Qué dice la frase que los está acabando?"
+          ]
         }
       ]
     },
@@ -75,7 +96,9 @@
         },
         {
           "objetivo": "Volver al reto: aplicar el truco a la frase de los ajolotes.",
-          "ejemplo": ["🔥 ¡Eso! Ahora usa el truco en la frase de los ajolotes. ¿Cuántas causas hay?"]
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora usa el truco en la frase de los ajolotes. ¿Cuántas causas hay?"
+          ]
         }
       ]
     },
@@ -91,7 +114,9 @@
         },
         {
           "objetivo": "Inferir por qué importa que sea limpia (significado de contaminación).",
-          "ejemplo": ["¿Y para qué crees que se tomaron la molestia de que fuera limpia?"]
+          "ejemplo": [
+            "¿Y para qué crees que se tomaron la molestia de que fuera limpia?"
+          ]
         },
         {
           "objetivo": "Volver al reto con el vocabulario resuelto.",

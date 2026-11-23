@@ -30,6 +30,10 @@ interface Caso {
   pregunta: string;
   respuesta: string;
   esperado: Clasificacion[];
+  /** Pepe ya le pidió que justificara. */
+  justificar?: boolean;
+  /** Valores aceptables de explica_por_que (si se quiere revisar). */
+  explica?: string[];
 }
 
 const ultimaDe = (r: typeof mate, n: number, p: number) =>
@@ -56,15 +60,18 @@ const casos: Caso[] = [
   { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'si le atinaste', esperado: ['incorrecta'] },
   { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'no, el texto no dice nada de pesca. dice que es por la contaminacion del agua y por la tilapia que se come sus huevos', esperado: ['correcta'] },
   { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'no es por la pesca, es por la contaminación', esperado: ['parcial'] },
+  { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'no, el texto no dice nada de pesca, dice que es por la contaminación del agua y la tilapia que se come sus huevos', esperado: ['correcta'], justificar: false, explica: ['si'] },
+  { reto: lectura, nivel: 0, paso: 0, pregunta: '¿Y cómo sabes eso?', respuesta: 'porque en el párrafo 2 dice que la contaminación y la tilapia han reducido su población', esperado: ['correcta'], justificar: true, explica: ['si'] },
+  { reto: mate, nivel: 0, paso: 0, pregunta: '¿Y cómo sabes?', respuesta: 'pues porque los de abajo no se suman, son pedazos de distinto tamaño', esperado: ['correcta'], justificar: true, explica: ['si'] },
   { reto: lectura, nivel: 1, paso: 0, pregunta: ultimaDe(lectura, 1, 0), respuesta: 'Párrafo 2', esperado: ['paso_correcto'] },
   { reto: lectura, nivel: 2, paso: 0, pregunta: ultimaDe(lectura, 2, 0), respuesta: 'No', esperado: ['paso_correcto'] },
   { reto: lectura, nivel: 3, paso: 0, pregunta: ultimaDe(lectura, 3, 0), respuesta: 'dos', esperado: ['paso_correcto'] },
 ];
 
-function sesionEn(reto: typeof mate, nivel: number, paso: number): Sesion {
+function sesionEn(reto: typeof mate, nivel: number, paso: number, justificar = false): Sesion {
   return {
     id: 's', alumno_id: 'a', reto_id: reto.id, canal: 'web', fase: 'nivel', nivel, paso, nivel_max: nivel,
-    pidio_justificacion: false, insistio_lectura: false, contador_pide_respuesta: 0, requiere_docente: false,
+    pidio_justificacion: justificar, insistio_lectura: false, contador_pide_respuesta: 0, requiere_docente: false,
     siguiente_reto_id: null, version: 0,
   };
 }
@@ -76,17 +83,19 @@ async function main() {
     const t0 = Date.now();
     const { evaluacion, origen } = await evaluarTurno(generarJSON, {
       reto: c.reto,
-      sesion: sesionEn(c.reto, c.nivel, c.paso),
+      sesion: sesionEn(c.reto, c.nivel, c.paso, c.justificar),
       pregunta_pepe: c.pregunta,
       respuesta_alumno: c.respuesta,
       historial: [{ rol: 'pepe', texto: c.pregunta }],
     });
     const efectiva = clasificacionEfectiva(evaluacion).clasificacion;
-    const ok = c.esperado.includes(evaluacion.clasificacion);
+    const ok =
+      c.esperado.includes(evaluacion.clasificacion) &&
+      (!c.explica || c.explica.includes(String(evaluacion.explica_por_que)));
     if (ok) bien++;
     console.log(
       `${ok ? '✓' : '✗'} ${String(i + 1).padStart(2)} [${c.reto.materia.slice(0, 4)} n${c.nivel}.${c.paso}] "${c.respuesta.slice(0, 50)}"\n` +
-        `     esperado=${c.esperado.join('|')} juez=${evaluacion.clasificacion} (conf ${evaluacion.confianza}, ${origen}) → máquina=${efectiva} · ${Date.now() - t0} ms\n` +
+        `     esperado=${c.esperado.join('|')}${c.explica ? ` (explica ${c.explica.join('|')})` : ''} juez=${evaluacion.clasificacion} explica=${evaluacion.explica_por_que} (conf ${evaluacion.confianza}, ${origen}) → máquina=${efectiva} · ${Date.now() - t0} ms\n` +
         `     ${evaluacion.comentario_docente}`,
     );
     // ~2K tokens por caso; con 8K por minuto, unos 4 casos por minuto.

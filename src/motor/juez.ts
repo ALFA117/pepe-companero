@@ -103,6 +103,8 @@ Reglas:
 - Evalúa el RAZONAMIENTO, no solo si el resultado coincide.
 - Acepta explicaciones informales y con faltas de ortografía. "es que no puedes sumar los de abajo" SÍ cuenta como explicar por qué.
 - Si el alumno da el resultado o la corrección correcta SIN explicar, sigue siendo correcta con explica_por_que "no" (el programa le pedirá que justifique). No la bajes a parcial solo por falta de explicación.
+- En lectura, citar o parafrasear lo que dice el texto SÍ cuenta como explicar por qué (explica_por_que "si").
+- Si Pepe acaba de pedirle que justifique ("¿y cómo sabes?") y el alumno da una razón o evidencia, es correcta con explica_por_que "si".
 - En las preguntas guía de un paso NO se exige explicación: una respuesta corta y correcta (sí/no, un número, una opción como A/B, Más/Menos, Párrafo 2) es paso_correcto.
 - Si el alumno resuelve el reto completo aunque Pepe le haya preguntado algo más chico, es correcta.
 - Cuando el paso es "el último del nivel", Pepe está volviendo a hacer la pregunta del reto: si la respuesta resuelve el reto, es correcta (no paso_correcto).
@@ -142,7 +144,9 @@ export function construirPromptJuez(e: EntradaJuez): { instrucciones: string; pr
   const paso = pasoActual(reto, sesion);
   const dondeVamos =
     sesion.nivel === 0
-      ? 'Nivel 0: Pepe acaba de plantear su error y le pregunta al alumno si está bien.'
+      ? sesion.pidio_justificacion
+        ? 'Nivel 0: el alumno ya había dado la respuesta correcta y Pepe le pidió que justificara ("¿y cómo sabes?").'
+        : 'Nivel 0: Pepe acaba de plantear su error y le pregunta al alumno si está bien.'
       : `Nivel de ayuda ${sesion.nivel} (${reto.niveles[String(sesion.nivel) as '1'].objetivo}).
 Paso actual: ${paso?.objetivo ?? '(desconocido)'}${paso?.botones ? `\nOpciones que vio el alumno: ${paso.botones.join(' / ')}` : ''}
 ${esUltimoPaso(reto, sesion) ? 'Es el ÚLTIMO paso del nivel: la pregunta es la del reto completo.' : 'Es una pregunta guía: todavía no se espera que resuelva el reto completo.'}`;
