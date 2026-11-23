@@ -6,7 +6,8 @@ import 'server-only';
  *   funcionando con los `ejemplo` de los retos).
  */
 import { db } from '@/db/cliente';
-import { repositorioMemoriaGlobal } from '@/db/memoria';
+import { repositorioMemoriaGlobal, sembrarDemo } from '@/db/memoria';
+import { generarDemo } from '@/demo/generar';
 import type { Repositorio } from '@/db/repositorio';
 import { RepositorioSupabase } from '@/db/supabase';
 import type { GenerarJSON } from '@/ia/llm';
@@ -23,7 +24,10 @@ const sinLLM: GenerarJSON = async () => {
 let repo: Repositorio | undefined;
 
 export function repositorio(): Repositorio {
-  repo ??= haySupabase() ? new RepositorioSupabase(db()) : repositorioMemoriaGlobal();
+  // En memoria (solo local) se siembra el grupo de demo para que el panel se vea lleno.
+  repo ??= haySupabase()
+    ? new RepositorioSupabase(db())
+    : repositorioMemoriaGlobal((datos) => sembrarDemo(datos, generarDemo({ banco: listarRetos() })));
   return repo;
 }
 

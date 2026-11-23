@@ -6,6 +6,9 @@
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
 import type {
   Alumno,
+  DatosPanel,
+  EvaluacionFinalGuardada,
+  FluidezGuardada,
   Grupo,
   MetricasFluidez,
   NuevoTurno,
@@ -173,14 +176,70 @@ export class RepositorioMemoria implements Repositorio {
     this.datos.fluidez = this.datos.fluidez.filter((x) => x.sesion_id !== sesionId);
     this.datos.fluidez.push({ ...m, sesion_id: sesionId, creado_en: this.ahora() });
   }
+
+  async grupos() {
+    return structuredClone(this.datos.grupos);
+  }
+
+  async datosPanel(grupoId: string): Promise<DatosPanel | null> {
+    const grupo = this.datos.grupos.find((g) => g.id === grupoId);
+    if (!grupo) return null;
+    const alumnos = this.datos.alumnos.filter((a) => a.grupo_id === grupoId);
+    const ids = new Set(alumnos.map((a) => a.id));
+    const sesiones = this.datos.sesiones.filter((s) => ids.has(s.alumno_id));
+    const sids = new Set(sesiones.map((s) => s.id));
+    return structuredClone({
+      grupo,
+      alumnos,
+      sesiones,
+      finales: this.datos.evaluaciones_finales.filter((f) => sids.has(f.sesion_id)) as EvaluacionFinalGuardada[],
+      fluidez: this.datos.fluidez.filter((f) => sids.has(f.sesion_id)) as FluidezGuardada[],
+      brechas_turno: this.datos.evaluaciones
+        .filter((e) => sids.has(e.sesion_id))
+        .map((e) => ({ sesion_id: e.sesion_id, brecha: (e.juez as { brecha_probable?: string | null }).brecha_probable ?? '' }))
+        .filter((b) => b.brecha),
+    });
+  }
+
+  async sesionesDeAlumno(alumnoId: string) {
+    return structuredClone(this.sesionesDe(alumnoId));
+  }
+
+  async evaluacionFinal(sesionId: string) {
+    return structuredClone(
+      (this.datos.evaluaciones_finales.find((f) => f.sesion_id === sesionId) as EvaluacionFinalGuardada | undefined) ?? null,
+    );
+  }
+
+  async fluidezDe(sesionId: string) {
+    return structuredClone((this.datos.fluidez.find((f) => f.sesion_id === sesionId) as FluidezGuardada | undefined) ?? null);
+  }
 }
 
 declare global {
   var __pepeRepoMemoria: RepositorioMemoria | undefined;
 }
 
-/** Instancia compartida (sobrevive a los recargos de `next dev`). */
-export function repositorioMemoriaGlobal(): RepositorioMemoria {
-  globalThis.__pepeRepoMemoria ??= new RepositorioMemoria();
+/** Agrega un grupo de demo (de `generarDemo`) a los datos en memoria. */
+export function sembrarDemo(datos: DatosMemoria, demo: Omit<DatosMemoria, 'grupos'> & { grupo: Grupo }): void {
+  datos.grupos.push(demo.grupo);
+  datos.alumnos.push(...demo.alumnos);
+  datos.sesiones.push(...demo.sesiones);
+  datos.turnos.push(...demo.turnos);
+  datos.evaluaciones.push(...demo.evaluaciones);
+  datos.evaluaciones_finales.push(...demo.evaluaciones_finales);
+  datos.fluidez.push(...demo.fluidez);
+}
+
+/**
+ * Instancia compartida (sobrevive a los recargos de `next dev`). Recibe una
+ * función opcional para sembrar datos la primera vez (p. ej. el grupo de demo).
+ */
+export function repositorioMemoriaGlobal(sembrar?: (datos: DatosMemoria) => void): RepositorioMemoria {
+  if (!globalThis.__pepeRepoMemoria) {
+    const datos = datosIniciales();
+    sembrar?.(datos);
+    globalThis.__pepeRepoMemoria = new RepositorioMemoria(datos);
+  }
   return globalThis.__pepeRepoMemoria;
 }

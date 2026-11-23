@@ -5,6 +5,10 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
 import type {
   Alumno,
+  DatosPanel,
+  EvaluacionFinalGuardada,
+  FluidezGuardada,
+  Grupo,
   MetricasFluidez,
   NuevoTurno,
   Repositorio,
@@ -193,5 +197,89 @@ export class RepositorioSupabase implements Repositorio {
   async guardarFluidez(sesionId: string, m: MetricasFluidez) {
     const { error } = await this.sb.from('fluidez').upsert({ sesion_id: sesionId, ...m });
     if (error) falla('guardarFluidez', error);
+  }
+
+  async grupos() {
+    const { data, error } = await this.sb.from('grupos').select('*').order('nombre');
+    if (error) falla('grupos', error);
+    return (data ?? []) as Grupo[];
+  }
+
+  async datosPanel(grupoId: string): Promise<DatosPanel | null> {
+    const { data: grupo, error: eg } = await this.sb.from('grupos').select('*').eq('id', grupoId).maybeSingle();
+    if (eg) falla('datosPanel grupo', eg);
+    if (!grupo) return null;
+
+    // Filtros por grupo con joins (!inner), para no mandar cientos de ids en la URL.
+    const [alumnos, sesiones, finales, fluidez, evaluaciones] = await Promise.all([
+      this.sb.from('alumnos').select('*').eq('grupo_id', grupoId),
+      this.sb.from('sesiones').select('*, alumnos!inner(grupo_id)').eq('alumnos.grupo_id', grupoId),
+      this.sb
+        .from('evaluaciones_finales')
+        .select('*, sesiones!inner(alumnos!inner(grupo_id))')
+        .eq('sesiones.alumnos.grupo_id', grupoId),
+      this.sb.from('fluidez').select('*, sesiones!inner(alumnos!inner(grupo_id))').eq('sesiones.alumnos.grupo_id', grupoId),
+      this.sb
+        .from('evaluaciones')
+        .select('sesion_id, juez->>brecha_probable, sesiones!inner(alumnos!inner(grupo_id))')
+        .eq('sesiones.alumnos.grupo_id', grupoId)
+        .not('juez->>brecha_probable', 'is', null),
+    ]);
+    for (const [nombre, r] of Object.entries({ alumnos, sesiones, finales, fluidez, evaluaciones })) {
+      if (r.error) falla(`datosPanel ${nombre}`, r.error);
+    }
+    const sinJoin = <T,>(filas: unknown[] | null, clave: string) =>
+      (filas ?? []).map((f) => {
+        const { [clave]: _quitado, ...resto } = f as Record<string, unknown>;
+        void _quitado;
+        return resto as T;
+      });
+    const finalesPlanos = sinJoin<Record<string, unknown>>(finales.data, 'sesiones').map(
+      (f) => ({ ...(f.juez as object), sesion_id: f.sesion_id, creado_en: f.creado_en }) as EvaluacionFinalGuardada,
+    );
+    return {
+      grupo: grupo as Grupo,
+      alumnos: (alumnos.data ?? []) as Alumno[],
+      sesiones: sinJoin<SesionGuardada>(sesiones.data, 'alumnos'),
+      finales: finalesPlanos,
+      fluidez: sinJoin<FluidezGuardada>(fluidez.data, 'sesiones').map((f) => ({
+        ...f,
+        duracion_voz_s: Number(f.duracion_voz_s),
+        ppm: Number(f.ppm),
+        precision_est: f.precision_est === null ? null : Number(f.precision_est),
+      })),
+      brechas_turno: (evaluaciones.data ?? [])
+        .map((e) => ({ sesion_id: (e as { sesion_id: string }).sesion_id, brecha: (e as { brecha_probable: string | null }).brecha_probable ?? '' }))
+        .filter((b) => b.brecha),
+    };
+  }
+
+  async sesionesDeAlumno(alumnoId: string) {
+    const { data, error } = await this.sb
+      .from('sesiones')
+      .select('*')
+      .eq('alumno_id', alumnoId)
+      .order('creado_en', { ascending: false });
+    if (error) falla('sesionesDeAlumno', error);
+    return (data ?? []) as SesionGuardada[];
+  }
+
+  async evaluacionFinal(sesionId: string) {
+    const { data, error } = await this.sb.from('evaluaciones_finales').select('*').eq('sesion_id', sesionId).maybeSingle();
+    if (error) falla('evaluacionFinal', error);
+    if (!data) return null;
+    return { ...(data.juez as object), sesion_id: data.sesion_id, creado_en: data.creado_en } as EvaluacionFinalGuardada;
+  }
+
+  async fluidezDe(sesionId: string) {
+    const { data, error } = await this.sb.from('fluidez').select('*').eq('sesion_id', sesionId).maybeSingle();
+    if (error) falla('fluidezDe', error);
+    if (!data) return null;
+    return {
+      ...data,
+      duracion_voz_s: Number(data.duracion_voz_s),
+      ppm: Number(data.ppm),
+      precision_est: data.precision_est === null ? null : Number(data.precision_est),
+    } as FluidezGuardada;
   }
 }

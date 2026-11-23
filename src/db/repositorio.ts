@@ -62,6 +62,27 @@ export interface SesionGuardada extends Sesion {
   actualizado_en: string;
 }
 
+export interface EvaluacionFinalGuardada extends EvaluacionFinal {
+  sesion_id: string;
+  creado_en: string;
+}
+
+export interface FluidezGuardada extends MetricasFluidez {
+  sesion_id: string;
+  creado_en: string;
+}
+
+/** Todo lo que necesita el panel de un grupo (sin los turnos). */
+export interface DatosPanel {
+  grupo: Grupo;
+  alumnos: Alumno[];
+  sesiones: SesionGuardada[];
+  finales: EvaluacionFinalGuardada[];
+  fluidez: FluidezGuardada[];
+  /** Brechas que el Juez vio turno a turno (complementan las del cierre). */
+  brechas_turno: { sesion_id: string; brecha: string }[];
+}
+
 export interface Repositorio {
   // Alumnos
   alumnoPorCodigo(codigo: string): Promise<Alumno | null>;
@@ -101,6 +122,13 @@ export interface Repositorio {
   }): Promise<void>;
   guardarEvaluacionFinal(sesionId: string, e: EvaluacionFinal): Promise<void>;
   guardarFluidez(sesionId: string, m: MetricasFluidez): Promise<void>;
+
+  // Panel docente
+  grupos(): Promise<Grupo[]>;
+  datosPanel(grupoId: string): Promise<DatosPanel | null>;
+  sesionesDeAlumno(alumnoId: string): Promise<SesionGuardada[]>;
+  evaluacionFinal(sesionId: string): Promise<EvaluacionFinalGuardada | null>;
+  fluidezDe(sesionId: string): Promise<FluidezGuardada | null>;
 }
 
 export type { NombreCanal };
