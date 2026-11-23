@@ -180,6 +180,78 @@ export type EvaluacionFinalLLM = z.infer<typeof EvaluacionFinalLLMSchema>;
 export type EvaluacionFinal = z.infer<typeof EvaluacionFinalSchema>;
 
 // ─────────────────────────────────────────────────────────────
+// Máquina de estados: eventos que entran y acciones que salen
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Lo que le pasa a la sesión. `procesar.ts` traduce la entrada del alumno
+ * (texto, botón, audio) al evento que toca según la fase.
+ */
+export type EventoMotor =
+  /** El maestro asignó un reto pendiente y ya se puede arrancar. */
+  | { tipo: 'iniciar' }
+  /** En `leyendo_texto`: llegó la nota de voz (ya transcrita y medida). */
+  | { tipo: 'lectura_audio' }
+  /** En `leyendo_texto`: llegó texto en vez de audio. */
+  | { tipo: 'lectura_texto'; no_puede_grabar: boolean }
+  /** En `nivel`: el Juez evaluó la respuesta del alumno. */
+  | { tipo: 'evaluacion'; evaluacion: EvaluacionTurno }
+  /** En `cierre`: el Juez evaluó la explicación final. */
+  | { tipo: 'evaluacion_final'; evaluacion: EvaluacionFinalLLM };
+
+/**
+ * Qué tiene que hacer Pepe después de la transición. La máquina NUNCA redacta
+ * texto ni conoce la solución: solo dice el tipo de mensaje y en qué nivel/paso.
+ */
+export type AccionPepe =
+  /** Sesión creada como pendiente: no se manda nada todavía. */
+  | { tipo: 'ninguna' }
+  /** "Hoy me dejaron leer esto…" + el texto + "¿Me lo lees en una nota de voz?" */
+  | { tipo: 'presentar_lectura' }
+  /** El alumno mandó texto en vez de audio: Pepe insiste con amabilidad (una vez). */
+  | { tipo: 'insistir_lectura' }
+  /** Mensajes de `planteamiento_pepe`. `con_lectura` es null si el reto no es de lectura. */
+  | { tipo: 'plantear'; con_lectura: boolean | null }
+  /** Contestó bien en nivel 0 sin explicar: "¿y cómo sabes?" */
+  | { tipo: 'pedir_justificacion' }
+  /** Mensaje del paso actual de la escalera de ayuda. */
+  | {
+      tipo: 'guiar';
+      nivel: number;
+      paso: number;
+      /** true si se acaba de subir de nivel (Pepe abre con una transición). */
+      cambio_de_nivel: boolean;
+      /** La clasificación que provocó este mensaje. */
+      motivo: Clasificacion;
+      /** "¡Yo tampoco la sé, por eso te pregunto!" */
+      pidio_respuesta: boolean;
+      /** Saltó directo al nivel 3 porque ya había detectado el error. */
+      atajo: boolean;
+    }
+  /** Habló de otra cosa: Pepe regresa al reto en una frase. */
+  | { tipo: 'regresar_al_reto' }
+  /** Resolvió: "¡me salvaste!" y pide la explicación con sus palabras. */
+  | { tipo: 'pedir_explicacion' }
+  /** Fin del reto. */
+  | {
+      tipo: 'despedir';
+      resuelto: boolean;
+      requiere_docente: boolean;
+      siguiente_reto_id: string | null;
+    }
+  /** Llegó algo a una sesión ya terminada. */
+  | { tipo: 'sesion_terminada' };
+
+export interface ResultadoTransicion {
+  sesion: Sesion;
+  accion: AccionPepe;
+  /** Clasificación con la que decidió la máquina (puede diferir de la del Juez). */
+  clasificacion_efectiva?: Clasificacion;
+  /** Solo al salir de `cierre`: la evaluación final con `nivel_ayuda_maximo` del motor. */
+  evaluacion_final?: EvaluacionFinal;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Pepe
 // ─────────────────────────────────────────────────────────────
 

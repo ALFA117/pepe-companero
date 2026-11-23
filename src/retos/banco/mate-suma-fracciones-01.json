@@ -1,0 +1,124 @@
+{
+  "id": "mate-suma-fracciones-01",
+  "materia": "matematicas",
+  "grado": "1_secundaria",
+  "concepto": "suma_fracciones_distinto_denominador",
+  "dificultad": 1,
+  "prerequisito": "fracciones_equivalentes",
+  "planteamiento_pepe": [
+    "¡Qué onda! Mi profe me dejó esta: 1/2 + 1/3",
+    "Sumé los de arriba (1+1=2) y los de abajo (2+3=5). Me salió 2/5 😎 ¿Me la va a calificar bien?"
+  ],
+  "error_plantado": "Suma numeradores entre sí y denominadores entre sí.",
+  "solucion_para_juez": "1/2 + 1/3 = 3/6 + 2/6 = 5/6. Los denominadores no se suman: indican el tamaño de las partes. Hay que convertir a fracciones equivalentes con el mismo denominador. Además, 2/5 es menor que 1/2, lo cual es absurdo si se le suma algo positivo a 1/2.",
+  "prohibido_para_pepe": ["5/6", "3/6 + 2/6", "3/6+2/6", "denominador común", "mínimo común múltiplo"],
+  "rubrica": {
+    "correcta": "Dice que los denominadores no se suman Y da 5/6 o explica que hay que igualar el tamaño de las partes.",
+    "parcial": "Detecta que está mal (p. ej. 2/5 es menos que la mitad) pero no explica por qué o no sabe corregirlo.",
+    "incorrecta": "Acepta 2/5 o propone otro resultado erróneo.",
+    "evidencia_minima_cierre": "Explica con sus palabras por qué no se suman los de abajo (tamaño de las partes)."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: que elija en qué paso está el error.",
+      "pasos": [
+        {
+          "objetivo": "Mostrar los dos pasos y pedir que elija el que está mal.",
+          "ejemplo": [
+            "Va, sin presión 😅 Yo hice dos cosas y sospecho que una está chueca:",
+            "A) Sumé los de arriba: 1 + 1 = 2\nB) Sumé los de abajo: 2 + 3 = 5\n¿Cuál te late que está mal?"
+          ],
+          "botones": ["A", "B", "Las dos están bien"]
+        },
+        {
+          "objetivo": "Si eligió un paso, pedir el porqué (vuelve a la pregunta del reto).",
+          "ejemplo": ["¡Uy, puede ser! ¿Y por qué no se pueden sumar los de abajo?"]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Sentido común: que note que el resultado es absurdo usando pizza.",
+      "pasos": [
+        {
+          "objetivo": "Media pizza más otro pedazo, ¿más o menos que media?",
+          "ejemplo": [
+            "Déjame checar con pizza 🍕",
+            "Si me como media pizza y luego otro pedazo más, ¿comí más o menos que media pizza?"
+          ],
+          "botones": ["Más", "Menos"]
+        },
+        {
+          "objetivo": "¿2/5 es más o menos que media pizza?",
+          "ejemplo": [
+            "Eso pensé. Ahora, 2/5 es partir la pizza en 5 rebanadas y comerte 2.",
+            "¿Eso es más o menos que media pizza?"
+          ],
+          "botones": ["Más", "Menos"]
+        },
+        {
+          "objetivo": "Confrontar la contradicción y volver a preguntar qué está mal.",
+          "ejemplo": [
+            "😳 Entonces me comí media pizza, luego más… ¿y al final tengo menos que media? Algo no cuadra. ¿Qué hice mal?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos con un ejemplo paralelo (1/4 + 1/4), no el mismo.",
+      "pasos": [
+        {
+          "objetivo": "Mostrar 1/4 + 1/4 = 2/4 con pizza y preguntar si el denominador cambió.",
+          "ejemplo": [
+            "Creo que los dos estamos medio perdidos, investiguemos 🕵️",
+            "Probemos una más fácil: 1/4 + 1/4. Parto la pizza en 4, me como 1 pedazo y luego otro: me comí 2/4.",
+            "¿El número de abajo cambió o se quedó igual?"
+          ]
+        },
+        {
+          "objetivo": "Que note que medios y tercios son pedazos de distinto tamaño.",
+          "ejemplo": [
+            "¡Ajá! El de abajo dice en cuántos pedazos partí la pizza.",
+            "En la mía, los medios y los tercios… ¿son pedazos del mismo tamaño?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿cómo los hago del mismo tamaño?",
+          "ejemplo": [
+            "🔥 ¡Eso! Por eso no podía sumarlos así nomás.",
+            "¿Y cómo hago para que sean pedazos del mismo tamaño?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: fracciones equivalentes con pizza y luego regresar.",
+      "pasos": [
+        {
+          "objetivo": "Mitad partida en 3 → ¿cuántos pedacitos tiene la pizza?",
+          "ejemplo": [
+            "Va, reto rapidito antes 💪",
+            "Tengo media pizza y cada mitad la parto en 3 pedacitos. ¿En cuántos pedacitos quedó la pizza completa?"
+          ]
+        },
+        {
+          "objetivo": "¿Cuántos sextos tiene media pizza?",
+          "ejemplo": ["¡Sí! Y la media pizza, ¿cuántos de esos 6 pedacitos tiene?"]
+        },
+        {
+          "objetivo": "¿Cuántos sextos es 1/3?",
+          "ejemplo": [
+            "O sea que 1/2 = 3/6 🤯",
+            "Ahora tú: si la pizza está en 6 pedacitos, 1/3 son… ¿cuántos?"
+          ]
+        },
+        {
+          "objetivo": "Regresar al reto original.",
+          "ejemplo": [
+            "¡Exacto! Ya los dos son pedacitos del mismo tamaño.",
+            "Ahora sí, regresemos a mi tarea: ¿cuánto es 1/2 + 1/3?"
+          ]
+        }
+      ]
+    }
+  }
+}

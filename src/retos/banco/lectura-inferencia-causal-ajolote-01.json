@@ -1,0 +1,106 @@
+{
+  "id": "lectura-inferencia-causal-ajolote-01",
+  "materia": "lectura",
+  "grado": "1_secundaria",
+  "concepto": "inferencia_causal",
+  "dificultad": 1,
+  "prerequisito": "localizar_informacion_literal",
+  "requiere_lectura_voz": true,
+  "texto": {
+    "titulo": "El ajolote de Xochimilco",
+    "parrafos": [
+      "El ajolote es un anfibio que solo vive de forma natural en los canales de Xochimilco, al sur de la Ciudad de México. A diferencia de otros anfibios, conserva sus branquias toda la vida y casi nunca sale del agua.",
+      "Hoy está en peligro de extinción. La contaminación del agua y la llegada de peces como la tilapia, que se comen sus huevos, han reducido su población. Por eso, algunos chinamperos de Xochimilco han creado refugios con agua limpia donde los ajolotes pueden reproducirse."
+    ]
+  },
+  "planteamiento_pepe": [
+    "¡Gracias, ya lo entendí mejor! 🦎 Bueno, creo…",
+    "Según yo, los ajolotes se están acabando porque la gente los pesca para comérselos. Entonces la solución es prohibir la pesca, ¿no? ¿Le atiné?"
+  ],
+  "error_plantado": "Inventa una causa (la pesca) que el texto no menciona.",
+  "solucion_para_juez": "El texto (párrafo 2) da dos causas: la contaminación del agua y la llegada de peces como la tilapia, que se comen sus huevos. No menciona la pesca. Una mejor solución según el texto: refugios con agua limpia, como los de los chinamperos.",
+  "prohibido_para_pepe": ["las dos causas son", "son dos causas: la contaminación y la tilapia"],
+  "rubrica": {
+    "correcta": "Dice que el texto no habla de pesca Y menciona las dos causas (agua contaminada/sucia y tilapia), idealmente con evidencia del texto.",
+    "parcial": "Corrige a Pepe pero menciona solo una causa, o no puede ubicar dónde lo dice el texto.",
+    "incorrecta": "Acepta la pesca como causa o inventa otra.",
+    "evidencia_minima_cierre": "Da las dos causas y propone una solución que aparece en el texto."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿en qué párrafo está la causa?",
+      "pasos": [
+        {
+          "objetivo": "Pedir el párrafo con botones.",
+          "ejemplo": [
+            "Mmm, ahora que lo pienso, no sé si lo leí o me lo imaginé 😅",
+            "¿En qué párrafo dice por qué se están acabando?"
+          ],
+          "botones": ["Párrafo 1", "Párrafo 2", "No lo dice"]
+        },
+        {
+          "objetivo": "Volver al reto: ¿qué dice ese párrafo que los está acabando?",
+          "ejemplo": ["¿Y qué dice ahí que los está acabando?"]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Confrontar con la frase exacta del texto.",
+      "pasos": [
+        {
+          "objetivo": "Citar la oración de las causas y preguntar si habla de pesca.",
+          "ejemplo": [
+            "Busqué en el párrafo 2 y encontré esta frase:",
+            "“La contaminación del agua y la llegada de peces como la tilapia, que se comen sus huevos, han reducido su población.”",
+            "Pregunta fácil: ¿aquí dice algo de gente pescando ajolotes?"
+          ],
+          "botones": ["Sí", "No"]
+        },
+        {
+          "objetivo": "Volver al reto: ¿qué los está acabando según la frase?",
+          "ejemplo": ["😳 Uy, entonces me lo inventé.", "¿Qué dice la frase que los está acabando?"]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos: estrategia de conectores causales con un texto paralelo.",
+      "pasos": [
+        {
+          "objetivo": "Modelar la estrategia con la oración de las abejas.",
+          "ejemplo": [
+            "¡Vas bien! Pero siento que hay algo más. Te enseño un truco que uso 🕵️",
+            "“Las abejas están desapareciendo por el uso de pesticidas y la pérdida de flores silvestres.”",
+            "Busco palabras como «por» o «debido a», y cuento cuántas cosas están unidas con «y». ¿Cuántas causas hay aquí?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: aplicar el truco a la frase de los ajolotes.",
+          "ejemplo": ["🔥 ¡Eso! Ahora usa el truco en la frase de los ajolotes. ¿Cuántas causas hay?"]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: vocabulario por contexto y dato literal.",
+      "pasos": [
+        {
+          "objetivo": "Dato literal: ¿cómo es el agua de los refugios?",
+          "ejemplo": [
+            "¡Buenísima pregunta! A ver si el mismo texto nos da una pista 🔍",
+            "Al final dice que los chinamperos hicieron refugios con agua… ¿cómo?"
+          ]
+        },
+        {
+          "objetivo": "Inferir por qué importa que sea limpia (significado de contaminación).",
+          "ejemplo": ["¿Y para qué crees que se tomaron la molestia de que fuera limpia?"]
+        },
+        {
+          "objetivo": "Volver al reto con el vocabulario resuelto.",
+          "ejemplo": [
+            "🤯 Ahí está: contaminación es cuando el agua está sucia, con basura o químicos.",
+            "Usando el truco: ¿cuántas causas hay y cuáles son?"
+          ]
+        }
+      ]
+    }
+  }
+}
