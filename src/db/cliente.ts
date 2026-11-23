@@ -1,6 +1,6 @@
 import 'server-only';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { env } from '@/lib/env';
+import { exigir } from '@/lib/env';
 
 /**
  * Cliente de Supabase con la service role key.
@@ -11,9 +11,7 @@ import { env } from '@/lib/env';
 let cliente: SupabaseClient | undefined;
 
 export function db(): SupabaseClient {
-  if (cliente) return cliente;
-  const e = env();
-  cliente = createClient(e.NEXT_PUBLIC_SUPABASE_URL, e.SUPABASE_SERVICE_ROLE_KEY, {
+  cliente ??= createClient(exigir('NEXT_PUBLIC_SUPABASE_URL'), exigir('SUPABASE_SERVICE_ROLE_KEY'), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   return cliente;

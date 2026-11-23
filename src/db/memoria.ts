@@ -1,0 +1,186 @@
+/**
+ * Repositorio en memoria. Imita las reglas de la base (ids únicos,
+ * idempotencia por `mensaje_externo_id`, bloqueo optimista por `version`)
+ * para que los tests y el simulador se comporten como producción.
+ */
+import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
+import type {
+  Alumno,
+  Grupo,
+  MetricasFluidez,
+  NuevoTurno,
+  Repositorio,
+  SesionGuardada,
+  TurnoGuardado,
+} from './repositorio';
+
+export interface DatosMemoria {
+  grupos: Grupo[];
+  alumnos: Alumno[];
+  sesiones: SesionGuardada[];
+  turnos: TurnoGuardado[];
+  evaluaciones: { id: string; turno_id: string; sesion_id: string; clasificacion: string; nivel: number; paso: number; juez: unknown; creado_en: string }[];
+  evaluaciones_finales: (EvaluacionFinal & { sesion_id: string; creado_en: string })[];
+  fluidez: (MetricasFluidez & { sesion_id: string; creado_en: string })[];
+}
+
+export const GRUPO_PRUEBAS_ID = '00000000-0000-0000-0000-000000000001';
+
+/** Los mismos datos que `supabase/seed.sql`. */
+export function datosIniciales(): DatosMemoria {
+  return {
+    grupos: [
+      {
+        id: GRUPO_PRUEBAS_ID,
+        nombre: '1° B (pruebas)',
+        escuela: 'Secundaria de prueba',
+        docente_nombre: 'Profe de prueba',
+        es_demo: false,
+      },
+    ],
+    alumnos: [1, 2, 3].map((n) => ({
+      id: `00000000-0000-0000-0000-00000000010${n}`,
+      grupo_id: GRUPO_PRUEBAS_ID,
+      nombre: `Alumno Prueba ${n}`,
+      codigo: `PEPE-1B-0${n}`,
+      tel_hash: null,
+      tel_cifrado: null,
+      ultimo_mensaje_wa_en: null,
+    })),
+    sesiones: [],
+    turnos: [],
+    evaluaciones: [],
+    evaluaciones_finales: [],
+    fluidez: [],
+  };
+}
+
+export class RepositorioMemoria implements Repositorio {
+  private reloj = 0;
+
+  constructor(readonly datos: DatosMemoria = datosIniciales()) {}
+
+  /** Fechas que siempre avanzan, para que el orden sea estable en tests. */
+  private ahora(): string {
+    this.reloj = Math.max(this.reloj + 1, Date.now());
+    return new Date(this.reloj).toISOString();
+  }
+
+  async alumnoPorCodigo(codigo: string) {
+    return this.datos.alumnos.find((a) => a.codigo === codigo.trim().toUpperCase()) ?? null;
+  }
+
+  async alumnoPorId(id: string) {
+    return this.datos.alumnos.find((a) => a.id === id) ?? null;
+  }
+
+  async alumnoPorTelHash(telHash: string) {
+    return this.datos.alumnos.find((a) => a.tel_hash === telHash) ?? null;
+  }
+
+  async vincularTelefono(alumnoId: string, telHash: string, telCifrado: string) {
+    if (this.datos.alumnos.some((a) => a.tel_hash === telHash && a.id !== alumnoId)) {
+      throw new Error('Ese teléfono ya está vinculado a otro alumno');
+    }
+    const a = this.datos.alumnos.find((x) => x.id === alumnoId);
+    if (!a) throw new Error('Alumno no encontrado');
+    a.tel_hash = telHash;
+    a.tel_cifrado = telCifrado;
+  }
+
+  async marcarMensajeWhatsApp(alumnoId: string, cuando: Date) {
+    const a = this.datos.alumnos.find((x) => x.id === alumnoId);
+    if (a) a.ultimo_mensaje_wa_en = cuando.toISOString();
+  }
+
+  private sesionesDe(alumnoId: string) {
+    return this.datos.sesiones
+      .filter((s) => s.alumno_id === alumnoId)
+      .sort((a, b) => b.creado_en.localeCompare(a.creado_en));
+  }
+
+  async sesionActiva(alumnoId: string) {
+    return structuredClone(this.sesionesDe(alumnoId).find((s) => s.fase !== 'terminado') ?? null);
+  }
+
+  async ultimaSesion(alumnoId: string) {
+    return structuredClone(this.sesionesDe(alumnoId)[0] ?? null);
+  }
+
+  async sesionPorId(id: string) {
+    return structuredClone(this.datos.sesiones.find((s) => s.id === id) ?? null);
+  }
+
+  async insertarSesion(s: Sesion) {
+    if (this.datos.sesiones.some((x) => x.id === s.id)) throw new Error('Sesión duplicada');
+    const t = this.ahora();
+    const guardada: SesionGuardada = { ...s, creado_en: t, actualizado_en: t };
+    this.datos.sesiones.push(guardada);
+    return structuredClone(guardada);
+  }
+
+  async actualizarSesion(anterior: Sesion, nueva: Sesion) {
+    const i = this.datos.sesiones.findIndex((s) => s.id === anterior.id);
+    const actual = this.datos.sesiones[i];
+    if (!actual || actual.version !== anterior.version) return null;
+    const guardada: SesionGuardada = {
+      ...nueva,
+      version: anterior.version + 1,
+      creado_en: actual.creado_en,
+      actualizado_en: this.ahora(),
+    };
+    this.datos.sesiones[i] = guardada;
+    return structuredClone(guardada);
+  }
+
+  async retosHechos(alumnoId: string) {
+    return [...new Set(this.datos.sesiones.filter((s) => s.alumno_id === alumnoId).map((s) => s.reto_id))];
+  }
+
+  async existeMensajeExterno(id: string) {
+    return this.datos.turnos.some((t) => t.mensaje_externo_id === id);
+  }
+
+  async agregarTurno(t: NuevoTurno) {
+    if (t.mensaje_externo_id && (await this.existeMensajeExterno(t.mensaje_externo_id))) return null;
+    const id = crypto.randomUUID();
+    this.datos.turnos.push({
+      id,
+      sesion_id: t.sesion_id,
+      rol: t.rol,
+      tipo: t.tipo,
+      texto: t.texto,
+      creado_en: this.ahora(),
+      ...(t.mensaje_externo_id ? { mensaje_externo_id: t.mensaje_externo_id } : {}),
+    } as TurnoGuardado);
+    return id;
+  }
+
+  async ultimosTurnos(sesionId: string, n: number) {
+    return structuredClone(this.datos.turnos.filter((t) => t.sesion_id === sesionId).slice(-n));
+  }
+
+  async guardarEvaluacion(e: Parameters<Repositorio['guardarEvaluacion']>[0]) {
+    this.datos.evaluaciones.push({ id: crypto.randomUUID(), ...e, creado_en: this.ahora() });
+  }
+
+  async guardarEvaluacionFinal(sesionId: string, e: EvaluacionFinal) {
+    this.datos.evaluaciones_finales = this.datos.evaluaciones_finales.filter((x) => x.sesion_id !== sesionId);
+    this.datos.evaluaciones_finales.push({ ...e, sesion_id: sesionId, creado_en: this.ahora() });
+  }
+
+  async guardarFluidez(sesionId: string, m: MetricasFluidez) {
+    this.datos.fluidez = this.datos.fluidez.filter((x) => x.sesion_id !== sesionId);
+    this.datos.fluidez.push({ ...m, sesion_id: sesionId, creado_en: this.ahora() });
+  }
+}
+
+declare global {
+  var __pepeRepoMemoria: RepositorioMemoria | undefined;
+}
+
+/** Instancia compartida (sobrevive a los recargos de `next dev`). */
+export function repositorioMemoriaGlobal(): RepositorioMemoria {
+  globalThis.__pepeRepoMemoria ??= new RepositorioMemoria();
+  return globalThis.__pepeRepoMemoria;
+}

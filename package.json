@@ -9,10 +9,14 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "simular": "tsx --conditions=react-server scripts/simular.ts",
+    "evaluar-juez": "tsx --conditions=react-server scripts/evaluar-juez.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.107",
+    "@ai-sdk/google": "^4.0.124",
+    "@ai-sdk/groq": "^4.0.86",
     "@base-ui/react": "^1.9.0",
     "@supabase/supabase-js": "^2.119.2",
     "ai": "^7.0.179",
