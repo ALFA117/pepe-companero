@@ -1,0 +1,129 @@
+{
+  "id": "lectura-secuencia-hechos-01",
+  "materia": "lectura",
+  "grado": "6_primaria",
+  "concepto": "secuencia_de_hechos",
+  "dificultad": 1,
+  "prerequisito": "localizar_informacion_literal",
+  "requiere_lectura_voz": true,
+  "texto": {
+    "titulo": "Tamales para la posada",
+    "parrafos": [
+      "Para preparar tamales, primero se remojan las hojas de maíz en agua tibia para que se ablanden. Mientras tanto, se bate la masa con manteca y caldo hasta que quede esponjosa. Una prueba es poner una bolita de masa en un vaso con agua: si flota, ya está lista.",
+      "Después se unta la masa sobre cada hoja, se agrega el relleno y se dobla. Al final, los tamales se acomodan parados en la vaporera y se cuecen durante una hora y media."
+    ]
+  },
+  "planteamiento_pepe": [
+    "¡Gracias, ya lo entendí mejor! 🫔",
+    "Según yo, el orden es: rellenar las hojas, luego batir la masa y al final cocerlos. ¿Así va?"
+  ],
+  "error_plantado": "Altera la secuencia: pone el relleno antes de preparar la masa y se salta el remojo de las hojas.",
+  "solucion_para_juez": "Orden del texto: 1) remojar las hojas, 2) mientras tanto batir la masa (prueba del vaso), 3) después untar la masa, rellenar y doblar, 4) al final cocer en la vaporera. No se puede rellenar antes de tener la masa; además Pepe omite remojar las hojas.",
+  "prohibido_para_pepe": [
+    "primero se remojan",
+    "primero remojar",
+    "primero hay que remojar",
+    "la masa va antes",
+    "batir antes de rellenar",
+    "el orden correcto es"
+  ],
+  "rubrica": {
+    "correcta": "Dice que el orden de Pepe está mal Y da la secuencia correcta (remojar, batir, untar/rellenar, cocer) o al menos explica que la masa se bate antes de rellenar y menciona el remojo.",
+    "parcial": "Detecta un problema en el orden pero no da la secuencia completa (p. ej. olvida el remojo).",
+    "incorrecta": "Acepta el orden de Pepe o propone otro orden equivocado.",
+    "evidencia_minima_cierre": "Da la secuencia correcta y menciona las palabras del texto que indican el orden (primero, mientras, después, al final)."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿qué se hace primero?",
+      "pasos": [
+        {
+          "objetivo": "Pedir el primer paso con botones.",
+          "ejemplo": [
+            "Mmm, ahora que lo pienso, lo leí bien rápido 😅",
+            "Según el texto, ¿qué se hace PRIMERO?"
+          ],
+          "botones": [
+            "Rellenar",
+            "Remojar hojas",
+            "Batir la masa"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: el orden completo.",
+          "ejemplo": [
+            "¿Y entonces mi orden está bien? ¿Cómo va?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Confrontar con la frase de «después».",
+      "pasos": [
+        {
+          "objetivo": "Citar la frase y preguntar si se puede untar sin masa.",
+          "ejemplo": [
+            "Busqué en el párrafo 2 y encontré esto:",
+            "«Después se unta la masa sobre cada hoja, se agrega el relleno y se dobla.»",
+            "¿Se puede untar la masa si todavía no está batida?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "😳 Uy, entonces me salté pasos.",
+            "¿En qué orden se hacen los tamales?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos: palabras que marcan el orden.",
+      "pasos": [
+        {
+          "objetivo": "Modelar con la rutina de la noche.",
+          "ejemplo": [
+            "¡Vas bien! Te enseño un truco que uso 🕵️",
+            "Busco palabras de orden como «primero», «después» y «al final». Mira: «Primero me lavo los dientes, después me pongo la pijama y al final apago la luz.»",
+            "¿Qué hago en segundo lugar?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto con el truco.",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora busca esas palabras en el texto de los tamales. ¿Cuál es el orden?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: una pista a la vez.",
+      "pasos": [
+        {
+          "objetivo": "Palabra de orden en el párrafo 2.",
+          "ejemplo": [
+            "¡Buenísima pregunta! A ver si el texto nos da pistas 🔍",
+            "¿Con qué palabra empieza el párrafo 2?"
+          ]
+        },
+        {
+          "objetivo": "Qué se hace justo antes de cocer.",
+          "ejemplo": [
+            "¡Sí! ¿Y qué se hace justo antes de cocerlos en la vaporera?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "🤯 Ya casi lo tenemos.",
+            "Ahora sí: ¿en qué orden se hacen los tamales, del primer paso al último?"
+          ]
+        }
+      ]
+    }
+  }
+}

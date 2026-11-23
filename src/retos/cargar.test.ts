@@ -42,12 +42,17 @@ describe('banco de retos', () => {
     }
   });
 
-  it('avisa de los prerrequisitos que todavía no tienen reto (se agregan en la Fase 7)', () => {
-    expect(advertenciasDelBanco()).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('fracciones_equivalentes'),
-        expect.stringContaining('localizar_informacion_literal'),
-      ]),
-    );
+  it('todos los prerrequisitos tienen al menos un reto en el banco', () => {
+    expect(advertenciasDelBanco()).toEqual([]);
+  });
+
+  it('hay 5 retos de matemáticas y 5 de lectura', () => {
+    const r = listarRetos();
+    expect(r.filter((x) => x.materia === 'matematicas')).toHaveLength(5);
+    expect(r.filter((x) => x.materia === 'lectura')).toHaveLength(5);
+  });
+
+  it('todos los retos de lectura piden la nota de voz', () => {
+    for (const r of listarRetos().filter((x) => x.materia === 'lectura')) expect(r.requiere_lectura_voz).toBe(true);
   });
 });

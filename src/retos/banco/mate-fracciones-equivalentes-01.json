@@ -1,0 +1,132 @@
+{
+  "id": "mate-fracciones-equivalentes-01",
+  "materia": "matematicas",
+  "grado": "6_primaria",
+  "concepto": "fracciones_equivalentes",
+  "dificultad": 1,
+  "prerequisito": null,
+  "planteamiento_pepe": [
+    "¡Qué onda! Me pidieron una fracción equivalente a 2/3.",
+    "Le sumé 1 arriba y 1 abajo y me salió 3/4 😎 ¿Verdad que 2/3 y 3/4 son iguales?"
+  ],
+  "error_plantado": "Cree que sumar el mismo número al numerador y al denominador da una fracción equivalente.",
+  "solucion_para_juez": "2/3 y 3/4 no son equivalentes (2/3 ≈ 0.67, 3/4 = 0.75). Sumar lo mismo arriba y abajo cambia el valor. Una fracción equivalente se obtiene multiplicando (o dividiendo) numerador y denominador por el mismo número: 2/3 = 4/6 = 6/9.",
+  "prohibido_para_pepe": [
+    "4/6",
+    "6/9",
+    "multiplicar arriba y abajo",
+    "multiplicas arriba y abajo",
+    "por el mismo número",
+    "multiplicando el numerador y el denominador"
+  ],
+  "rubrica": {
+    "correcta": "Dice que no son iguales Y explica que hay que multiplicar (o dividir) arriba y abajo por el mismo número, o da una equivalente correcta como 4/6.",
+    "parcial": "Dice que no son iguales (p. ej. 3/4 es más grande) pero no sabe cómo hacer una equivalente.",
+    "incorrecta": "Acepta que 3/4 es igual a 2/3 o propone otra fracción no equivalente.",
+    "evidencia_minima_cierre": "Explica que sumar lo mismo cambia el tamaño y que para conservarlo se multiplica arriba y abajo por lo mismo."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: que juzgue la única operación que hizo Pepe.",
+      "pasos": [
+        {
+          "objetivo": "Mostrar la operación y preguntar si deja la fracción igual.",
+          "ejemplo": [
+            "Va, sin presión 😅 Yo solo hice una cosa: sumé 1 arriba y 1 abajo.",
+            "¿Eso deja la fracción del mismo tamaño?"
+          ],
+          "botones": [
+            "Sí",
+            "No",
+            "No sé"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿son iguales 2/3 y 3/4 y por qué?",
+          "ejemplo": [
+            "Mmm… ¿entonces 2/3 y 3/4 son iguales o no? ¿Por qué?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Sentido común con chocolate: comparar lo que sobra.",
+      "pasos": [
+        {
+          "objetivo": "Comparar sobrantes de 2/3 y 3/4 de chocolate.",
+          "ejemplo": [
+            "Déjame checar con chocolate 🍫",
+            "Parto un chocolate en 3 y me como 2. Otro igualito lo parto en 4 y me como 3. ¿En cuál me sobró MENOS?"
+          ],
+          "botones": [
+            "En el de 3",
+            "En el de 4",
+            "Igual"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: si sobró distinto, ¿son iguales?",
+          "ejemplo": [
+            "😳 Si me sobró distinto, entonces no comí lo mismo…",
+            "¿2/3 y 3/4 son iguales? ¿Qué hice mal?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos con 1/2 y 2/4 (ejemplo paralelo).",
+      "pasos": [
+        {
+          "objetivo": "Partir cada mitad en 2: ¿cuántos pedazos y cuántos me como?",
+          "ejemplo": [
+            "Creo que los dos estamos medio perdidos, investiguemos 🕵️",
+            "Tengo media pizza. Si parto cada mitad en 2, ¿en cuántos pedazos queda la pizza y cuántos me toca comer?"
+          ]
+        },
+        {
+          "objetivo": "Que note qué les pasó a los números: ¿sumar o multiplicar?",
+          "ejemplo": [
+            "¡Ajá! 1/2 se volvió 2/4 y es la misma cantidad de pizza.",
+            "¿Qué les pasó al de arriba y al de abajo: les sumé algo o los multipliqué?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿cómo hacer una fracción igual a 2/3?",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahí está mi error.",
+            "Entonces, ¿mi 3/4 es igual a 2/3? ¿Cómo hago una que sí sea igual?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: duplicar una receta.",
+      "pasos": [
+        {
+          "objetivo": "Duplicar una receta 2 a 3.",
+          "ejemplo": [
+            "Va, reto rapidito antes 💪",
+            "Unos hotcakes llevan 2 tazas de harina por cada 3 de leche. Si quiero el doble, ¿cuánta harina y cuánta leche?"
+          ]
+        },
+        {
+          "objetivo": "Contrastar con sumar 1 a cada uno.",
+          "ejemplo": [
+            "¡Sí! Y si mejor le sumo 1 a cada uno (3 de harina y 4 de leche), ¿quedan igual de espesos?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto original.",
+          "ejemplo": [
+            "¡Exacto! Para que quede igual hay que hacerle lo mismo a los dos, pero sin sumar.",
+            "Ahora sí: ¿2/3 es igual a 3/4? ¿Qué fracción sí es igual a 2/3?"
+          ]
+        }
+      ]
+    }
+  }
+}

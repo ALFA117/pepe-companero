@@ -80,6 +80,9 @@ const SIN_RETOS: SalidaPepe = {
 // Elección del reto cuando el alumno no tiene sesión activa
 // ─────────────────────────────────────────────────────────────
 
+/** El primer reto de todo alumno: el de la demo (sección 8 del brief). */
+export const RETO_INICIAL = 'mate-suma-fracciones-01';
+
 export function elegirRetoInicial(
   banco: readonly Reto[],
   ultima: Sesion | null,
@@ -89,6 +92,8 @@ export function elegirRetoInicial(
     const sig = banco.find((r) => r.id === ultima.siguiente_reto_id);
     if (sig) return sig;
   }
+  const inicial = banco.find((r) => r.id === RETO_INICIAL);
+  if (inicial && !hechos.includes(inicial.id)) return inicial;
   const ordenados = [...banco].sort(
     (a, b) =>
       a.dificultad - b.dificultad ||

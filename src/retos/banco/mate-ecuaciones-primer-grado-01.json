@@ -1,0 +1,136 @@
+{
+  "id": "mate-ecuaciones-primer-grado-01",
+  "materia": "matematicas",
+  "grado": "1_secundaria",
+  "concepto": "ecuaciones_primer_grado",
+  "dificultad": 2,
+  "prerequisito": "jerarquia_operaciones",
+  "planteamiento_pepe": [
+    "¡Qué onda! Tengo que resolver 3x + 5 = 20.",
+    "Pasé el 5 al otro lado sumando: 3x = 25, y luego x = 25/3 😎 ¿Está bien?"
+  ],
+  "error_plantado": "Al pasar el 5 al otro lado conserva la suma en vez de usar la operación inversa (restar).",
+  "solucion_para_juez": "Para despejar se resta 5 en ambos lados: 3x = 15, y se divide entre 3: x = 5. Comprobación: 3·5 + 5 = 20. Con x = 25/3, 3x + 5 = 30, no 20.",
+  "prohibido_para_pepe": [
+    "x = 5",
+    "x=5",
+    "3x = 15",
+    "3x=15",
+    "restar 5",
+    "restarle 5",
+    "resta 5",
+    "restando 5",
+    "x vale 5"
+  ],
+  "rubrica": {
+    "correcta": "Dice que el 5 pasa restando (operación inversa) Y llega a x = 5, o comprueba y corrige.",
+    "parcial": "Detecta que está mal (p. ej. al comprobar no da 20) pero no sabe corregirlo.",
+    "incorrecta": "Acepta x = 25/3 o da otro valor erróneo.",
+    "evidencia_minima_cierre": "Explica que para quitar el 5 hay que hacer la operación contraria en los dos lados (o comprobar sustituyendo)."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿en qué paso está el error?",
+      "pasos": [
+        {
+          "objetivo": "Mostrar los dos pasos y pedir el que está mal.",
+          "ejemplo": [
+            "Va, sin presión 😅 Hice dos pasos:",
+            "A) Pasé el 5 sumando: 3x = 25\nB) Dividí entre 3: x = 25/3\n¿Cuál te late que está chueco?"
+          ],
+          "botones": [
+            "A",
+            "B",
+            "Los dos bien"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿qué debí hacer con el 5?",
+          "ejemplo": [
+            "¡Uy, puede ser! ¿Y qué debí hacer con el 5? ¿Cuánto vale x?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Sentido común: comprobar sustituyendo.",
+      "pasos": [
+        {
+          "objetivo": "Sustituir 25/3 y ver si da 20.",
+          "ejemplo": [
+            "Déjame comprobar 🧐",
+            "Si x es 25/3, entonces 3 por x da 25. Y 25 + 5… ¿da 20?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Confrontar y volver a preguntar.",
+          "ejemplo": [
+            "😳 Da 30, no 20. Algo hice mal.",
+            "¿Qué estuvo mal y cuánto vale x de verdad?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos con una balanza (ejemplo paralelo).",
+      "pasos": [
+        {
+          "objetivo": "Balanza x + 4 = 10: qué hacer del otro lado.",
+          "ejemplo": [
+            "Creo que los dos estamos medio perdidos, investiguemos 🕵️",
+            "Imagina una balanza: de un lado x + 4 y del otro 10. Si quito las 4 pesas de un lado, ¿qué hago del otro para que no se ladee?"
+          ]
+        },
+        {
+          "objetivo": "Que encuentre x en la balanza.",
+          "ejemplo": [
+            "¡Ajá! Lo que le haces a un lado se lo haces al otro.",
+            "Entonces, en x + 4 = 10, ¿cuánto vale x?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto con la balanza.",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora usa la balanza en la mía: 3x + 5 = 20.",
+            "¿Qué haces con el 5 y cuánto vale x?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: operaciones inversas con adivinanzas.",
+      "pasos": [
+        {
+          "objetivo": "Adivinanza con suma.",
+          "ejemplo": [
+            "Va, reto rapidito antes 💪",
+            "Pensé un número, le sumé 5 y me dio 12. ¿Qué número pensé?"
+          ]
+        },
+        {
+          "objetivo": "Nombrar la operación inversa.",
+          "ejemplo": [
+            "¡Sí! ¿Qué hiciste para regresar al número: sumar o lo contrario?"
+          ]
+        },
+        {
+          "objetivo": "Adivinanza con multiplicación.",
+          "ejemplo": [
+            "Ahora: pensé otro número, lo multipliqué por 3 y me dio 12. ¿Cuál era?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto original.",
+          "ejemplo": [
+            "¡Exacto! Para regresar se hace lo contrario.",
+            "Ahora sí, mi tarea: 3x + 5 = 20. ¿Cuánto vale x?"
+          ]
+        }
+      ]
+    }
+  }
+}

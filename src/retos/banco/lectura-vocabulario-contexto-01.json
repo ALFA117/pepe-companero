@@ -1,0 +1,129 @@
+{
+  "id": "lectura-vocabulario-contexto-01",
+  "materia": "lectura",
+  "grado": "1_secundaria",
+  "concepto": "vocabulario_en_contexto",
+  "dificultad": 2,
+  "prerequisito": "localizar_informacion_literal",
+  "requiere_lectura_voz": true,
+  "texto": {
+    "titulo": "Los cenotes de Yucatán",
+    "parrafos": [
+      "En la península de Yucatán hay miles de cenotes: pozos naturales de agua dulce que se forman cuando el suelo de piedra caliza se hunde. Para los antiguos mayas eran lugares sagrados.",
+      "Hoy muchos cenotes están en peligro. La basura y los químicos que se tiran en la superficie se filtran por la roca porosa y ensucian el agua que bebe la población. Por eso algunas comunidades organizan limpiezas y piden a los turistas que no usen bloqueador al nadar."
+    ]
+  },
+  "planteamiento_pepe": [
+    "¡Gracias, ya lo entendí mejor! 🏊",
+    "Nada más no entendí una palabra, pero ya la adiviné: «porosa» quiere decir que la roca es súper dura y no deja pasar nada. ¿Verdad?"
+  ],
+  "error_plantado": "Adivina el significado de una palabra sin usar las pistas del contexto (dice lo contrario).",
+  "solucion_para_juez": "Porosa significa que tiene poros o agujeritos por donde pasan los líquidos. La pista está en la misma oración: los químicos «se filtran por la roca porosa» y llegan al agua; si no dejara pasar nada, no ensuciarían el cenote.",
+  "prohibido_para_pepe": [
+    "tiene agujeritos",
+    "tiene poros",
+    "con poros",
+    "con agujeritos",
+    "deja pasar el agua",
+    "deja pasar los líquidos",
+    "agujeros por donde"
+  ],
+  "rubrica": {
+    "correcta": "Dice que porosa no significa que no deja pasar nada Y explica que tiene huecos/poros por donde pasan los líquidos, usando la pista del texto (se filtran).",
+    "parcial": "Dice que Pepe está mal o da un significado aproximado, pero no usa la pista del texto o no lo explica.",
+    "incorrecta": "Acepta que porosa es dura e impermeable o da otro significado erróneo.",
+    "evidencia_minima_cierre": "Da el significado de porosa y dice qué parte de la oración le dio la pista."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ubicar la palabra.",
+      "pasos": [
+        {
+          "objetivo": "Pedir el párrafo donde aparece.",
+          "ejemplo": [
+            "Mmm, ahora que lo pienso, la adiviné sin buscarla 😅",
+            "¿En qué párrafo aparece «porosa»?"
+          ],
+          "botones": [
+            "Párrafo 1",
+            "Párrafo 2"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto usando la oración.",
+          "ejemplo": [
+            "¿Y qué les pasa a la basura y a los químicos en esa oración? Con eso, ¿qué crees que significa porosa?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Confrontar con la oración exacta.",
+      "pasos": [
+        {
+          "objetivo": "Citar «se filtran por la roca porosa» y preguntar.",
+          "ejemplo": [
+            "Encontré esta frase:",
+            "«La basura y los químicos que se tiran en la superficie se filtran por la roca porosa y ensucian el agua.»",
+            "Si la roca no dejara pasar nada, ¿los químicos llegarían al agua?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "😳 Uy, entonces lo que adiviné no cuadra.",
+            "¿Qué significa porosa?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos: buscar pistas alrededor de la palabra.",
+      "pasos": [
+        {
+          "objetivo": "Modelar con «absorbente».",
+          "ejemplo": [
+            "¡Vas bien! Te enseño un truco que uso 🕵️",
+            "Busco pistas alrededor de la palabra. Mira: «La esponja es absorbente: se traga el agua derramada en segundos.»",
+            "¿Qué significa absorbente?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto con el truco.",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora busca las pistas alrededor de «porosa». ¿Qué significa?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: la esponja.",
+      "pasos": [
+        {
+          "objetivo": "Qué hace una esponja en el agua.",
+          "ejemplo": [
+            "¡Buenísima pregunta! Pensemos en algo de la casa 🔍",
+            "¿Qué le pasa a una esponja cuando la metes al agua?"
+          ]
+        },
+        {
+          "objetivo": "Por qué la esponja se llena.",
+          "ejemplo": [
+            "¡Sí! ¿Y cómo es la superficie de una esponja para que le pueda entrar el agua?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "🤯 Ahí está la pista.",
+            "Si la roca de los cenotes se parece a una esponja, ¿qué significa porosa?"
+          ]
+        }
+      ]
+    }
+  }
+}

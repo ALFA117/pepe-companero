@@ -1,0 +1,137 @@
+{
+  "id": "mate-jerarquia-operaciones-01",
+  "materia": "matematicas",
+  "grado": "6_primaria",
+  "concepto": "jerarquia_operaciones",
+  "dificultad": 1,
+  "prerequisito": null,
+  "planteamiento_pepe": [
+    "¡Qué onda! Me tocó esta: 3 + 4 × 2",
+    "Lo hice en orden: 3 + 4 = 7 y 7 × 2 = 14 😎 ¿Me sacaré 10?"
+  ],
+  "error_plantado": "Resuelve de izquierda a derecha sin respetar que la multiplicación va antes que la suma.",
+  "solucion_para_juez": "Por jerarquía de operaciones, primero se multiplica: 4 × 2 = 8, luego se suma: 3 + 8 = 11. Resolver de izquierda a derecha (14) es incorrecto.",
+  "prohibido_para_pepe": [
+    "11",
+    "primero se multiplica",
+    "primero multiplica",
+    "primero multiplicas",
+    "la multiplicación va primero",
+    "la multiplicación va antes"
+  ],
+  "rubrica": {
+    "correcta": "Dice que primero se multiplica Y da 11, o explica la jerarquía de operaciones.",
+    "parcial": "Detecta que 14 está mal o que el orden importa, pero no sabe cuál va primero o no llega a 11.",
+    "incorrecta": "Acepta 14 o da otro resultado erróneo.",
+    "evidencia_minima_cierre": "Explica con sus palabras que la multiplicación se hace antes que la suma (y por qué, p. ej. son grupos)."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿qué paso está mal?",
+      "pasos": [
+        {
+          "objetivo": "Mostrar los dos pasos y pedir el chueco.",
+          "ejemplo": [
+            "Va, sin presión 😅 Hice dos pasos:",
+            "A) 3 + 4 = 7\nB) 7 × 2 = 14\n¿Cuál te late que está chueco?"
+          ],
+          "botones": [
+            "A",
+            "B",
+            "Ninguno"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿por dónde se empieza?",
+          "ejemplo": [
+            "¡Uy, puede ser! ¿Y por dónde debí empezar? ¿Cuánto da?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Sentido común con chicles.",
+      "pasos": [
+        {
+          "objetivo": "Contar chicles: 3 sueltos y 4 paquetes de 2.",
+          "ejemplo": [
+            "Déjame checar con chicles 🍬",
+            "Tengo 3 chicles sueltos y 4 paquetes de 2 chicles cada uno. ¿Cuántos chicles traen los paquetes?"
+          ]
+        },
+        {
+          "objetivo": "Total de chicles: ¿da 14?",
+          "ejemplo": [
+            "Eso pensé. Ahora súmale los 3 sueltos: ¿me da 14 chicles?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Confrontar y volver al reto.",
+          "ejemplo": [
+            "😳 No me da 14… pero 3 + 4 × 2 es justo eso.",
+            "¿Qué hice mal en mi cuenta y cuánto da?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos con la calculadora científica (ejemplo paralelo).",
+      "pasos": [
+        {
+          "objetivo": "2 + 5 × 3 da 17 en la calculadora.",
+          "ejemplo": [
+            "Creo que los dos estamos medio perdidos, investiguemos 🕵️",
+            "Puse 2 + 5 × 3 en una calculadora científica y me dio 17, no 21.",
+            "¿Qué operación hizo primero la calculadora?"
+          ]
+        },
+        {
+          "objetivo": "Por qué esa operación va antes.",
+          "ejemplo": [
+            "¡Ajá! ¿Y por qué crees que esa va antes? Piensa en los paquetes de chicles."
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "🔥 ¡Eso! Con esa regla, regresemos a la mía.",
+            "¿Cuánto da 3 + 4 × 2?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: la multiplicación como suma repetida.",
+      "pasos": [
+        {
+          "objetivo": "4 × 2 como suma repetida.",
+          "ejemplo": [
+            "Va, reto rapidito antes 💪",
+            "¿4 × 2 es lo mismo que 2 + 2 + 2 + 2?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Reescribir la operación.",
+          "ejemplo": [
+            "¡Sí! Entonces 3 + 4 × 2 es lo mismo que 3 + 2 + 2 + 2 + 2. ¿Cuánto da eso?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto original.",
+          "ejemplo": [
+            "¡Exacto! Los 4 grupos de 2 van juntos.",
+            "Ahora sí: ¿mi 14 estaba bien? ¿Cuánto da 3 + 4 × 2?"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "id": "lectura-idea-principal-01",
+  "materia": "lectura",
+  "grado": "1_secundaria",
+  "concepto": "idea_principal",
+  "dificultad": 1,
+  "prerequisito": "localizar_informacion_literal",
+  "requiere_lectura_voz": true,
+  "texto": {
+    "titulo": "El maíz de colores",
+    "parrafos": [
+      "En México el maíz se cultiva desde hace miles de años. Con él se preparan tortillas, tamales, pozole y atole, y está presente en casi todas las comidas del día, desde el desayuno hasta la cena.",
+      "Además, existen decenas de variedades de maíz: blanco, amarillo, azul y hasta rojo. Muchas familias campesinas guardan cada año sus mejores semillas para volver a sembrarlas. Así cuidan esa diversidad y la heredan a sus hijos y nietos."
+    ]
+  },
+  "planteamiento_pepe": [
+    "¡Gracias, ya lo entendí mejor! 🌽",
+    "Según yo, la idea principal es que existe el maíz azul y el maíz rojo. ¿Le atiné?"
+  ],
+  "error_plantado": "Toma un detalle (los colores del maíz) como si fuera la idea principal.",
+  "solucion_para_juez": "La idea principal es que el maíz es muy importante en México: se come en casi todas las comidas (párrafo 1) y hay muchas variedades que las familias cuidan y heredan (párrafo 2). Los colores son un detalle del párrafo 2.",
+  "prohibido_para_pepe": [
+    "el maíz es muy importante",
+    "la idea principal es que el maíz",
+    "es solo un detalle",
+    "es un detalle"
+  ],
+  "rubrica": {
+    "correcta": "Dice que los colores son solo un detalle Y da una idea principal que abarca todo el texto (importancia del maíz en la comida y su diversidad).",
+    "parcial": "Corrige a Pepe pero propone otra idea que solo cubre un párrafo.",
+    "incorrecta": "Acepta la idea de Pepe o propone otro detalle.",
+    "evidencia_minima_cierre": "Distingue idea principal de detalle y da una idea que cubre los dos párrafos."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿de qué habla todo el texto?",
+      "pasos": [
+        {
+          "objetivo": "Preguntar el tema de todo el texto con botones.",
+          "ejemplo": [
+            "Mmm, ahora que lo pienso, no sé si me fijé en todo 😅",
+            "¿De qué habla TODO el texto, no solo una parte?"
+          ],
+          "botones": [
+            "Del maíz",
+            "De colores",
+            "De familias"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿cuál es la idea principal?",
+          "ejemplo": [
+            "¿Y qué dice del maíz en general? ¿Cuál sería la idea principal?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Confrontar: los colores solo aparecen en una frase.",
+      "pasos": [
+        {
+          "objetivo": "Preguntar si el párrafo 1 habla de colores.",
+          "ejemplo": [
+            "Revisé y lo de los colores está en una sola frase del párrafo 2.",
+            "Pregunta fácil: ¿el párrafo 1 habla de colores?"
+          ],
+          "botones": [
+            "Sí",
+            "No"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "😳 Entonces mi idea deja fuera medio texto.",
+            "¿Cuál sería una mejor idea principal?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos: la idea principal contesta «¿de qué trata todo?».",
+      "pasos": [
+        {
+          "objetivo": "Modelar con un texto de perros.",
+          "ejemplo": [
+            "¡Vas bien! Te enseño un truco que uso 🕵️",
+            "«Los perros ayudan a las personas. Algunos guían a personas ciegas y otros rescatan gente en los sismos.»",
+            "¿Cuál es la idea de todo: que rescatan gente o que ayudan a las personas?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto con el truco.",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora usa el truco con el texto del maíz. ¿Cuál es la idea principal?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: un título por párrafo.",
+      "pasos": [
+        {
+          "objetivo": "Título del párrafo 1.",
+          "ejemplo": [
+            "¡Buenísima pregunta! Vamos por partes 🔍",
+            "Ponle un título cortito (de 3 a 5 palabras) al párrafo 1."
+          ]
+        },
+        {
+          "objetivo": "Título del párrafo 2.",
+          "ejemplo": [
+            "¡Me late! Ahora ponle uno al párrafo 2."
+          ]
+        },
+        {
+          "objetivo": "Volver al reto juntando los títulos.",
+          "ejemplo": [
+            "🤯 Ya casi.",
+            "Junta tus dos títulos en una oración: ¿cuál es la idea principal de todo el texto?"
+          ]
+        }
+      ]
+    }
+  }
+}

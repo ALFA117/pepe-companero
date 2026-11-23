@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "next typegen && tsc --noEmit",
     "simular": "tsx --conditions=react-server scripts/simular.ts",
-    "evaluar-juez": "tsx --conditions=react-server scripts/evaluar-juez.ts"
+    "evaluar-juez": "tsx --conditions=react-server scripts/evaluar-juez.ts",
+    "seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.107",

@@ -1,0 +1,133 @@
+{
+  "id": "mate-porcentajes-01",
+  "materia": "matematicas",
+  "grado": "1_secundaria",
+  "concepto": "porcentajes",
+  "dificultad": 1,
+  "prerequisito": "fracciones_equivalentes",
+  "planteamiento_pepe": [
+    "¡Qué onda! Unos tenis cuestan $800 y tienen 25% de descuento 👟",
+    "Le quité 25 pesos, así que voy a pagar $775 😎 ¿Me alcanza con $780?"
+  ],
+  "error_plantado": "Confunde el porcentaje con una cantidad fija de pesos.",
+  "solucion_para_juez": "25% significa 25 de cada 100, o sea la cuarta parte del precio: 800 ÷ 4 = 200 de descuento. Se pagan 800 − 200 = 600 pesos. Restar 25 pesos solo sería correcto si el precio fuera 100.",
+  "prohibido_para_pepe": [
+    "600",
+    "$200",
+    "200 pesos",
+    "la cuarta parte",
+    "un cuarto del precio",
+    "25 de cada 100"
+  ],
+  "rubrica": {
+    "correcta": "Dice que 25% no son 25 pesos Y calcula el descuento (200) o el precio final (600), o explica que es la cuarta parte.",
+    "parcial": "Detecta que el descuento debe ser mayor que 25 pesos pero no lo calcula.",
+    "incorrecta": "Acepta $775 o da otro resultado erróneo.",
+    "evidencia_minima_cierre": "Explica que el porcentaje es una parte del precio (de cada 100) y no una cantidad fija de pesos."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿25% son 25 pesos?",
+      "pasos": [
+        {
+          "objetivo": "Preguntar si 25% equivale a 25 pesos.",
+          "ejemplo": [
+            "Va, sin presión 😅 Yo pensé que 25% de descuento es lo mismo que quitar 25 pesos.",
+            "¿Eso está bien?"
+          ],
+          "botones": [
+            "Sí",
+            "No",
+            "No sé"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿cuánto pago entonces?",
+          "ejemplo": [
+            "Mmm… ¿entonces qué significa 25%? ¿Cuánto pago por los tenis?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Sentido común con un precio de $100.",
+      "pasos": [
+        {
+          "objetivo": "Descuento de 25% en $100.",
+          "ejemplo": [
+            "Déjame checar con algo más fácil 🧐",
+            "Si los tenis costaran $100 con 25% de descuento, ¿cuántos pesos me descuentan?"
+          ]
+        },
+        {
+          "objetivo": "Comparar con $800: ¿más o menos descuento?",
+          "ejemplo": [
+            "Eso pensé. Pero los míos cuestan $800, que es 8 veces más.",
+            "¿El descuento debería ser más o menos que 25 pesos?"
+          ],
+          "botones": [
+            "Más",
+            "Menos"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "😳 Entonces quitar solo 25 pesos no cuadra.",
+            "¿Cuánto me descuentan de verdad y cuánto pago?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos con 50% (ejemplo paralelo).",
+      "pasos": [
+        {
+          "objetivo": "50% de una mochila de $300.",
+          "ejemplo": [
+            "Creo que los dos estamos medio perdidos, investiguemos 🕵️",
+            "Una mochila de $300 tiene 50% de descuento. ¿Cuánto me descuentan?"
+          ]
+        },
+        {
+          "objetivo": "Qué parte del precio es el 50%.",
+          "ejemplo": [
+            "¡Ajá! ¿Y qué parte del precio es el 50%?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: qué parte es el 25%.",
+          "ejemplo": [
+            "🔥 ¡Eso! Entonces el 25% también es una parte del precio, no una cantidad fija.",
+            "¿Qué parte es el 25%? Con eso, ¿cuánto pago por mis tenis?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: fracciones de 100.",
+      "pasos": [
+        {
+          "objetivo": "Cuánto es 1/4 de 100.",
+          "ejemplo": [
+            "Va, reto rapidito antes 💪",
+            "Si reparto $100 entre 4 amigos en partes iguales, ¿cuánto le toca a cada uno?"
+          ]
+        },
+        {
+          "objetivo": "Escalar a 800 (8 veces 100).",
+          "ejemplo": [
+            "¡Sí! Y si reparto $800 entre 4, ¿cuánto le toca a cada uno? Piénsalo como 8 billetes de $100."
+          ]
+        },
+        {
+          "objetivo": "Volver al reto original.",
+          "ejemplo": [
+            "¡Exacto! 25% es lo mismo que repartir entre 4.",
+            "Ahora sí: ¿cuánto me descuentan y cuánto pago por los tenis?"
+          ]
+        }
+      ]
+    }
+  }
+}

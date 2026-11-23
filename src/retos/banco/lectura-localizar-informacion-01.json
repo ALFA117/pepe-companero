@@ -1,0 +1,128 @@
+{
+  "id": "lectura-localizar-informacion-01",
+  "materia": "lectura",
+  "grado": "6_primaria",
+  "concepto": "localizar_informacion_literal",
+  "dificultad": 1,
+  "prerequisito": null,
+  "requiere_lectura_voz": true,
+  "texto": {
+    "titulo": "El viaje de la mariposa monarca",
+    "parrafos": [
+      "Cada otoño, millones de mariposas monarca viajan desde Canadá y Estados Unidos hasta los bosques de Michoacán y del Estado de México. Recorren más de cuatro mil kilómetros y llegan a finales de octubre, muy cerca del Día de Muertos.",
+      "En los bosques de oyamel se juntan en racimos sobre los árboles para protegerse del frío. Ahí pasan el invierno descansando. En marzo, cuando sube la temperatura, emprenden el regreso hacia el norte para tener a sus crías."
+    ]
+  },
+  "planteamiento_pepe": [
+    "¡Gracias, ya lo entendí mejor! 🦋",
+    "Las monarcas llegan a México en marzo, cuando ya hace calorcito. ¿Verdad que sí?"
+  ],
+  "error_plantado": "Confunde el dato de la llegada con el de la partida (marzo es cuando se van).",
+  "solucion_para_juez": "El párrafo 1 dice que llegan a finales de octubre, cerca del Día de Muertos. En marzo emprenden el regreso hacia el norte (se van), según el párrafo 2.",
+  "prohibido_para_pepe": [
+    "llegan a finales de octubre",
+    "llegan en octubre",
+    "en marzo se van",
+    "en marzo regresan",
+    "en marzo se regresan"
+  ],
+  "rubrica": {
+    "correcta": "Dice que no llegan en marzo Y que llegan a finales de octubre (o cerca de Día de Muertos), idealmente con la frase del texto.",
+    "parcial": "Dice que marzo es cuando se van, pero no encuentra cuándo llegan (o al revés).",
+    "incorrecta": "Acepta que llegan en marzo o da otra fecha.",
+    "evidencia_minima_cierre": "Da el dato correcto de la llegada y dice en qué parte del texto lo encontró."
+  },
+  "niveles": {
+    "1": {
+      "objetivo": "Acotar: ¿en qué párrafo dice cuándo llegan?",
+      "pasos": [
+        {
+          "objetivo": "Pedir el párrafo con botones.",
+          "ejemplo": [
+            "Mmm, ahora que lo pienso, no sé si lo leí o me lo imaginé 😅",
+            "¿En qué párrafo dice cuándo llegan?"
+          ],
+          "botones": [
+            "Párrafo 1",
+            "Párrafo 2",
+            "No lo dice"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto: ¿qué dice ese párrafo?",
+          "ejemplo": [
+            "¿Y qué dice ahí? ¿Cuándo llegan?"
+          ]
+        }
+      ]
+    },
+    "2": {
+      "objetivo": "Confrontar con la frase exacta.",
+      "pasos": [
+        {
+          "objetivo": "Citar la frase de marzo y preguntar si habla de llegar o irse.",
+          "ejemplo": [
+            "Busqué y encontré esta frase:",
+            "«En marzo, cuando sube la temperatura, emprenden el regreso hacia el norte.»",
+            "¿Aquí dice que llegan o que se van?"
+          ],
+          "botones": [
+            "Llegan",
+            "Se van"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "😳 Uy, entonces confundí los datos.",
+            "¿Cuándo llegan de verdad?"
+          ]
+        }
+      ]
+    },
+    "3": {
+      "objetivo": "Aprender juntos: buscar la palabra clave de la pregunta.",
+      "pasos": [
+        {
+          "objetivo": "Modelar con un texto corto.",
+          "ejemplo": [
+            "¡Vas bien! Te enseño un truco que uso 🕵️",
+            "Busco en el texto la palabra de la pregunta. Mira: «Los niños llegan a la escuela a las 7 y salen a la 1.»",
+            "¿A qué hora llegan?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto con el truco.",
+          "ejemplo": [
+            "🔥 ¡Eso! Ahora busca «llegan» en el texto de las monarcas. ¿Cuándo llegan?"
+          ]
+        }
+      ]
+    },
+    "4": {
+      "objetivo": "Bajar un escalón: pistas y vocabulario.",
+      "pasos": [
+        {
+          "objetivo": "Qué significa «emprenden el regreso».",
+          "ejemplo": [
+            "¡Buenísima pregunta! A ver si el mismo texto nos da una pista 🔍",
+            "Cuando dice «emprenden el regreso hacia el norte», ¿están llegando o se están yendo?"
+          ]
+        },
+        {
+          "objetivo": "Fiesta mexicana cercana a la llegada.",
+          "ejemplo": [
+            "¡Sí! Y en el párrafo 1, ¿qué fiesta mexicana dice que está cerca de cuando llegan?"
+          ]
+        },
+        {
+          "objetivo": "Volver al reto.",
+          "ejemplo": [
+            "¡Exacto! 🤯",
+            "Entonces, ¿en qué mes llegan las monarcas a México?"
+          ]
+        }
+      ]
+    }
+  }
+}

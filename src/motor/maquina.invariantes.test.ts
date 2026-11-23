@@ -4,7 +4,7 @@
  * revisan los invariantes de la máquina.
  */
 import { describe, expect, it } from 'vitest';
-import { obtenerReto } from '@/retos/cargar';
+import { listarRetos } from '@/retos/cargar';
 import { ev, evFinal, nueva } from '@/test/fabricas';
 import { pasosDelNivel, transicion, type ContextoMotor } from './maquina';
 import { CLASIFICACIONES, NIVELES_AYUDA, type EventoMotor, type Reto, type Sesion } from './tipos';
@@ -50,17 +50,14 @@ function cotaDeEventos(reto: Reto): number {
   return 2 + 2 + pasos + 1;
 }
 
-describe.each([
-  { reto: obtenerReto('mate-suma-fracciones-01') },
-  { reto: obtenerReto('lectura-inferencia-causal-ajolote-01') },
-])('invariantes con 3000 conversaciones aleatorias: $reto.id', ({ reto }) => {
+describe.each(listarRetos().map((reto) => ({ reto })))('invariantes con 1000 conversaciones aleatorias: $reto.id', ({ reto }) => {
   const ctx: ContextoMotor = { reto, banco: [reto] };
 
   it('siempre termina y nunca rompe las reglas', () => {
     const r = azar(20261123);
     const cota = cotaDeEventos(reto);
 
-    for (let conversacion = 0; conversacion < 3000; conversacion++) {
+    for (let conversacion = 0; conversacion < 1000; conversacion++) {
       let s = nueva(reto).sesion;
       let eventosQueCuentan = 0;
 
