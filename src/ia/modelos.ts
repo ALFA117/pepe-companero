@@ -63,11 +63,15 @@ function modeloDe(id: string): LanguageModel {
 /** Modelos a intentar para un rol, en orden y sin repetir. */
 export function cadenaDeModelos(rol: RolModelo): string[] {
   const e = env();
-  const principal = rol === 'pepe' ? e.MODEL_PEPE : e.MODEL_JUEZ;
-  const otro = rol === 'pepe' ? e.MODEL_JUEZ : e.MODEL_PEPE;
   const respaldos = (e.MODEL_RESPALDO ?? '').split(',').map((s) => s.trim()).filter(Boolean);
-  // El Juez prefiere el otro modelo configurado; Pepe, los de Groq rápidos.
-  const candidatos = [principal, otro, ...RESPALDOS_GROQ, ...respaldos];
+  // Prioridad cuando se acaba el límite por minuto: el Juez decide el nivel y
+  // no tiene un buen respaldo, así que puede usar todos los modelos. Pepe sí
+  // tiene respaldo (el `ejemplo` del paso), así que nunca le gasta el cupo al
+  // modelo del Juez: solo usa el suyo y los de MODEL_RESPALDO de otros proveedores.
+  const candidatos =
+    rol === 'pepe'
+      ? [e.MODEL_PEPE, ...respaldos.filter((id) => id !== e.MODEL_JUEZ && !RESPALDOS_GROQ.includes(id))]
+      : [e.MODEL_JUEZ, e.MODEL_PEPE, ...RESPALDOS_GROQ, ...respaldos];
   return [...new Set(candidatos)].filter((id) => {
     try {
       separarIdModelo(id);

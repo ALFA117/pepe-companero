@@ -12,6 +12,8 @@ export type MensajeEntrante = {
   | { tipo: 'texto'; texto: string }
   | { tipo: 'boton'; texto: string; boton_id: string }
   | { tipo: 'audio'; media_id: string; mime: string | null }
+  /** Imagen, sticker, ubicación, texto vacío…: Pepe solo entiende texto y voz. */
+  | { tipo: 'otro'; descripcion: string }
 );
 
 export interface Canal {

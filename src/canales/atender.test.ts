@@ -132,6 +132,14 @@ describe('conversación por WhatsApp', () => {
     expect(canal.enviados).toHaveLength(enviados);
   });
 
+  it('un sticker o una imagen no se evalúa ni cambia la sesión', async () => {
+    const antes = { ...(await repo.sesionActiva(repo.datos.alumnos[0]!.id))! };
+    await atenderMensaje(deps, { id_externo: `wamid.${++n}`, de: TEL, tipo: 'otro', descripcion: 'sticker' });
+    expect(canal.enviados).toEqual([{ a: TEL, texto: expect.stringContaining('nota de voz') }]);
+    expect(repo.datos.evaluaciones).toHaveLength(0);
+    expect(await repo.sesionActiva(antes.alumno_id)).toMatchObject({ nivel: antes.nivel, paso: antes.paso, version: antes.version });
+  });
+
   it('si algo truena, manda un mensaje amable en vez de quedarse callado', async () => {
     deps.motor.repo.ultimosTurnos = async () => {
       throw new Error('base caída');

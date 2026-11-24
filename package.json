@@ -13,7 +13,9 @@
     "simular": "tsx --conditions=react-server scripts/simular.ts",
     "evaluar-juez": "tsx --conditions=react-server scripts/evaluar-juez.ts",
     "seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts",
-    "probar-supabase": "tsx --conditions=react-server scripts/probar-supabase.ts"
+    "probar-supabase": "tsx --conditions=react-server scripts/probar-supabase.ts",
+    "probar-whatsapp": "tsx --conditions=react-server scripts/probar-whatsapp.ts",
+    "reiniciar-pruebas": "tsx --conditions=react-server scripts/reiniciar-pruebas.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.107",

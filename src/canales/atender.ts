@@ -30,6 +30,7 @@ export const MENSAJES_VINCULACION = {
   codigoOcupado: ['Ese código ya está conectado a otro número 😅 Pídele ayuda a tu profe.'],
   bienvenida: (nombre: string) => `¡Listo, ${nombre}! Ya quedamos conectados 🙌`,
   error: ['Uy, se me trabó algo 😅 ¿Me lo repites en un ratito?'],
+  noSoportado: ['Uy, eso no lo puedo ver 🙈 Escríbeme o mándame una nota de voz.'],
 };
 
 async function mandar(canal: Canal, destino: string, mensajes: string[], botones?: string[]) {
@@ -46,7 +47,7 @@ async function vincular(
   m: MensajeEntrante,
   telHash: string,
 ): Promise<{ alumnoId: string; nombre: string } | null> {
-  const texto = m.tipo === 'audio' ? '' : m.texto;
+  const texto = m.tipo === 'texto' || m.tipo === 'boton' ? m.texto : '';
   const codigo = texto.toUpperCase().match(RE_CODIGO)?.[0];
   if (!codigo) {
     await mandar(deps.canal, m.de, MENSAJES_VINCULACION.pedirCodigo);
@@ -106,6 +107,12 @@ export async function atenderMensaje(deps: DependenciasAtender, m: MensajeEntran
       }
     }
 
+    // Sticker, imagen, etc.: no es una respuesta al reto, no se evalúa ni cambia nada.
+    if (m.tipo === 'otro' && !saludo) {
+      await mandar(canal, m.de, MENSAJES_VINCULACION.noSoportado);
+      return;
+    }
+
     let entrada: EntradaAlumno;
     if (saludo) {
       // El mensaje con el código no es una respuesta al reto: arranca la conversación.
@@ -114,6 +121,8 @@ export async function atenderMensaje(deps: DependenciasAtender, m: MensajeEntran
       if (!canal.descargarAudio) throw new Error(`El canal ${canal.nombre} no descarga audio`);
       const { audio, mime } = await canal.descargarAudio(m.media_id);
       entrada = { tipo: 'audio', audio, mime: m.mime ?? mime };
+    } else if (m.tipo === 'otro') {
+      return; // inalcanzable: se atiende arriba
     } else {
       entrada = { tipo: m.tipo, texto: m.texto };
     }

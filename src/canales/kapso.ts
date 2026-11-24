@@ -80,7 +80,7 @@ export function mensajeDesdeEvento(evento: unknown): MensajeEntrante | null {
     };
   }
   // Imagen, sticker, ubicación…: Pepe solo entiende texto y voz.
-  return { ...base, tipo: 'texto', texto: `[mandó un mensaje de tipo ${m.type}]` };
+  return { ...base, tipo: 'otro', descripcion: m.type };
 }
 
 export interface ConfigKapso {

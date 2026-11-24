@@ -55,7 +55,12 @@ export class CanalTwilio implements Canal {
     if (Number(params.NumMedia ?? 0) > 0 && params.MediaContentType0?.startsWith('audio/') && params.MediaUrl0) {
       return [{ ...base, tipo: 'audio', media_id: params.MediaUrl0, mime: params.MediaContentType0 }];
     }
-    return [{ ...base, tipo: 'texto', texto: params.Body ?? '' }];
+    const cuerpo = (params.Body ?? '').trim();
+    if (cuerpo === '') {
+      const descripcion = Number(params.NumMedia ?? 0) > 0 ? (params.MediaContentType0 ?? 'media') : 'vacio';
+      return [{ ...base, tipo: 'otro', descripcion }];
+    }
+    return [{ ...base, tipo: 'texto', texto: cuerpo }];
   }
 
   private async enviar(destino: string, cuerpo: string): Promise<void> {

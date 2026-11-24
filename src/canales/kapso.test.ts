@@ -71,7 +71,7 @@ describe('mensajeDesdeEvento', () => {
   });
 
   it('otros tipos llegan como texto descriptivo', () => {
-    expect(mensajeDesdeEvento(evento({ type: 'image' }))).toMatchObject({ tipo: 'texto', texto: '[mandó un mensaje de tipo image]' });
+    expect(mensajeDesdeEvento(evento({ type: 'image' }))).toMatchObject({ tipo: 'otro', descripcion: 'image' });
   });
 
   it('un cuerpo irreconocible no truena', () => {

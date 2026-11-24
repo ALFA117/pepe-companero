@@ -238,3 +238,19 @@ describe('redactar', () => {
     }
   });
 });
+
+describe('quitarSaludo', () => {
+  it('quita el "¡Qué onda!" repetido a media conversación', async () => {
+    const { quitarSaludo } = await import('./pepe');
+    expect(quitarSaludo(['¡Qué onda! Yo también hice dos cosas', '¿Cuál?'])).toEqual(['Yo también hice dos cosas', '¿Cuál?']);
+    expect(quitarSaludo(['Hola, ¿cómo vas? Mira esto'])).toEqual(['¿cómo vas? Mira esto']);
+    expect(quitarSaludo(['¡Qué onda, compa! Mira esto'])).toEqual(['Mira esto']);
+    expect(quitarSaludo(['¡Qué onda!', '¿Cuál?'])).toEqual(['', '¿Cuál?']);
+  });
+
+  it('no toca mensajes sin saludo ni palabras que empiezan igual', async () => {
+    const { quitarSaludo } = await import('./pepe');
+    expect(quitarSaludo(['¡Órale, sí!'])).toEqual(['¡Órale, sí!']);
+    expect(quitarSaludo(['Holanda queda lejos'])).toEqual(['Holanda queda lejos']);
+  });
+});

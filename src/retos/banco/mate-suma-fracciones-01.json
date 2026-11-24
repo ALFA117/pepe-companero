@@ -21,7 +21,7 @@
     "5 sextos"
   ],
   "rubrica": {
-    "correcta": "Dice que los denominadores no se suman Y da 5/6 o explica que hay que igualar el tamaño de las partes.",
+    "correcta": "Dice que los denominadores no se suman Y además da 5/6 o explica por qué: las partes son de distinto tamaño (hay que igualarlas).",
     "parcial": "Detecta que está mal (p. ej. 2/5 es menos que la mitad) pero no explica por qué o no sabe corregirlo.",
     "incorrecta": "Acepta 2/5 o propone otro resultado erróneo.",
     "evidencia_minima_cierre": "Explica con sus palabras por qué no se suman los de abajo (tamaño de las partes)."

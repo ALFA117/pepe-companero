@@ -6,7 +6,7 @@ MVP para el hackathon UniconHub. Pepe es un compañero de secundaria que **siemp
 - **Lectura:** el alumno le lee el texto a Pepe en una nota de voz (se mide su fluidez) y luego corrige una conclusión equivocada citando el texto.
 - **Canales:** WhatsApp (Kapso, con Twilio de respaldo) y web. Los dos usan el mismo motor.
 
-El plan del proyecto está en [docs/PLAN.md](docs/PLAN.md).
+El plan del proyecto está en [docs/PLAN.md](docs/PLAN.md) y el guion de la demo en [docs/DEMO.md](docs/DEMO.md).
 
 ## Arquitectura
 
@@ -64,10 +64,12 @@ pnpm dev
 
 | Comando | Qué hace |
 |---|---|
-| `pnpm test` | 295 tests: máquina (todos los caminos y miles de conversaciones aleatorias), Juez, Pepe, filtro, fluidez, WhatsApp y panel |
+| `pnpm test` | 302 tests: máquina (todos los caminos y miles de conversaciones aleatorias), Juez, Pepe, filtro, fluidez, WhatsApp y panel |
 | `pnpm typecheck` / `pnpm lint` / `pnpm build` | Revisión de tipos, ESLint y build |
 | `pnpm simular [--reto <id>] [--audio nota.m4a]` | Conversación con Pepe en la terminal, con el LLM real |
 | `pnpm evaluar-juez` | 26 casos fijos contra el Juez real (gasta tokens) |
+| `pnpm probar-whatsapp [nota.m4a]` | Flujo de WhatsApp de punta a punta (webhook firmado, vinculación, botones, voz, privacidad) sin mandar mensajes reales |
+| `pnpm reiniciar-pruebas [--desvincular]` | Deja como nuevos a PEPE-1B-01 a 03 antes de una demo |
 | `pnpm probar-supabase` | Prueba de integración contra el Supabase real (índice único, versiones, carreras, idempotencia) |
 | `pnpm seed-demo` | Siembra el grupo de demo "1° B" (45 alumnos) en Supabase |
 
@@ -97,7 +99,7 @@ Después corre `pnpm seed-demo`, cambia `BASE_DATOS=auto` y verifica con `pnpm p
 
 Se configuran con `MODEL_PEPE`, `MODEL_JUEZ` y `MODEL_RESPALDO`, en formato `proveedor:modelo` (`groq`, `google` o `anthropic`).
 
-Con el plan gratis de Groq hay un límite de 8K tokens por minuto **por modelo**. Por eso la cadena de respaldo pasa primero por el otro modelo de Groq antes de usar `MODEL_RESPALDO`. Si de todos modos se agota, Pepe contesta con el `ejemplo` del paso y la conversación sigue.
+Con el plan gratis de Groq hay un límite de 8K tokens por minuto **por modelo**, y cada mensaje del alumno gasta unos 3,300 (Juez ~2,000 y Pepe ~1,300): unos 5 mensajes por minuto entre todos. Cuando se agota, el Juez tiene prioridad y puede usar los dos modelos de Groq; Pepe solo usa el suyo (y `MODEL_RESPALDO` de otros proveedores) y si no alcanza contesta con el `ejemplo` del paso. Para una demo con varias personas a la vez conviene el plan de pago de Groq.
 
 ## Límites conocidos
 
