@@ -56,6 +56,10 @@ const casos: Caso[] = [
   { reto: mate, nivel: 4, paso: 0, pregunta: ultimaDe(mate, 4, 0), respuesta: '6', esperado: ['paso_correcto'] },
   { reto: mate, nivel: 4, paso: 1, pregunta: ultimaDe(mate, 4, 1), respuesta: 'los de abajo dicen el tamaño de los pedazos y no se suman, hay que hacerlos del mismo tamaño', esperado: ['correcta', 'parcial'] },
   { reto: mate, nivel: 4, paso: 3, pregunta: ultimaDe(mate, 4, 3), respuesta: '5/6', esperado: ['correcta'] },
+  // Resuelve el reto completo en medio de una pregunta guía (falló en la prueba real).
+  { reto: mate, nivel: 3, paso: 0, pregunta: ultimaDe(mate, 3, 0), respuesta: 'porque son pedazos de distinto tamaño, da 5/6', esperado: ['correcta'] },
+  { reto: mate, nivel: 2, paso: 0, pregunta: ultimaDe(mate, 2, 0), respuesta: 'más, por eso tu 2/5 está mal: hay que hacer los pedazos del mismo tamaño y da 5/6', esperado: ['correcta'] },
+  { reto: mate, nivel: 0, paso: 0, pregunta: ultimaDe(mate, 0, 0), respuesta: 'esta mal, no se suman los de abajo', esperado: ['parcial', 'correcta'] },
   // Lectura
   { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'si le atinaste', esperado: ['incorrecta'] },
   { reto: lectura, nivel: 0, paso: 0, pregunta: ultimaDe(lectura, 0, 0), respuesta: 'no, el texto no dice nada de pesca. dice que es por la contaminacion del agua y por la tilapia que se come sus huevos', esperado: ['correcta'] },

@@ -210,9 +210,14 @@ describe('carreras (bloqueo optimista)', () => {
 describe('una sola sesión activa', () => {
   it('dos mensajes simultáneos de un alumno nuevo no crean dos sesiones', async () => {
     preparar(llmConGuion(['incorrecta']));
-    await Promise.all([procesar(deps, texto('hola', 'm1')), procesar(deps, texto('oye', 'm2'))]);
+    const rs = await Promise.all([procesar(deps, texto('hola', 'm1')), procesar(deps, texto('oye', 'm2'))]);
     expect(repo.datos.sesiones).toHaveLength(1);
     expect(repo.datos.turnos.filter((t) => t.rol === 'alumno')).toHaveLength(2);
+    // El que pierde la carrera no se evalúa como respuesta al reto.
+    expect(llm.de('juez')).toHaveLength(0);
+    expect(repo.datos.evaluaciones).toHaveLength(0);
+    expect(repo.datos.sesiones[0]).toMatchObject({ nivel: 0, nivel_max: 0 });
+    expect(rs.filter((r) => r.mensajes.length > 0)).toHaveLength(1);
   });
 });
 

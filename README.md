@@ -67,7 +67,8 @@ pnpm dev
 | `pnpm test` | 295 tests: máquina (todos los caminos y miles de conversaciones aleatorias), Juez, Pepe, filtro, fluidez, WhatsApp y panel |
 | `pnpm typecheck` / `pnpm lint` / `pnpm build` | Revisión de tipos, ESLint y build |
 | `pnpm simular [--reto <id>] [--audio nota.m4a]` | Conversación con Pepe en la terminal, con el LLM real |
-| `pnpm evaluar-juez` | 23 casos fijos contra el Juez real (gasta tokens) |
+| `pnpm evaluar-juez` | 26 casos fijos contra el Juez real (gasta tokens) |
+| `pnpm probar-supabase` | Prueba de integración contra el Supabase real (índice único, versiones, carreras, idempotencia) |
 | `pnpm seed-demo` | Siembra el grupo de demo "1° B" (45 alumnos) en Supabase |
 
 ## Base de datos (Supabase)
@@ -79,7 +80,7 @@ Corre en el **SQL Editor**, en orden:
 3. `supabase/migrations/20261123000002_sesion_activa_unica.sql`: una sola sesión activa por alumno.
 4. `supabase/seed.sql`: grupo de pruebas.
 
-Después corre `pnpm seed-demo` y cambia `BASE_DATOS=auto`.
+Después corre `pnpm seed-demo`, cambia `BASE_DATOS=auto` y verifica con `pnpm probar-supabase`.
 
 ## Deploy (Vercel) y WhatsApp (Kapso)
 

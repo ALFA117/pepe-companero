@@ -154,11 +154,14 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
       sesion = await repo.sesionActiva(p.alumno_id);
       if (!sesion) throw err;
     }
+    const turno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
+    if (!turno) return { duplicado: true, mensajes: [], sesion };
     if (sesion.id === inicio.sesion.id) {
-      const turno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
-      if (!turno) return { duplicado: true, mensajes: [], sesion };
       return responder(deps, { reto, sesion, accion: inicio.accion, ultimoMensaje: texto });
     }
+    // Perdió la carrera: el otro mensaje ya presentó el reto. Este se guarda
+    // pero no se evalúa (sería un "hola" calificado como respuesta al reto).
+    return { duplicado: false, mensajes: [], sesion };
   }
 
   const reto = retoDe(deps.banco, sesion.reto_id);

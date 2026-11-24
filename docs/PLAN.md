@@ -26,7 +26,7 @@ Las 8 fases están hechas y cada una tiene su commit. Pasan 295 tests, la revisi
 - Transcripción con Groq en vez de OpenAI.
 
 **Pendientes para la noche:**
-1. Correr `supabase/migrations/20261123000001_permisos.sql` y `20261123000002_sesion_activa_unica.sql` (hoy Supabase responde `permission denied`), luego `pnpm seed-demo` y cambiar `BASE_DATOS=auto`.
+1. ~~Supabase: permisos, índice único y seed de demo~~ ✅ hecho (23-nov, verificado con `pnpm probar-supabase`).
 2. Cambiar la identidad de git por la personal, hacer el push y el deploy en Vercel con las variables.
 3. Crear el webhook de Kapso apuntando al dominio de producción, con `KAPSO_WEBHOOK_SECRET`.
 4. La llave de Google no tiene créditos: el respaldo final no sirve hasta que se recargue o se cambie de modelo.

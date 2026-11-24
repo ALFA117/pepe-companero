@@ -106,7 +106,7 @@ Reglas:
 - En lectura, citar o parafrasear lo que dice el texto SÍ cuenta como explicar por qué (explica_por_que "si").
 - Si Pepe acaba de pedirle que justifique ("¿y cómo sabes?") y el alumno da una razón o evidencia, es correcta con explica_por_que "si".
 - En las preguntas guía de un paso NO se exige explicación: una respuesta corta y correcta (sí/no, un número, una opción como A/B, Más/Menos, Párrafo 2) es paso_correcto.
-- Si el alumno resuelve el reto completo aunque Pepe le haya preguntado algo más chico, es correcta.
+- PRIORIDAD: si la respuesta cumple la rúbrica de "correcta", es correcta en CUALQUIER nivel o paso, aunque no conteste la pregunta guía que hizo Pepe. Nunca la bajes a parcial por no contestar la pregunta guía.
 - Cuando el paso es "el último del nivel", Pepe está volviendo a hacer la pregunta del reto: si la respuesta resuelve el reto, es correcta (no paso_correcto).
 - detecto_error: true si el alumno nota que lo que hizo Pepe está mal; false si no; null si no aplica (p. ej. fuera_de_tema).
 - explica_por_que: "si", "parcial" o "no" según si justifica su respuesta; null si no aplica.
@@ -149,7 +149,7 @@ export function construirPromptJuez(e: EntradaJuez): { instrucciones: string; pr
         : 'Nivel 0: Pepe acaba de plantear su error y le pregunta al alumno si está bien.'
       : `Nivel de ayuda ${sesion.nivel} (${reto.niveles[String(sesion.nivel) as '1'].objetivo}).
 Paso actual: ${paso?.objetivo ?? '(desconocido)'}${paso?.botones ? `\nOpciones que vio el alumno: ${paso.botones.join(' / ')}` : ''}
-${esUltimoPaso(reto, sesion) ? 'Es el ÚLTIMO paso del nivel: la pregunta es la del reto completo.' : 'Es una pregunta guía: todavía no se espera que resuelva el reto completo.'}`;
+${esUltimoPaso(reto, sesion) ? 'Es el ÚLTIMO paso del nivel: la pregunta es la del reto completo.' : 'Es una pregunta guía: si solo la contesta bien, es paso_correcto; pero si además resuelve el reto completo (cumple la rúbrica de "correcta"), es correcta.'}`;
 
   const prompt = `# Reto
 Materia: ${reto.materia}. Concepto: ${reto.concepto}.${textoDelReto(reto)}

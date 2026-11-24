@@ -12,7 +12,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "simular": "tsx --conditions=react-server scripts/simular.ts",
     "evaluar-juez": "tsx --conditions=react-server scripts/evaluar-juez.ts",
-    "seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts"
+    "seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts",
+    "probar-supabase": "tsx --conditions=react-server scripts/probar-supabase.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.107",
