@@ -132,6 +132,10 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 
 - **Cifras animadas que podían mostrar un dato falso.** Un contador que sube de 0 a 34 se quedaba congelado a medias (13 %) si el navegador frenaba la animación. Ahora el número siempre es el real y solo se anima su tamaño.
 
+- **Conversación en la ficha del alumno con poco contraste.** Las burbujas del alumno tenían fondo turquesa oscuro con texto oscuro. Ahora usan el color de texto de su burbuja.
+- **Pestañas de la tabla desbordadas a 320 px** y nombres de la tabla con menos de 44 px de alto para tocarlos. Ya corregido.
+- **Generar hojas mostraba el esqueleto del panel** mientras tardaba unos 20 s. Ahora tiene su propia pantalla de carga ("Pepe está armando las hojas…") y un error con **Reintentar**.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.
@@ -159,6 +163,14 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
     - **"¿Por qué importa?":** las cifras de PISA con su fuente.
     - **Toast:** para errores como el permiso del micrófono.
     - **Panel:** cifras con "pop" y la lista de atención escalonada.
+- **Cuarta vuelta (panel del maestro):** el dado dio la receta 4 (túnel de anillos). Como el fondo ya estaba completo, la usé para subirle el nivel: **anillos de agua** que se expanden en las pantallas de trabajo, como gotas que caen al canal.
+  - **Panel:** encabezado con resumen de la semana y a quién atender primero, y la **escalera del grupo** (cuántos alumnos resolvieron en cada escalón de ayuda).
+  - **Atención:** tarjetas compactas con iniciales y motivos con íconos; muestra 6 y tiene un botón "Ver los 12".
+  - **Tabla:** búsqueda por nombre o código, con su estado vacío.
+  - **Indicador de ayuda:** pasó de puntos a una **mini escalera** en todo el panel.
+  - **Ficha del alumno:** encabezado con avatar, lectura en recuadros con íconos y conversación como chat.
+  - **Hojas:** barras por brecha y vista previa de las tres hojas.
+  - **Entrada del maestro:** dos columnas ("qué vas a ver") y PIN con mostrar u ocultar.
 - **Modo oscuro:** sigue al sistema (`prefers-color-scheme`), con sus propios tokens y sin una inversión automática.
 - **Detalles propios del proyecto:** la tarea de Pepe con "1/2 + 1/3 = 2/5" encerrado en rojo en el inicio, el aviso "Pepe nunca te va a dar la respuesta" al empezar el chat y la onda de la nota de voz.
 - **Animación (Motion):** las burbujas entran con spring, el estado ("escribiendo…") cambia con crossfade, las respuestas rápidas tienen press con spring y el botón de micrófono/enviar se intercambia con animación.
@@ -176,3 +188,4 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 9. Regresa al inicio: aparece "Seguir donde me quedé" con tu código.
 10. En "Pruébalo tú", toca una respuesta equivocada (Pepe da una pista) y luego la correcta.
 11. En "La escalera de ayuda", toca los niveles 0 a 4: el indicador se desliza y cambia el ejemplo.
+12. En el panel, busca "cruz" en la tabla y toca "Ver los 12" en "Necesitan atención hoy".

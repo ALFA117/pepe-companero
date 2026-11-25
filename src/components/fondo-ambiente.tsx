@@ -7,6 +7,7 @@
  *   - capa media: la superficie del canal en malla de ondas (canvas, en perspectiva);
  *   - horizonte: una trajinera que se mece (solo en el inicio);
  *   - burbuja low-poly en WebGL (Three.js) detrás de Pepe (solo en el inicio);
+ *   - anillos de agua que se expanden, como gotas en el canal (pantallas de trabajo);
  *   - capa cercana: burbujas y hojas de lirio flotando (más parallax).
  * Completo en el inicio y tranquilo en el chat y el panel. Solo transform y
  * opacity; el canvas se pausa con la pestaña oculta; con movimiento reducido se
@@ -280,6 +281,13 @@ export function FondoAmbiente() {
             <Trajinera />
           </div>
         </motion.div>
+      )}
+      {!completo && (
+        <div className="amb-anillos">
+          {[0, 1, 2].map((k) => (
+            <span key={k} className={`amb-anillo ${k === 2 ? 'max-md:hidden' : ''}`} style={{ animationDelay: `${k * 2.6}s` }} />
+          ))}
+        </div>
       )}
       <CapaFlotantes
         items={completo ? FLOTANTES_COMPLETO : FLOTANTES_TRANQUILO}
