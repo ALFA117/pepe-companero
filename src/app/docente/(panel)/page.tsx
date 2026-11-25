@@ -1,9 +1,9 @@
-import { CircleCheckBig, LifeBuoy, TriangleAlert, Users, type LucideIcon } from 'lucide-react';
+import { ArrowDown, CircleCheckBig, FileText, LifeBuoy, TriangleAlert, Users, type LucideIcon } from 'lucide-react';
 import { exigirDocente } from '@/lib/docente';
 import Link from 'next/link';
-import * as motion from 'motion/react-client';
 import { Contador } from '@/components/contador';
-import { GraficaBrechas, TablaAlumnos } from './componentes';
+import { PepeAjolote } from '@/components/pepe-ajolote';
+import { EscaleraGrupo, GraficaBrechas, ListaAtencion, TablaAlumnos } from './componentes';
 import { grupoElegido, resumenDelGrupo } from './datos';
 
 export const metadata = { title: 'Panel del maestro' };
@@ -46,34 +46,62 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
   if (!r) return null;
   const i = r.indicadores;
 
+  const primero = r.atencion[0];
+  const resumen = primero
+    ? `Esta semana ${i.activos} de ${i.total} alumnos practicaron. Empieza por ${primero.nombre}: ${primero.motivos[0]?.toLowerCase() ?? 'necesita apoyo'}.`
+    : `Esta semana ${i.activos} de ${i.total} alumnos practicaron y nadie necesita atención especial.`;
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow text-primary">Tu grupo</p>
-          <h1 className="texto-display text-4xl">{r.grupo.nombre}</h1>
-          <p className="text-sm text-muted-foreground">
-            {[r.grupo.escuela, r.grupo.docente_nombre].filter(Boolean).join(' · ')} · Últimos 7 días
-            {r.grupo.es_demo && (
-              <span className="ml-2 rounded-full bg-trajinera/40 px-2 py-0.5 text-xs font-bold text-trajinera-tinta">Datos de demostración</span>
-            )}
-          </p>
-        </div>
-        {grupos.length > 1 && (
-          <nav className="flex flex-wrap gap-1" aria-label="Grupos">
-            {grupos.map((g) => (
-              <Link
-                key={g.id}
-                href={`/docente?grupo=${g.id}`}
-                aria-current={g.id === grupoId ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center rounded-2xl border px-4 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${g.id === grupoId ? 'border-primary bg-primary text-primary-foreground shadow-boton' : 'border-border bg-card hover:bg-muted'}`}
+      <section className="tarjeta-clay relative overflow-hidden p-5 sm:p-6">
+        <div className="pointer-events-none absolute -top-10 -right-10 size-48 rounded-full bg-primary/10" aria-hidden />
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-center">
+          <div className="min-w-0 flex-1 space-y-2">
+            <p className="eyebrow text-primary">Tu grupo · últimos 7 días</p>
+            <h1 className="texto-display text-4xl sm:text-5xl">{r.grupo.nombre}</h1>
+            <p className="text-sm text-muted-foreground">
+              {[r.grupo.escuela, r.grupo.docente_nombre].filter(Boolean).join(' · ')}
+              {r.grupo.es_demo && (
+                <span className="ml-2 rounded-full bg-trajinera/40 px-2 py-0.5 text-xs font-bold text-trajinera-tinta">Datos de demostración</span>
+              )}
+            </p>
+            <p className="max-w-2xl text-[17px] font-semibold">{resumen}</p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <a
+                href="#alumnos"
+                className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-boton transition-transform active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
               >
-                {g.nombre}
+                <ArrowDown className="size-4" aria-hidden /> Ver a todos los alumnos
+              </a>
+              <Link
+                href="/docente/hojas"
+                className="inline-flex min-h-11 items-center gap-2 rounded-2xl border-2 border-border bg-card px-4 text-sm font-extrabold transition-transform active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+              >
+                <FileText className="size-4" aria-hidden /> Hojas de práctica
               </Link>
-            ))}
-          </nav>
-        )}
-      </div>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-3 md:flex-col">
+            <span className="pepe-flota flex size-24 items-center justify-center rounded-3xl bg-ajolote/35 sm:size-28">
+              <PepeAjolote vivo cara={i.necesitan_atencion > 0 ? 'pensando' : 'feliz'} className="w-20 sm:w-24" />
+            </span>
+            {grupos.length > 1 && (
+              <nav className="flex flex-wrap gap-1" aria-label="Grupos">
+                {grupos.map((g) => (
+                  <Link
+                    key={g.id}
+                    href={`/docente?grupo=${g.id}`}
+                    aria-current={g.id === grupoId ? 'page' : undefined}
+                    className={`inline-flex min-h-11 items-center rounded-2xl border px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${g.id === grupoId ? 'border-primary bg-primary text-primary-foreground shadow-boton' : 'border-border bg-card hover:bg-muted'}`}
+                  >
+                    {g.nombre}
+                  </Link>
+                ))}
+              </nav>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Indicadores de la semana">
         <Indicador titulo="Alumnos activos" valor={`${i.activos} / ${i.total}`} detalle="Hicieron al menos un reto" icono={Users} tono="bg-primary/15 text-primary" />
@@ -91,48 +119,33 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
           icono={LifeBuoy}
           tono="bg-trajinera/35 text-trajinera-tinta"
         />
-        <Indicador titulo="Necesitan atención" valor={String(i.necesitan_atencion)} detalle="Ver la lista de abajo" icono={TriangleAlert} tono="bg-peligro/15 text-peligro" />
+        <Indicador titulo="Necesitan atención" valor={String(i.necesitan_atencion)} detalle="Lista de abajo" icono={TriangleAlert} tono="bg-peligro/15 text-peligro" />
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <section className="tarjeta-clay p-5">
+          <h2 className="texto-titulo text-xl">La escalera del grupo</h2>
+          <p className="mb-4 text-sm text-muted-foreground">Cuántos alumnos resolvieron en cada escalón de ayuda</p>
+          <EscaleraGrupo filas={r.filas.todos} />
+        </section>
         <section className="tarjeta-clay p-5">
           <h2 className="texto-titulo text-xl">Dónde se atora el grupo</h2>
           <p className="mb-2 text-sm text-muted-foreground">Alumnos con cada brecha esta semana</p>
           <GraficaBrechas datos={r.brechas} />
         </section>
-
-        <section className="tarjeta-clay p-5">
-          <h2 className="texto-titulo text-xl">Necesitan atención hoy</h2>
-          {r.atencion.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Nadie necesita atención especial esta semana.</p>
-          ) : (
-            <ul className="mt-2 divide-y divide-border">
-              {r.atencion.map((a, idx) => (
-                <motion.li
-                  key={a.alumno_id}
-                  initial={{ x: -10 }}
-                  whileInView={{ x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: Math.min(idx, 8) * 0.04 }}
-                  className="flex items-start gap-3 py-2.5"
-                >
-                  <span aria-hidden className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-peligro/15 text-peligro">
-                    <TriangleAlert className="size-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <Link href={`/docente/alumno/${a.alumno_id}`} className="font-bold text-primary hover:underline">
-                      {a.nombre}
-                    </Link>
-                    <p className="text-sm text-muted-foreground">{a.motivos.join(' · ')}</p>
-                  </div>
-                </motion.li>
-              ))}
-            </ul>
-          )}
-        </section>
       </div>
 
-      <section className="space-y-3">
+      <section className="tarjeta-clay p-5">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="texto-titulo text-xl">Necesitan atención hoy</h2>
+          {r.atencion.length > 0 && (
+            <span className="rounded-full bg-peligro/15 px-2.5 py-0.5 text-sm font-extrabold text-peligro">{r.atencion.length}</span>
+          )}
+        </div>
+        <ListaAtencion items={r.atencion} />
+      </section>
+
+      <section id="alumnos" className="scroll-mt-24 space-y-3">
         <h2 className="texto-titulo text-xl">Alumnos</h2>
         <TablaAlumnos filas={r.filas} />
         <p className="text-xs text-muted-foreground">
