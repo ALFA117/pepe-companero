@@ -17,7 +17,7 @@
 ![Groq](https://img.shields.io/badge/Groq_·_gpt--oss-F55036)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
 <br/>
-![Pruebas](https://img.shields.io/badge/pruebas-320_pasando-2ea44f)
+![Pruebas](https://img.shields.io/badge/pruebas-395_pasando-2ea44f)
 ![Juez](https://img.shields.io/badge/Juez_IA-29%2F29_casos-2ea44f)
 ![Lighthouse móvil](https://img.shields.io/badge/Lighthouse_móvil-97_rendimiento_·_100_accesibilidad-2ea44f)
 
@@ -79,6 +79,25 @@ Si el alumno se atora, Pepe le da **pistas cada vez más concretas, pero nunca l
 <br/><sub>En la página de inicio puedes probar un mini reto y recorrer la escalera sin registrarte.</sub>
 </div>
 
+## 🧩 Lo que pasa cuando el alumno no contesta "bien"
+
+Un niño de secundaria no siempre responde la pregunta. Pepe distingue lo que **es** una respuesta de lo que **no**, para que el nivel que ve el maestro sea real:
+
+| Si el alumno escribe… | Pepe… | ¿Cuenta para su nivel? |
+|:--|:--|:--:|
+| "hola", "jaja", "ok", 👍 | Saluda y repite su pregunta | No |
+| "espera, déjame pensar" | "¡Tómate tu tiempo!" | No |
+| "menú" · "repite" · "mi progreso" | Explica, repite la pregunta o cuenta sus retos | No |
+| "no sé" · **Dame una pista** | Baja un escalón con una pista más concreta | Sí |
+| "ya dime la respuesta" | "¡Yo tampoco la sé, por eso te pregunto!" | Sí |
+| "otro reto" a media tarea | "Primero terminemos este" y ofrece pista | No |
+| Un insulto | Pone un límite amable y sigue | No |
+| "nadie me quiere", "me quiero morir" | Responde con cuidado, da la **Línea de la Vida (800 911 2000)** y **avisa al maestro** | No |
+| "gracias" al terminar | No arranca otro reto por sorpresa: ofrece **Otro reto** y **Mi progreso** | — |
+| La IA no responde (límite, caída) | Pide repetir en vez de subirle el nivel por un error nuestro | No |
+
+Todo esto funciona igual en **WhatsApp** (con botones) y en la **web** (con atajos), sin gastar una llamada a la IA.
+
 ## 📚 Dos materias, un mismo motor
 
 - **Matemáticas:** Pepe resuelve con un error típico de secundaria (fracciones, ecuaciones, porcentajes, jerarquía de operaciones).
@@ -109,7 +128,7 @@ Si el alumno se atora, Pepe le da **pistas cada vez más concretas, pero nunca l
 ```mermaid
 flowchart LR
     A["WhatsApp / Web"] --> B["Juez IA: clasifica la respuesta"]
-    B --> C{"Maquina de estados: TypeScript, 320 pruebas"}
+    B --> C{"Maquina de estados: TypeScript, 395 pruebas"}
     C -->|decide el escalon| D["Pepe IA: solo redacta"]
     D --> E["Filtro anti-respuesta"]
     E --> A
@@ -145,7 +164,7 @@ flowchart LR
 | Datos | Supabase (Postgres con RLS) |
 | IA | Groq: `gpt-oss-120b` (Juez), `gpt-oss-20b` (Pepe), Whisper (voz) · AI SDK · salidas validadas con zod |
 | WhatsApp | API de WhatsApp Business vía Kapso (Twilio de respaldo) |
-| Calidad | Vitest (320 pruebas, incluidas miles de conversaciones aleatorias contra la máquina de estados) · Lighthouse |
+| Calidad | Vitest (395 pruebas, incluidas miles de conversaciones aleatorias contra la máquina de estados) · Lighthouse |
 | Deploy | Vercel |
 
 ## 🚀 Correrlo en tu compu
@@ -163,7 +182,7 @@ Sin llaves de Supabase, todo corre en memoria con un grupo de demo de 45 alumnos
 
 | Comando | Qué hace |
 |---|---|
-| `pnpm test` | 320 pruebas: máquina de estados, Juez, Pepe, filtro, fluidez, WhatsApp y panel |
+| `pnpm test` | 395 pruebas: máquina de estados, Juez, Pepe, filtro, fluidez, WhatsApp y panel |
 | `pnpm typecheck` · `pnpm lint` · `pnpm build` | Tipos, ESLint y build |
 | `pnpm simular` | Platica con Pepe en la terminal, con la IA real |
 | `pnpm evaluar-juez` | 29 casos fijos contra el Juez real |
