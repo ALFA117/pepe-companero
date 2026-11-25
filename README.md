@@ -138,6 +138,10 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 
 - **No se distinguía qué botón avanzaba ni qué hacía cada uno.** Ahora hay una regla en toda la app: **turquesa sólido = avanzar** (siempre con texto: "Entrar", "Enviar", "Siguiente reto"), **con borde = alternativa** ("Salir", "Cancelar") y **fichas claras = respuestas para Pepe**, con la instrucción encima ("Toca una respuesta o escribe la tuya"). El micrófono dice "Voz", y arriba del teclado hay una pista de qué hacer en cada momento. "Entrar" ya no se ve apagado: si falta el código, explica qué escribir.
 
+- **El inicio era lento en celular** (Lighthouse móvil: rendimiento 58; el navegador se trababa 1.9 s). Three.js tardaba 3.5 s en ejecutarse. Ahora la burbuja 3D solo carga en pantallas grandes con memoria suficiente, sin modo de ahorro de datos y después de que la página ya se ve, y las ondas en celular van a 30 cuadros por segundo.
+- **Contraste:** las etiquetas amarillas pequeñas y los avatares con iniciales de color sobre color no llegaban a 4.5:1. Ahora usan el color de texto normal.
+- **Chat sin señal:** el encabezado dice "sin conexión" y, si un mensaje no salió por falta de internet, se reenvía solo cuando vuelve la señal.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.

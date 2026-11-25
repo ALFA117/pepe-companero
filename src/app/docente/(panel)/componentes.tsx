@@ -83,7 +83,7 @@ export function EtiquetaEstado({ estado }: { estado: Estado }) {
   );
 }
 
-const TONOS_AVATAR = ['bg-primary/15 text-primary', 'bg-ajolote/45 text-ajolote-branquia', 'bg-trajinera/40 text-trajinera-tinta'];
+const TONOS_AVATAR = ['bg-primary/20 text-foreground', 'bg-ajolote/50 text-foreground', 'bg-trajinera/45 text-foreground'];
 
 /** Círculo con las iniciales del alumno (sin fotos de menores). */
 export function Avatar({ nombre, grande = false }: { nombre: string; grande?: boolean }) {

@@ -100,7 +100,7 @@ export function EscaleraAyuda() {
               </p>
             </div>
             <p className="flex items-center gap-2 text-sm">
-              <span className="rounded-full bg-trajinera/40 px-2.5 py-0.5 text-xs font-extrabold text-trajinera-tinta">El maestro ve</span>
+              <span className="rounded-full bg-trajinera/40 px-2.5 py-0.5 text-xs font-extrabold text-foreground">El maestro ve</span>
               <span className="text-muted-foreground">{n.maestro}</span>
             </p>
           </motion.div>

@@ -9,7 +9,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight, BookOpenText, House, Mic, MousePointerClick, PartyPopper, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
 import type { RespuestaChat } from '@/app/api/chat/route';
 import { PepeAjolote } from '@/components/pepe-ajolote';
 import { Toast } from '@/components/toast';
@@ -48,6 +48,15 @@ function pausaPara(texto: string) {
 }
 
 const dormir = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function suscribirRed(cb: () => void) {
+  window.addEventListener('online', cb);
+  window.addEventListener('offline', cb);
+  return () => {
+    window.removeEventListener('online', cb);
+    window.removeEventListener('offline', cb);
+  };
+}
 
 /** *negritas* como en WhatsApp. */
 function conFormato(texto: string): ReactNode[] {
@@ -147,16 +156,25 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
         await mostrarRespuesta(datos);
       } catch (err) {
         setEscribiendo(false);
+        let hecho = false;
         const reintentar = () => {
+          if (hecho) return;
+          hecho = true;
+          window.removeEventListener('online', reintentar);
           setMensajes((xs) => xs.filter((m) => m.id !== `${id}-error`));
           void enviar(cuerpo, false);
         };
+        const sinRed = typeof navigator !== 'undefined' && !navigator.onLine;
+        // Sin señal: se reenvía solo en cuanto vuelva la conexión.
+        if (sinRed) window.addEventListener('online', reintentar, { once: true });
         setMensajes((xs) => [
           ...xs,
           {
             id: `${id}-error`,
             rol: 'sistema',
-            texto: `${err instanceof Error && err.message !== 'Error' ? err.message : 'No se pudo enviar tu mensaje'}. Revisa tu internet.`,
+            texto: sinRed
+              ? 'Sin internet. Tu mensaje se envía solo cuando vuelva la señal.'
+              : `${err instanceof Error && err.message !== 'Error' ? err.message : 'No se pudo enviar tu mensaje'}. Revisa tu internet.`,
             reintentar,
           },
         ]);
@@ -235,7 +253,14 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
     ? undefined
     : { initial: { opacity: 0, y: 10, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 } };
   const resorte = { type: 'spring' as const, stiffness: 300, damping: 26 };
-  const estado = escribiendo ? 'escribiendo…' : grabando ? 'escuchándote…' : `en línea · hola, ${nombre}`;
+  const enLinea = useSyncExternalStore(suscribirRed, () => navigator.onLine, () => true);
+  const estado = !enLinea
+    ? 'sin conexión · revisa tu internet'
+    : escribiendo
+      ? 'escribiendo…'
+      : grabando
+        ? 'escuchándote…'
+        : `en línea · hola, ${nombre}`;
 
   return (
     <div className="flex h-dvh flex-col">
@@ -251,7 +276,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
           </Link>
           <div className="relative flex size-12 shrink-0 items-center justify-center rounded-2xl bg-ajolote/35">
             <PepeAjolote vivo cara={escribiendo ? 'pensando' : 'feliz'} className="w-11" />
-            <span className="absolute -right-0.5 -bottom-0.5 size-3.5 rounded-full border-2 border-card bg-exito" aria-hidden />
+            <span className={`absolute -right-0.5 -bottom-0.5 size-3.5 rounded-full border-2 border-card ${enLinea ? 'bg-exito' : 'bg-peligro'}`} aria-hidden />
           </div>
           <div className="min-w-0 flex-1">
             <p className="texto-titulo text-lg leading-none">Pepe</p>
@@ -263,7 +288,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduce ? undefined : { opacity: 0, y: -4 }}
                   transition={{ duration: 0.15 }}
-                  className={`inline-block ${escribiendo || grabando ? 'font-bold text-primary' : ''}`}
+                  className={`inline-block ${!enLinea ? 'font-bold text-peligro' : escribiendo || grabando ? 'font-bold text-primary' : ''}`}
                 >
                   {estado}
                 </motion.span>

@@ -54,8 +54,14 @@ function useCanvasLoop(
     resize();
     window.addEventListener('resize', resize);
     if (reduce) return () => window.removeEventListener('resize', resize);
+    // En celular basta con ~30 cuadros por segundo: libera al procesador.
+    const intervalo = window.innerWidth < 768 ? 33 : 0;
+    let ultimo = 0;
     const loop = (t: number) => {
-      draw(ctx, w, h, t / 1000);
+      if (t - ultimo >= intervalo) {
+        ultimo = t;
+        draw(ctx, w, h, t / 1000);
+      }
       raf = requestAnimationFrame(loop);
     };
     const vis = () => {
@@ -259,6 +265,23 @@ export function FondoAmbiente() {
   const scroll = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
   const yAgua = useTransform(scroll, (v) => (reduce ? 0 : v * -60));
   const xAurora = useTransform(px, (v) => (reduce ? 0 : v * -12));
+  // La burbuja 3D (Three.js) es pesada: solo en pantallas grandes con memoria
+  // suficiente, sin ahorro de datos, y después de que la página ya se ve.
+  const [con3D, setCon3D] = useState(false);
+  useEffect(() => {
+    if (!completo) return;
+    const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+    const apto =
+      window.innerWidth >= 768 && (nav.deviceMemory ?? 8) >= 4 && !nav.connection?.saveData && (nav.hardwareConcurrency ?? 8) >= 4;
+    if (!apto) return;
+    // Safari no tiene requestIdleCallback: ahí se espera un poco con setTimeout.
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(() => setCon3D(true), { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(() => setCon3D(true), 1200);
+    return () => clearTimeout(id);
+  }, [completo]);
   const xTrajinera = useTransform(px, (v) => (reduce ? 0 : v * 10));
   const yTrajinera = useTransform(scroll, (v) => (reduce ? 0 : v * -90));
   const yBurbuja = useTransform(scroll, (v) => (reduce ? 0 : v * -220));
@@ -270,7 +293,7 @@ export function FondoAmbiente() {
       <motion.div className="amb-capa" style={{ y: yAgua }}>
         <AguaDelCanal reduce={reduce} completo={completo} px={px} />
       </motion.div>
-      {completo && (
+      {completo && con3D && (
         <motion.div className="amb-burbuja3d" style={{ y: yBurbuja }}>
           <Burbuja3D />
         </motion.div>
