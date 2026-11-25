@@ -91,6 +91,13 @@ export class SesionActivaDuplicadaError extends Error {
   }
 }
 
+export class CodigoOcupadoError extends Error {
+  constructor(codigo: string) {
+    super(`El código ${codigo} ya existe`);
+    this.name = 'CodigoOcupadoError';
+  }
+}
+
 export interface Repositorio {
   // Alumnos
   alumnoPorCodigo(codigo: string): Promise<Alumno | null>;
@@ -98,6 +105,8 @@ export interface Repositorio {
   alumnoPorTelHash(telHash: string): Promise<Alumno | null>;
   vincularTelefono(alumnoId: string, telHash: string, telCifrado: string): Promise<void>;
   marcarMensajeWhatsApp(alumnoId: string, cuando: Date): Promise<void>;
+  /** Crea el grupo si no existe y un alumno nuevo en él. Lanza CodigoOcupadoError si el código ya existe. */
+  crearAlumno(grupo: Grupo, alumno: { nombre: string; codigo: string }): Promise<Alumno>;
 
   // Sesiones
   /** La sesión no terminada más reciente (incluye `pendiente`). */

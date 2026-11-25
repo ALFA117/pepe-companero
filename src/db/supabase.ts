@@ -4,6 +4,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
 import {
+  CodigoOcupadoError,
   SesionActivaDuplicadaError,
   type Alumno,
   type DatosPanel,
@@ -59,6 +60,20 @@ function columnasSesion(s: Sesion) {
 
 export class RepositorioSupabase implements Repositorio {
   constructor(private readonly sb: SupabaseClient) {}
+
+  async crearAlumno(grupo: Grupo, nuevo: { nombre: string; codigo: string }) {
+    const { error: eg } = await this.sb.from('grupos').upsert(grupo, { onConflict: 'id', ignoreDuplicates: true });
+    if (eg) falla('crearAlumno (grupo)', eg);
+    const codigo = nuevo.codigo.trim().toUpperCase();
+    const { data, error } = await this.sb
+      .from('alumnos')
+      .insert({ grupo_id: grupo.id, nombre: nuevo.nombre, codigo })
+      .select('*')
+      .single();
+    if (error?.code === VIOLACION_UNIQUE) throw new CodigoOcupadoError(codigo);
+    if (error) falla('crearAlumno', error);
+    return data as Alumno;
+  }
 
   async alumnoPorCodigo(codigo: string) {
     const { data, error } = await this.sb

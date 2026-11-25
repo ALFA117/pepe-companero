@@ -1,9 +1,10 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, History } from 'lucide-react';
+import { ArrowRight, FlaskConical, History } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useSyncExternalStore, type FormEvent } from 'react';
+import { useState, useSyncExternalStore, useTransition, type FormEvent } from 'react';
+import { probarSinCodigo } from './acciones';
 import { Boton } from '@/components/boton';
 
 const RE_CODIGO = /^PEPE-[A-Z0-9]{1,6}-[A-Z0-9]{1,6}$/;
@@ -36,6 +37,19 @@ export function EntrarConCodigo() {
     }
     setYendo(true);
     router.push(`/alumno/${encodeURIComponent(c)}`);
+  }
+
+  const [probando, iniciarPrueba] = useTransition();
+  function probar() {
+    setError(null);
+    iniciarPrueba(async () => {
+      const r = await probarSinCodigo();
+      if ('error' in r) {
+        setError(r.error);
+        return;
+      }
+      ir(r.codigo);
+    });
   }
 
   function entrar(e: FormEvent) {
@@ -118,6 +132,15 @@ export function EntrarConCodigo() {
           Te lo da tu profe. También puedes mandárselo a Pepe por WhatsApp.
         </p>
       )}
+      <div className="flex items-center gap-3 pt-1" aria-hidden>
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-xs font-bold text-muted-foreground">o</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
+      <Boton type="button" variante="secundario" cargando={probando} onClick={probar} className="w-full">
+        <FlaskConical className="size-4" aria-hidden /> Probar sin código
+      </Boton>
+      <p className="text-center text-xs text-muted-foreground">Para el jurado o si solo quieres conocer a Pepe. Te damos un código de prueba.</p>
     </form>
   );
 }

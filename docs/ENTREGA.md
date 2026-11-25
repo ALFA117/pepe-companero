@@ -8,7 +8,7 @@
 | Video pitch (máx. 3 min) | 80 % | Guion abajo (sección 2) |
 | Ficha de entrega | 20 % | Textos listos para pegar (sección 1) |
 
-**Demo en vivo:** https://pepe-companero.vercel.app (alumno: `PEPE-DEMO-01` a `PEPE-DEMO-45`; maestro: `/docente`).
+**Demo en vivo:** https://pepe-companero.vercel.app. Para probar como alumno, toca **"Probar sin código"** en el inicio. El panel del maestro está en `/docente`.
 
 ---
 
@@ -43,6 +43,8 @@ En PISA 2022 solo el **34 %** de los estudiantes mexicanos de 15 años alcanzó 
 - **Privacidad de menores desde el diseño:** el audio no se guarda (solo el texto transcrito), y el teléfono se guarda con hash y cifrado, nunca en claro.
 - **Cumple la política de WhatsApp Business** que desde el 15 de enero de 2026 prohíbe los chatbots de IA de propósito general: Pepe solo habla del reto.
 - **Modelos abiertos y baratos,** sin depender de un solo proveedor. Pueden correr en infraestructura propia si una autoridad educativa lo pide.
+
+- **Rápido en celulares sencillos:** 97 de 100 en rendimiento y 100 en accesibilidad en la prueba de Google (Lighthouse, simulando un celular). Si se cae la señal, el chat lo avisa y reenvía solo.
 
 ### ¿Requiere grandes inversiones?
 No. Costo estimado con precios públicos de noviembre de 2026 y el consumo real medido en el prototipo:

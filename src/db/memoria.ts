@@ -5,6 +5,7 @@
  */
 import type { EvaluacionFinal, Sesion } from '@/motor/tipos';
 import {
+  CodigoOcupadoError,
   SesionActivaDuplicadaError,
   type Alumno,
   type DatosPanel,
@@ -68,6 +69,23 @@ export class RepositorioMemoria implements Repositorio {
   private ahora(): string {
     this.reloj = Math.max(this.reloj + 1, Date.now());
     return new Date(this.reloj).toISOString();
+  }
+
+  async crearAlumno(grupo: Grupo, nuevo: { nombre: string; codigo: string }) {
+    if (!this.datos.grupos.some((g) => g.id === grupo.id)) this.datos.grupos.push({ ...grupo });
+    const codigo = nuevo.codigo.trim().toUpperCase();
+    if (this.datos.alumnos.some((a) => a.codigo === codigo)) throw new CodigoOcupadoError(codigo);
+    const alumno: Alumno = {
+      id: crypto.randomUUID(),
+      grupo_id: grupo.id,
+      nombre: nuevo.nombre,
+      codigo,
+      tel_hash: null,
+      tel_cifrado: null,
+      ultimo_mensaje_wa_en: null,
+    };
+    this.datos.alumnos.push(alumno);
+    return structuredClone(alumno);
   }
 
   async alumnoPorCodigo(codigo: string) {

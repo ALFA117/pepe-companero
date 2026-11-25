@@ -62,7 +62,7 @@ cp .env.example .env.local   # y llena las llaves
 pnpm dev
 ```
 
-- Alumno: `http://localhost:3000` → código `PEPE-1B-01` (pruebas) o `PEPE-DEMO-01` a `PEPE-DEMO-45` (demo).
+- Alumno: `http://localhost:3000` → **Probar sin código**, o el código `PEPE-1B-01` (pruebas) o `PEPE-DEMO-01` a `PEPE-DEMO-45` (demo).
 - Maestro: `http://localhost:3000/docente` → PIN de `DOCENTE_PIN`.
 - Con `BASE_DATOS=memoria` todo corre sin Supabase y con el grupo de demo cargado en memoria. Se pierde al reiniciar.
 
@@ -141,6 +141,8 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 - **El inicio era lento en celular** (Lighthouse móvil: rendimiento 58; el navegador se trababa 1.9 s). Three.js tardaba 3.5 s en ejecutarse. Ahora la burbuja 3D solo carga en pantallas grandes con memoria suficiente, sin modo de ahorro de datos y después de que la página ya se ve, y las ondas en celular van a 30 cuadros por segundo.
 - **Contraste:** las etiquetas amarillas pequeñas y los avatares con iniciales de color sobre color no llegaban a 4.5:1. Ahora usan el color de texto normal.
 - **Chat sin señal:** el encabezado dice "sin conexión" y, si un mensaje no salió por falta de internet, se reenvía solo cuando vuelve la señal.
+
+- **El jurado no podía probar el chat sin un código.** Ahora el inicio tiene **"Probar sin código"**: crea un alumno visitante (`PEPE-VIS-XXXXX`, sin letras confusas) en el grupo "Visitantes (prueba)", separado de los grupos reales, y abre el chat. `pnpm reiniciar-pruebas` también borra a los visitantes.
 
 ## DESIGN_NOTES
 

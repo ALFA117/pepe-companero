@@ -2,7 +2,7 @@
 
 ## Antes de presentar (10 minutos antes)
 
-1. `pnpm reiniciar-pruebas` para dejar como nuevos a PEPE-1B-01, 02 y 03. El grupo de demo de 45 alumnos no se toca.
+1. `pnpm reiniciar-pruebas` para dejar como nuevos a PEPE-1B-01, 02 y 03 y borrar a los visitantes de "Probar sin código". El grupo de demo de 45 alumnos no se toca.
 2. En la laptop, abre `https://<dominio>/docente` y entra con el PIN.
 3. En el celular, abre `https://<dominio>` y escribe `PEPE-1B-01`. Que salga el reto y **no contestes todavía**. Si contesta, Groq está bien.
 4. Si vas a mostrar WhatsApp, usa el celular registrado en el sandbox de Kapso. Si ya estaba vinculado de otra prueba, corre `pnpm reiniciar-pruebas --desvincular`.
