@@ -6,7 +6,7 @@
  * con MediaRecorder que pasa por la misma transcripción que WhatsApp.
  */
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowLeft, ArrowRight, BookOpenText, House, Mic, MousePointerClick, PartyPopper, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpenText, ChartNoAxesColumnIncreasing, House, Lightbulb, Mic, MousePointerClick, PartyPopper, Repeat2, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
@@ -32,7 +32,19 @@ interface Props {
   reto: { titulo: string; materia: 'matematicas' | 'lectura' } | null;
   /** La sesión ya terminó: se ofrece el siguiente reto en vez del teclado. */
   terminado: boolean;
+  /** Regresó después de terminar un reto: la tarjeta lo invita a otro. */
+  entreRetos?: boolean;
+  faseInicial?: string | null;
+  /** Pistas usadas en el reto en curso (0 a 4). */
+  nivelInicial?: number;
 }
+
+const MAX_PISTAS = 4;
+/** Atajos que entiende el motor (motor/intencion.ts). */
+const ATAJO_PISTA = 'Dame una pista';
+const ATAJO_REPETIR = 'Repetir pregunta';
+const ATAJO_OTRO = 'Otro reto';
+const ATAJO_PROGRESO = 'Mi progreso';
 
 const MAX_GRABACION_S = 180;
 
@@ -58,14 +70,38 @@ function suscribirRed(cb: () => void) {
   };
 }
 
-/** *negritas* como en WhatsApp. */
+/** *negritas* como en WhatsApp, y los teléfonos de ayuda (800…) se pueden tocar para llamar. */
 function conFormato(texto: string): ReactNode[] {
-  return texto.split(/(\*[^*\n]+\*)/g).map((parte, i) =>
-    parte.startsWith('*') && parte.endsWith('*') && parte.length > 2 ? (
-      <strong key={i}>{parte.slice(1, -1)}</strong>
-    ) : (
-      <span key={i}>{parte}</span>
-    ),
+  return texto.split(/(\*[^*\n]+\*|\b800 ?\d{3} ?\d{4}\b)/g).map((parte, i) => {
+    if (parte.startsWith('*') && parte.endsWith('*') && parte.length > 2) return <strong key={i}>{parte.slice(1, -1)}</strong>;
+    if (/^800 ?\d{3} ?\d{4}$/.test(parte)) {
+      return (
+        <a key={i} href={`tel:${parte.replace(/\s/g, '')}`} className="-my-3 inline-block py-3 font-extrabold whitespace-nowrap text-primary underline underline-offset-2">
+          {parte}
+        </a>
+      );
+    }
+    return <span key={i}>{parte}</span>;
+  });
+}
+
+/** Cuántas pistas lleva el alumno en este reto: puntitos que se llenan. */
+function MedidorPistas({ nivel }: { nivel: number }) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1.5 border-l-2 border-border pl-2" title={`Pistas usadas: ${nivel} de ${MAX_PISTAS}`}>
+      <Lightbulb className={`size-3.5 ${nivel > 0 ? 'text-trajinera-tinta' : 'text-muted-foreground'}`} aria-hidden />
+      <span className="sr-only">Pistas usadas: {nivel} de {MAX_PISTAS}</span>
+      <span className="flex gap-0.5" aria-hidden>
+        {Array.from({ length: MAX_PISTAS }, (_, k) => (
+          <motion.span
+            key={k}
+            initial={false}
+            animate={{ scale: k < nivel ? [1.5, 1] : 1 }}
+            className={`size-2 rounded-full ${k < nivel ? 'bg-trajinera' : 'bg-muted-foreground/25'}`}
+          />
+        ))}
+      </span>
+    </span>
   );
 }
 
@@ -77,9 +113,22 @@ function tipoDeGrabacion(): string {
   return '';
 }
 
-export function Chat({ codigo, nombre, historial, botonesIniciales, reto, terminado: terminadoInicial }: Props) {
+export function Chat({
+  codigo,
+  nombre,
+  historial,
+  botonesIniciales,
+  reto: retoInicial,
+  terminado: terminadoInicial,
+  entreRetos = false,
+  faseInicial = null,
+  nivelInicial = 0,
+}: Props) {
   const router = useRouter();
   const [terminado, setTerminado] = useState(terminadoInicial);
+  const [fase, setFase] = useState<string | null>(faseInicial);
+  const [nivel, setNivel] = useState(nivelInicial);
+  const [reto, setReto] = useState(retoInicial);
   const [aviso, setAviso] = useState<string | null>(null);
   const cerrarAviso = useCallback(() => setAviso(null), []);
   const [mensajes, setMensajes] = useState<MensajeChat[]>(historial);
@@ -114,6 +163,9 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
       setMensajes((xs) => [...xs, { id: nuevoId(), rol: 'pepe', texto: m }]);
     }
     setBotones(r.botones ?? []);
+    if (r.fase) setFase(r.fase);
+    if (r.reto) setReto(r.reto);
+    if (r.nivel !== null && r.nivel !== undefined) setNivel(r.nivel);
     if (r.fase === 'terminado') setTerminado(true);
   }, []);
 
@@ -187,17 +239,17 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
 
   // Primera vez: saludar a Pepe para que arranque el reto.
   useEffect(() => {
-    if (historial.length === 0 && !arrancoRef.current) {
+    if (historial.length === 0 && !terminadoInicial && !arrancoRef.current) {
       arrancoRef.current = true;
       void enviar({ tipo: 'texto', texto: 'hola' }, false);
     }
-  }, [historial.length, enviar]);
+  }, [historial.length, terminadoInicial, enviar]);
 
   const [pasando, setPasando] = useState(false);
   async function siguienteReto() {
     setPasando(true);
     setTerminado(false);
-    await enviar({ tipo: 'texto', texto: 'hola' }, false);
+    await enviar({ tipo: 'boton', texto: ATAJO_OTRO }, false);
     setPasando(false);
     // Recarga los datos del servidor: el título del reto nuevo y su conversación.
     router.refresh();
@@ -260,7 +312,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
       ? 'escribiendo…'
       : grabando
         ? 'escuchándote…'
-        : `en línea · hola, ${nombre}`;
+        : 'en línea';
 
   return (
     <div className="flex h-dvh flex-col">
@@ -295,7 +347,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
               </AnimatePresence>
             </p>
           </div>
-          <span className="hidden rounded-xl bg-muted px-2.5 py-1 font-mono text-xs font-semibold text-muted-foreground min-[360px]:inline">
+          <span className="hidden rounded-xl bg-muted px-2.5 py-1 font-mono text-xs font-semibold text-muted-foreground min-[400px]:inline">
             {codigo}
           </span>
         </div>
@@ -310,6 +362,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
               <span className="text-muted-foreground">{reto.materia === 'lectura' ? 'Lectura' : 'Matemáticas'}</span>
               <span aria-hidden className="text-muted-foreground">·</span>
               <span className="truncate">{reto.titulo}</span>
+              {(fase === 'nivel' || fase === 'cierre') && <MedidorPistas nivel={nivel} />}
             </p>
           </div>
         )}
@@ -402,7 +455,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
       <footer className="px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="mx-auto max-w-2xl">
           <AnimatePresence>
-            {botones.length > 0 && !ocupado && (
+            {botones.length > 0 && !ocupado && !terminado && (
               <motion.div
                 key={botones.join('|')}
                 initial={reduce ? false : { opacity: 0, y: 8 }}
@@ -451,8 +504,12 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                 <PartyPopper className="size-7 text-trajinera-tinta" aria-hidden />
               </div>
               <div>
-                <p className="texto-titulo text-xl">¡Reto terminado!</p>
-                <p className="text-[15px] text-muted-foreground">Gracias por ayudar a Pepe. ¿Le entras a otro?</p>
+                <p className="texto-titulo text-xl">{entreRetos ? `¡Qué gusto verte, ${nombre}!` : '¡Reto terminado!'}</p>
+                <p className="text-[15px] text-muted-foreground">
+                  {entreRetos
+                    ? 'Pepe tiene otra tarea en la que seguro se equivocó. ¿Le ayudas?'
+                    : 'Gracias por ayudar a Pepe. ¿Le entras a otro?'}
+                </p>
               </div>
               <div className="flex w-full flex-col gap-2 min-[440px]:flex-row">
                 <motion.button
@@ -466,9 +523,18 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                 >
                   Siguiente reto <ArrowRight className="size-4" aria-hidden />
                 </motion.button>
+                <button
+                  type="button"
+                  onClick={() => void enviar({ tipo: 'boton', texto: ATAJO_PROGRESO })}
+                  disabled={ocupado}
+                  className="inline-flex min-h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-primary/50 bg-card px-5 font-extrabold shadow-clay disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                >
+                  <ChartNoAxesColumnIncreasing className="size-4 text-primary" aria-hidden /> Mi progreso
+                </button>
                 <Link
                   href="/"
-                  className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card px-5 font-extrabold shadow-clay focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                  aria-label="Salir al inicio"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-extrabold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
                 >
                   <House className="size-4" aria-hidden /> Salir
                 </Link>
@@ -491,6 +557,26 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                       ? 'Escribe tu respuesta y toca Enviar, o toca Voz para hablarle.'
                       : 'Escribe tu respuesta y toca Enviar.'}
               </p>
+            )}
+            {fase === 'nivel' && !grabando && !ocupado && (
+              <div className="mb-2 flex flex-wrap justify-end gap-2" role="group" aria-label="Atajos">
+                {[
+                  { texto: ATAJO_PISTA, icono: Lightbulb },
+                  { texto: ATAJO_REPETIR, icono: Repeat2 },
+                ]
+                  .filter((a) => !botones.includes(a.texto))
+                  .map(({ texto: t, icono: Icono }) => (
+                    <motion.button
+                      key={t}
+                      type="button"
+                      whileTap={reduce ? undefined : { scale: 0.96 }}
+                      onClick={() => void enviar({ tipo: 'boton', texto: t })}
+                      className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-2 border-dashed border-border bg-card/80 px-3.5 text-[13px] font-bold text-muted-foreground transition-colors hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                    >
+                      <Icono className="size-4 text-primary" aria-hidden /> {t}
+                    </motion.button>
+                  ))}
+              </div>
             )}
             <div className="tarjeta-clay rounded-3xl p-2">
             {grabando ? (

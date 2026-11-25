@@ -62,7 +62,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             <p className="text-sm text-muted-foreground">
               {[r.grupo.escuela, r.grupo.docente_nombre].filter(Boolean).join(' · ')}
               {r.grupo.es_demo && (
-                <span className="ml-2 rounded-full bg-trajinera/40 px-2 py-0.5 text-xs font-bold text-foreground">Datos de demostración</span>
+                <span className="ml-2 inline-block rounded-full bg-trajinera/40 px-2 py-0.5 text-xs font-bold whitespace-nowrap text-foreground">Datos de demostración</span>
               )}
             </p>
             <p className="max-w-2xl text-[17px] font-semibold">{resumen}</p>

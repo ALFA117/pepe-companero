@@ -4,6 +4,7 @@ import { pasoActual } from '@/motor/maquina';
 import { repositorio } from '@/motor/servidor';
 import { infoDeRetos } from '@/panel/calcular';
 import { existeReto, listarRetos, obtenerReto } from '@/retos/cargar';
+import { BOTON_NO_PUEDO_GRABAR } from '@/motor/pepe';
 import { Chat, type MensajeChat } from './chat';
 
 export const dynamic = 'force-dynamic';
@@ -46,13 +47,18 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
   // Si lo último fue una pregunta de Pepe con opciones, se vuelven a mostrar.
   let botones: string[] = [];
   const ultimo = turnos.at(-1);
-  if (sesion && sesion.fase === 'nivel' && ultimo?.rol === 'pepe' && existeReto(sesion.reto_id)) {
-    botones = pasoActual(obtenerReto(sesion.reto_id), sesion)?.botones ?? [];
+  if (sesion && ultimo?.rol === 'pepe' && existeReto(sesion.reto_id)) {
+    if (sesion.fase === 'nivel') botones = pasoActual(obtenerReto(sesion.reto_id), sesion)?.botones ?? [];
+    if (sesion.fase === 'leyendo_texto') botones = [BOTON_NO_PUEDO_GRABAR];
   }
+
+  // Regresa después de terminar un reto (el siguiente quedó pendiente): se le
+  // pregunta si quiere otro, en vez de arrancarlo por sorpresa.
+  const entreRetos = sesion?.fase === 'pendiente' && (await repo.retosHechos(alumno.id)).length > 1;
 
   const nombre = alumno.nombre.split(' ')[0] ?? alumno.nombre;
   const info = sesion ? infoDeRetos(listarRetos()).get(sesion.reto_id) : undefined;
-  const reto = info ? { titulo: info.titulo, materia: info.materia } : null;
+  const reto = info && !entreRetos ? { titulo: info.titulo, materia: info.materia } : null;
   // Se vuelve a montar al cambiar de sesión (por ejemplo, al pasar al siguiente reto).
   return (
     <Chat
@@ -62,7 +68,10 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
       historial={historial}
       botonesIniciales={botones}
       reto={reto}
-      terminado={sesion?.fase === 'terminado' && historial.length > 0}
+      terminado={(sesion?.fase === 'terminado' && historial.length > 0) || entreRetos}
+      entreRetos={entreRetos}
+      faseInicial={sesion?.fase ?? null}
+      nivelInicial={sesion?.nivel ?? 0}
     />
   );
 }

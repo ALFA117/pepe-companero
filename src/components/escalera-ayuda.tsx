@@ -2,7 +2,7 @@
 
 /**
  * La escalera de ayuda (niveles 0 a 4) explicada con pestañas. El indicador se
- * desliza con layoutId y el contenido cambia con crossfade. Usa el mismo
+ * desliza con CSS y el contenido cambia con crossfade. Usa el mismo
  * ejemplo de decimales del mini reto, no un reto del banco.
  */
 import { AnimatePresence, motion } from 'motion/react';
@@ -48,7 +48,14 @@ export function EscaleraAyuda() {
 
   return (
     <div className="tarjeta-clay space-y-5 p-5 sm:p-6">
-      <div className="flex gap-1 overflow-x-auto rounded-2xl bg-muted/80 p-1" role="tablist" aria-label="Niveles de ayuda">
+      <div className="relative grid grid-cols-5 gap-1 rounded-2xl bg-muted/80 p-1" role="tablist" aria-label="Niveles de ayuda">
+        {/* Indicador calculado con CSS (columnas iguales): no depende de medir el layout,
+            así no se desfasa si la sección todavía está entrando o se está desplazando. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-1 bottom-1 left-1 rounded-xl bg-primary shadow-clay transition-transform duration-300 ease-out motion-reduce:transition-none"
+          style={{ width: 'calc((100% - 1.5rem) / 5)', transform: `translateX(calc(${nivel} * (100% + 0.25rem)))` }}
+        />
         {NIVELES.map((x, i) => (
           <button
             key={x.nombre}
@@ -58,20 +65,13 @@ export function EscaleraAyuda() {
             aria-selected={nivel === i}
             aria-controls="nivel-panel"
             onClick={() => setNivel(i)}
-            className={`relative min-h-11 min-w-11 flex-1 cursor-pointer rounded-xl px-2 text-sm font-extrabold whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`relative min-h-14 min-w-0 cursor-pointer rounded-xl px-1 py-1.5 font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               nivel === i ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {nivel === i && (
-              <motion.span
-                layoutId="nivel-activo"
-                className="absolute inset-0 rounded-xl bg-primary shadow-boton"
-                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-              />
-            )}
-            <span className="relative">
-              <span className="font-mono">{i}</span>
-              <span className="hidden sm:inline"> · {x.nombre}</span>
+            <span className="relative flex flex-col items-center gap-0.5 leading-tight">
+              <span className="font-mono text-base">{i}</span>
+              <span className="hidden text-xs text-balance min-[360px]:block">{x.nombre}</span>
             </span>
           </button>
         ))}
@@ -88,7 +88,7 @@ export function EscaleraAyuda() {
             className="space-y-4"
           >
             <div>
-              <p className="eyebrow text-primary">Nivel {nivel}</p>
+              <p className="eyebrow text-primary">Nivel {nivel} · {n.nombre}</p>
               <h3 className="texto-titulo text-xl">{n.titulo}</h3>
             </div>
             <div className="flex items-end gap-2">
@@ -99,8 +99,8 @@ export function EscaleraAyuda() {
                 {n.pepe}
               </p>
             </div>
-            <p className="flex items-center gap-2 text-sm">
-              <span className="rounded-full bg-trajinera/40 px-2.5 py-0.5 text-xs font-extrabold text-foreground">El maestro ve</span>
+            <p className="flex items-start gap-2 text-sm">
+              <span className="shrink-0 rounded-full bg-trajinera/40 px-2.5 py-0.5 text-xs font-extrabold whitespace-nowrap text-foreground">El maestro ve</span>
               <span className="text-muted-foreground">{n.maestro}</span>
             </p>
           </motion.div>

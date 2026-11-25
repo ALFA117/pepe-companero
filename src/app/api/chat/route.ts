@@ -11,6 +11,8 @@ import { z } from 'zod';
 import { dependenciasMotor } from '@/motor/servidor';
 import { procesar } from '@/motor/procesar';
 import type { EntradaAlumno } from '@/motor/tipos';
+import { infoDeRetos } from '@/panel/calcular';
+import { listarRetos } from '@/retos/cargar';
 
 export const maxDuration = 60;
 
@@ -28,6 +30,16 @@ export interface RespuestaChat {
   mensajes: string[];
   botones?: string[];
   fase: string | null;
+  /** Pistas usadas en el reto (0 a 4). */
+  nivel: number | null;
+  /** El reto en curso, para el encabezado del chat. */
+  reto: { titulo: string; materia: 'matematicas' | 'lectura' } | null;
+}
+
+function retoDe(id: string | undefined, fase: string | undefined): RespuestaChat['reto'] {
+  if (!id || fase === 'pendiente') return null;
+  const info = infoDeRetos(listarRetos()).get(id);
+  return info ? { titulo: info.titulo, materia: info.materia } : null;
 }
 
 function error(estado: number, mensaje: string) {
@@ -77,6 +89,8 @@ export async function POST(req: Request) {
       mensajes: r.mensajes,
       ...(r.botones ? { botones: r.botones } : {}),
       fase: r.sesion?.fase ?? null,
+      nivel: r.sesion?.nivel ?? null,
+      reto: retoDe(r.sesion?.reto_id, r.sesion?.fase),
     };
     return Response.json(respuesta);
   } catch (err) {

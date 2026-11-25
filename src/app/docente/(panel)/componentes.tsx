@@ -76,7 +76,7 @@ const ESTADOS: Record<Estado, { texto: string; Icono: LucideIcon; clase: string 
 export function EtiquetaEstado({ estado }: { estado: Estado }) {
   const e = ESTADOS[estado];
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${e.clase}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap ${e.clase}`}>
       <e.Icono className="size-3.5" aria-hidden />
       {e.texto}
     </span>
@@ -183,8 +183,8 @@ export function ListaAtencion({ items }: { items: ResumenPanel['atencion'] }) {
                     {a.motivos.map((m) => {
                       const I = iconoMotivo(m);
                       return (
-                        <span key={m} className="inline-flex items-center gap-1 rounded-full bg-peligro/10 px-2 py-0.5 text-xs text-foreground">
-                          <I className="size-3.5 text-peligro" aria-hidden />
+                        <span key={m} className="inline-flex items-start gap-1 rounded-xl bg-peligro/10 px-2 py-1 text-xs leading-snug text-foreground">
+                          <I className="mt-px size-3.5 shrink-0 text-peligro" aria-hidden />
                           {m}
                         </span>
                       );
@@ -237,7 +237,15 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
           className="min-h-12 w-full rounded-2xl border-2 border-input bg-card/80 pr-4 pl-11 text-[16px] outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-ring/25"
         />
       </label>
-      <div className="flex gap-1 rounded-2xl bg-muted/80 p-1" role="tablist" aria-label="Filtrar por materia">
+      <div className="relative flex gap-1 rounded-2xl bg-muted/80 p-1" role="tablist" aria-label="Filtrar por materia">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-1 bottom-1 left-1 rounded-xl bg-card shadow-clay transition-transform duration-300 ease-out motion-reduce:transition-none"
+          style={{
+            width: `calc((100% - 0.5rem - ${(FILTROS.length - 1) * 0.25}rem) / ${FILTROS.length})`,
+            transform: `translateX(calc(${Math.max(0, FILTROS.findIndex((f) => f.clave === filtro))} * (100% + 0.25rem)))`,
+          }}
+        />
         {FILTROS.map((f) => (
           <button
             key={f.clave}
@@ -248,13 +256,6 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
               filtro === f.clave ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {filtro === f.clave && (
-              <motion.span
-                layoutId="filtro-materia"
-                className="absolute inset-0 rounded-xl bg-card shadow-clay"
-                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-              />
-            )}
             <span className="relative">
               {f.texto}
               <span className="ml-1 text-xs tabular-nums text-muted-foreground">{filas[f.clave].length}</span>

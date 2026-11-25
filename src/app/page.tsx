@@ -60,7 +60,7 @@ export default function Inicio() {
     <main id="contenido" className="flex min-h-dvh flex-col overflow-x-clip">
       <section className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-6 px-4 pt-6 pb-12 md:gap-10 sm:px-6 md:grid-cols-[1.1fr_0.9fr] md:pt-16">
         <motion.div className="min-w-0 space-y-6" variants={contenedor} initial="oculto" animate="visible">
-          <motion.p variants={pieza} className={`eyebrow inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 text-primary shadow-clay`}>
+          <motion.p variants={pieza} className={`eyebrow inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 whitespace-nowrap text-primary shadow-clay max-[359px]:tracking-normal`}>
             <span className="size-2 rounded-full bg-ajolote-branquia" aria-hidden />
             Tu compa de 1° de secundaria
           </motion.p>

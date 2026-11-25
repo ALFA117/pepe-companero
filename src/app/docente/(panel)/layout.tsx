@@ -30,15 +30,16 @@ export default async function LayoutPanel({ children }: { children: ReactNode })
             </span>
           </Link>
           <nav className="ml-auto flex items-center gap-1 text-sm font-bold" aria-label="Panel">
-            <Link href="/docente" className="flex min-h-11 items-center gap-2 rounded-xl px-3 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href="/docente" className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-3 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <Users className="size-4" aria-hidden /> <span className="hidden sm:inline">Grupo</span>
+              <span className="sr-only sm:hidden">Grupo</span>
             </Link>
-            <Link href="/docente/hojas" className="flex min-h-11 items-center gap-2 rounded-xl px-3 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href="/docente/hojas" className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-3 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <FileText className="size-4" aria-hidden /> <span className="hidden sm:inline">Hojas de práctica</span>
               <span className="sr-only sm:hidden">Hojas de práctica</span>
             </Link>
             <form action={salir}>
-              <button type="submit" aria-label="Salir" className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl px-3 text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <button type="submit" aria-label="Salir" className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-3 text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <LogOut className="size-4" aria-hidden /> <span className="hidden sm:inline">Salir</span>
               </button>
             </form>
