@@ -33,11 +33,35 @@ export const MENSAJES_VINCULACION = {
   noSoportado: ['Uy, eso no lo puedo ver 🙈 Escríbeme o mándame una nota de voz.'],
 };
 
+/** Límite de WhatsApp para el texto de un mensaje con botones. */
+export const MAX_TEXTO_CON_BOTONES = 1024;
+const MAX_TEXTO = 4096;
+
+/**
+ * Junta las burbujas de Pepe en un solo mensaje de WhatsApp. Meta cobra cada
+ * mensaje enviado (servicio, en México ~US$0.0085 desde oct-2026), así que una
+ * respuesta de 3 burbujas cuesta lo mismo que una. Si con botones el texto
+ * pasa del límite, la última burbuja va aparte con sus botones.
+ */
+export function agruparParaWhatsApp(mensajes: string[], botones?: string[]): { texto: string; botones?: string[] }[] {
+  const limpios = mensajes.map((m) => m.trim()).filter(Boolean);
+  if (limpios.length === 0) return [];
+  const conBotones = Boolean(botones && botones.length > 0);
+  const todo = limpios.join('\n\n');
+  if (!conBotones) {
+    if (todo.length <= MAX_TEXTO) return [{ texto: todo }];
+    return limpios.map((texto) => ({ texto }));
+  }
+  if (todo.length <= MAX_TEXTO_CON_BOTONES) return [{ texto: todo, botones }];
+  const ultimo = limpios.at(-1)!;
+  const antes = limpios.slice(0, -1).join('\n\n');
+  return [...(antes ? [{ texto: antes }] : []), { texto: ultimo, botones }];
+}
+
 async function mandar(canal: Canal, destino: string, mensajes: string[], botones?: string[]) {
-  for (const [i, m] of mensajes.entries()) {
-    const esUltimo = i === mensajes.length - 1;
-    if (esUltimo && botones && botones.length > 0) await canal.enviarBotones(destino, m, botones);
-    else await canal.enviarTexto(destino, m);
+  for (const m of agruparParaWhatsApp(mensajes, botones)) {
+    if (m.botones) await canal.enviarBotones(destino, m.texto, m.botones);
+    else await canal.enviarTexto(destino, m.texto);
   }
 }
 

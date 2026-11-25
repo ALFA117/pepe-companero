@@ -5,7 +5,7 @@
  *
  *   pnpm probar-whatsapp [ruta/a/nota.m4a]
  *
- * Usa el alumno de pruebas PEPE-1B-02 y un teléfono ficticio; al terminar
+ * Usa el alumno de pruebas PEPE-1B-03 y un teléfono ficticio; al terminar
  * borra sus sesiones y lo desvincula.
  */
 import { createHmac } from 'node:crypto';
@@ -14,14 +14,14 @@ import { createClient } from '@supabase/supabase-js';
 import { atenderMensaje } from '../src/canales/atender';
 import { CanalKapso } from '../src/canales/kapso';
 import { FirmaInvalidaError } from '../src/canales/tipos';
-import { cifrarTelefono, descifrarTelefono, hashTelefono } from '../src/lib/telefono';
+import { cifrarTelefono, descifrarTelefono, hashTelefono, normalizarTelefono } from '../src/lib/telefono';
 import { dependenciasMotor } from '../src/motor/servidor';
 
 process.loadEnvFile('.env.local');
 const SECRETO = process.env.KAPSO_WEBHOOK_SECRET!;
 const TEL = '5215500000001';
 const TEL_OTRO = '5215500000002';
-const CODIGO = 'PEPE-1B-02';
+const CODIGO = 'PEPE-1B-03';
 const audioPath = process.argv[2];
 
 const enviados: { a: string; texto: string; botones?: string[] }[] = [];
@@ -85,7 +85,7 @@ async function main() {
     const copia = reqCodigo.clone();
     r = await llega(reqCodigo, 'manda su código (en minúsculas)');
     ok(r.nuevos[0]?.texto.startsWith('¡Listo,') === true, 'bienvenida con su nombre');
-    ok(r.nuevos.length >= 3, 'y Pepe plantea el reto');
+    ok(r.nuevos.length === 1 && r.nuevos[0]!.texto.includes('1/2 + 1/3'), 'y Pepe plantea el reto en el mismo mensaje');
 
     r = await llega(copia, 'Kapso reenvía el mismo webhook');
     ok(r.nuevos.length === 0, 'duplicado: no contesta dos veces');
@@ -122,7 +122,7 @@ async function main() {
     const fila = JSON.stringify(al);
     ok(!fila.includes(TEL) && !fila.includes('5500000001'), 'el teléfono no está en claro en la fila del alumno');
     ok(al.tel_hash === hashTelefono(TEL), 'tel_hash coincide');
-    ok(descifrarTelefono(al.tel_cifrado) === TEL, 'tel_cifrado se descifra al teléfono');
+    ok(descifrarTelefono(al.tel_cifrado) === normalizarTelefono(TEL), 'tel_cifrado se descifra al teléfono (formato 52 + 10)');
     const { data: ses } = await sb.from('sesiones').select('id,nivel,paso,fase,canal').eq('alumno_id', alumnoId);
     const { data: tur } = await sb.from('turnos').select('texto,tipo,mensaje_externo_id').in('sesion_id', ses!.map((s) => s.id));
     ok(!JSON.stringify(tur).includes(TEL), 'el teléfono no aparece en los turnos');

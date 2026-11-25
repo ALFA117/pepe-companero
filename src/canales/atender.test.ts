@@ -67,9 +67,10 @@ describe('vinculación por código', () => {
     expect(alumno?.tel_hash).not.toContain(TEL);
     expect(alumno?.tel_cifrado).not.toContain(TEL);
     expect(descifrarTelefono(alumno!.tel_cifrado!, LLAVE)).toBe('525512345678'); // se guarda como 52 + 10 dígitos
-    const textos = canal.enviados.map((e) => e.texto);
-    expect(textos[0]).toContain('¡Listo, Alumno!');
-    expect(textos.slice(1)).toEqual(mate.planteamiento_pepe);
+    // Bienvenida + planteamiento en un solo mensaje de WhatsApp.
+    expect(canal.enviados).toHaveLength(1);
+    expect(canal.enviados[0]!.texto.startsWith('¡Listo, Alumno!')).toBe(true);
+    for (const m of mate.planteamiento_pepe) expect(canal.enviados[0]!.texto).toContain(m);
     expect(alumno?.ultimo_mensaje_wa_en).not.toBeNull();
   });
 
@@ -97,7 +98,9 @@ describe('vincular con un reto ya en curso', () => {
     await atenderMensaje(deps, msg('PEPE-1B-03'));
     expect(repo.datos.evaluaciones).toHaveLength(0);
     expect((await repo.sesionPorId('s-web'))?.version).toBe(3);
-    expect(canal.enviados.at(-1)).toMatchObject({ texto: '¿Cuál te late que está mal?', botones: ['A', 'B', 'Las dos están bien'] });
+    expect(canal.enviados.at(-1)).toMatchObject({ botones: ['A', 'B', 'Las dos están bien'] });
+    expect(canal.enviados.at(-1)!.texto).toContain('Sigamos donde nos quedamos');
+    expect(canal.enviados.at(-1)!.texto.endsWith('¿Cuál te late que está mal?')).toBe(true);
   });
 });
 
@@ -118,11 +121,9 @@ describe('conversación por WhatsApp', () => {
     const m = msg('sí, está bien');
     await atenderMensaje(deps, m);
     expect(canal.escribiendo).toContain(m.id_externo);
+    // Las burbujas de Pepe van en un solo mensaje (WhatsApp cobra por mensaje).
     const [primero, segundo] = mate.niveles['1'].pasos[0]!.ejemplo;
-    expect(canal.enviados).toEqual([
-      { a: TEL, texto: primero },
-      { a: TEL, texto: segundo, botones: ['A', 'B', 'Las dos están bien'] },
-    ]);
+    expect(canal.enviados).toEqual([{ a: TEL, texto: `${primero}\n\n${segundo}`, botones: ['A', 'B', 'Las dos están bien'] }]);
   });
 
   it('un mensaje duplicado del webhook no genera dos respuestas', async () => {
@@ -187,5 +188,25 @@ describe('Twilio', () => {
 
   it('los botones van como opciones en el texto', () => {
     expect(textoConOpciones('¿Cuál?', ['A', 'B'])).toBe('¿Cuál?\n\n• A\n• B\n(Escribe tu opción)');
+  });
+});
+
+describe('agruparParaWhatsApp', () => {
+  it('junta las burbujas en un mensaje', async () => {
+    const { agruparParaWhatsApp } = await import('./atender');
+    expect(agruparParaWhatsApp(['Hola', '¿Cómo vas?'])).toEqual([{ texto: 'Hola\n\n¿Cómo vas?' }]);
+  });
+
+  it('con botones respeta el límite de 1024 caracteres', async () => {
+    const { agruparParaWhatsApp, MAX_TEXTO_CON_BOTONES } = await import('./atender');
+    const largo = 'x'.repeat(600);
+    const r = agruparParaWhatsApp([largo, largo, '¿Cuál?'], ['A', 'B']);
+    expect(r).toEqual([{ texto: `${largo}\n\n${largo}` }, { texto: '¿Cuál?', botones: ['A', 'B'] }]);
+    expect(r.every((m) => !m.botones || m.texto.length <= MAX_TEXTO_CON_BOTONES)).toBe(true);
+  });
+
+  it('sin mensajes no manda nada', async () => {
+    const { agruparParaWhatsApp } = await import('./atender');
+    expect(agruparParaWhatsApp([], ['A'])).toEqual([]);
   });
 });
