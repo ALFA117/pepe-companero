@@ -191,7 +191,7 @@ describe('asignarReto', () => {
     const r = await asignarReto(deps, ALUMNO, MATE);
     expect(r.estado).toBe('enviado');
     expect(canal.enviados.map(([, t]) => t)).toEqual([AVISO_RETO_NUEVO, ...obtenerReto(MATE).planteamiento_pepe]);
-    expect(canal.enviados[0]![0]).toBe('5215500000000');
+    expect(canal.enviados[0]![0]).toBe('525500000000'); // formato canónico de México
     expect((await repo.sesionActiva(ALUMNO))?.fase).toBe('nivel');
   });
 

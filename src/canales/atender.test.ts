@@ -66,7 +66,7 @@ describe('vinculación por código', () => {
     expect(alumno?.tel_hash).toBe(hashTelefono(TEL, SAL));
     expect(alumno?.tel_hash).not.toContain(TEL);
     expect(alumno?.tel_cifrado).not.toContain(TEL);
-    expect(descifrarTelefono(alumno!.tel_cifrado!, LLAVE)).toBe(TEL);
+    expect(descifrarTelefono(alumno!.tel_cifrado!, LLAVE)).toBe('525512345678'); // se guarda como 52 + 10 dígitos
     const textos = canal.enviados.map((e) => e.texto);
     expect(textos[0]).toContain('¡Listo, Alumno!');
     expect(textos.slice(1)).toEqual(mate.planteamiento_pepe);
@@ -155,11 +155,19 @@ describe('teléfono', () => {
     expect(hashTelefono('whatsapp:+52 1 55 1234 5678', SAL)).toBe(hashTelefono(TEL, SAL));
   });
 
+  it('un celular de México con 521 o con 52 es el mismo alumno', () => {
+    expect(hashTelefono('5215512345678', SAL)).toBe(hashTelefono('525512345678', SAL));
+    expect(hashTelefono('whatsapp:+52 1 55 1234 5678', SAL)).toBe(hashTelefono('+52 55 1234 5678', SAL));
+    expect(descifrarTelefono(cifrarTelefono('5215512345678', LLAVE), LLAVE)).toBe('525512345678');
+    // Otros países no se tocan
+    expect(hashTelefono('15551234567', SAL)).not.toBe(hashTelefono('5551234567', SAL));
+  });
+
   it('cada cifrado es distinto pero descifra igual', () => {
     const a = cifrarTelefono(TEL, LLAVE);
     const b = cifrarTelefono(TEL, LLAVE);
     expect(a).not.toBe(b);
-    expect(descifrarTelefono(a, LLAVE)).toBe(TEL);
+    expect(descifrarTelefono(a, LLAVE)).toBe('525512345678');
   });
 
   it('un cifrado alterado no se puede descifrar', () => {

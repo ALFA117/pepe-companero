@@ -7,9 +7,16 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import { exigir } from './env';
 
-/** Solo dígitos (WhatsApp manda "5215512345678"; Twilio "whatsapp:+5215512345678"). */
+/**
+ * Solo dígitos (WhatsApp manda "5215512345678"; Twilio "whatsapp:+5215512345678").
+ * Celulares de México: WhatsApp los manda a veces como 521 + 10 dígitos y a
+ * veces como 52 + 10. Se guardan siempre como 52 + 10 para que el mismo
+ * alumno se encuentre con cualquiera de los dos (y Meta acepta ese formato
+ * para enviar).
+ */
 export function normalizarTelefono(tel: string): string {
-  return tel.replace(/\D/g, '');
+  const d = tel.replace(/\D/g, '');
+  return /^521\d{10}$/.test(d) ? `52${d.slice(3)}` : d;
 }
 
 export function hashTelefono(tel: string, sal = exigir('TEL_HASH_SALT')): string {
