@@ -108,13 +108,13 @@ Si el alumno se atora, Pepe le da **pistas cada vez más concretas, pero nunca l
 
 ```mermaid
 flowchart LR
-    A["📱 WhatsApp<br/>🌐 Web"] --> B["🧑‍⚖️ Juez (IA)<br/>clasifica la respuesta"]
-    B --> C{"⚙️ Máquina de estados<br/>TypeScript · 320 pruebas"}
-    C -- "decide el escalón" --> D["🦎 Pepe (IA)<br/>solo redacta"]
-    D --> E["🛡️ Filtro<br/>anti-respuesta"]
+    A["WhatsApp / Web"] --> B["Juez IA: clasifica la respuesta"]
+    B --> C{"Maquina de estados: TypeScript, 320 pruebas"}
+    C -->|decide el escalon| D["Pepe IA: solo redacta"]
+    D --> E["Filtro anti-respuesta"]
     E --> A
-    C --> F[("🗄️ Supabase")]
-    F --> G["📊 Panel del maestro"]
+    C --> F[("Supabase")]
+    F --> G["Panel del maestro"]
 ```
 
 **Reglas que no se rompen**
