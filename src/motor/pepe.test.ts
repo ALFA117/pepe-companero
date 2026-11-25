@@ -160,7 +160,7 @@ describe('respaldo', () => {
 describe('redactar', () => {
   it('usa lo que dice el LLM y los botones del paso', async () => {
     const llm = llmFalso({ pepe: () => ({ mensajes: ['Va, sin presión 😅', '¿Cuál te late que está mal?'] }) });
-    const r = await redactar(llm.generar, entrada(mate, 1, 0, guiar(1, 0)));
+    const r = await redactar(llm.generar, entrada(mate, 1, 0, { tipo: 'regresar_al_reto' }));
     expect(r.origen).toBe('llm');
     expect(r.salida).toEqual({
       mensajes: ['Va, sin presión 😅', '¿Cuál te late que está mal?'],
@@ -179,7 +179,7 @@ describe('redactar', () => {
     const llm = llmFalso({
       pepe: (_, n) => ({ mensajes: [n === 0 ? 'Creo que es 5/6' : '¿Cómo los hacemos del mismo tamaño?'] }),
     });
-    const r = await redactar(llm.generar, entrada(mate, 3, 2, guiar(3, 2)));
+    const r = await redactar(llm.generar, entrada(mate, 3, 2, { tipo: 'regresar_al_reto' }));
     expect(r.origen).toBe('llm_reintento');
     expect(llm.de('pepe')).toHaveLength(2);
     expect(llm.de('pepe')[1]!.instrucciones).toContain('IMPORTANTE');
@@ -187,9 +187,10 @@ describe('redactar', () => {
 
   it('si el reintento también revela la respuesta, usa el ejemplo', async () => {
     const llm = llmFalso({ pepe: () => ({ mensajes: ['Es 3/6 + 2/6, o sea 5/6'] }) });
-    const r = await redactar(llm.generar, entrada(mate, 4, 3, guiar(4, 3)));
+    const e = entrada(mate, 4, 3, { tipo: 'regresar_al_reto' });
+    const r = await redactar(llm.generar, e);
     expect(r).toMatchObject({ origen: 'respaldo', motivo_respaldo: 'filtro' });
-    expect(r.salida.mensajes).toEqual(mate.niveles['4'].pasos[3]!.ejemplo);
+    expect(r.salida.mensajes).toEqual(respaldo(e).mensajes);
   });
 
   it('si el LLM tarda más del límite, usa el ejemplo', async () => {
@@ -200,15 +201,16 @@ describe('redactar', () => {
       },
     });
     const inicio = Date.now();
-    const r = await redactar(llm.generar, entrada(mate, 2, 0, guiar(2, 0)), 50);
+    const e = entrada(mate, 2, 0, { tipo: 'regresar_al_reto' });
+    const r = await redactar(llm.generar, e, 50);
     expect(Date.now() - inicio).toBeLessThan(400);
     expect(r).toMatchObject({ origen: 'respaldo', motivo_respaldo: 'tiempo' });
-    expect(r.salida.mensajes).toEqual(mate.niveles['2'].pasos[0]!.ejemplo);
+    expect(r.salida.mensajes).toEqual(respaldo(e).mensajes);
   });
 
   it('si el LLM devuelve JSON inválido o falla, usa el ejemplo', async () => {
     for (const malo of [() => ({ texto: 'sin mensajes' }), () => { throw new Error('500'); }]) {
-      const r = await redactar(llmFalso({ pepe: malo }).generar, entrada(mate, 1, 1, guiar(1, 1)));
+      const r = await redactar(llmFalso({ pepe: malo }).generar, entrada(mate, 1, 1, { tipo: 'regresar_al_reto' }));
       expect(r).toMatchObject({ origen: 'respaldo', motivo_respaldo: 'error' });
     }
   });
@@ -218,7 +220,7 @@ describe('redactar', () => {
     ['burbuja de más de 400', ['x'.repeat(401)]],
     ['vacío', ['   ']],
   ])('rechaza la forma inválida (%s)', async (_, mensajes) => {
-    const r = await redactar(llmFalso({ pepe: () => ({ mensajes }) }).generar, entrada(mate, 1, 0, guiar(1, 0)));
+    const r = await redactar(llmFalso({ pepe: () => ({ mensajes }) }).generar, entrada(mate, 1, 0, { tipo: 'regresar_al_reto' }));
     expect(r.origen).toBe('respaldo');
   });
 
@@ -252,5 +254,58 @@ describe('quitarSaludo', () => {
     const { quitarSaludo } = await import('./pepe');
     expect(quitarSaludo(['¡Órale, sí!'])).toEqual(['¡Órale, sí!']);
     expect(quitarSaludo(['Holanda queda lejos'])).toEqual(['Holanda queda lejos']);
+  });
+});
+
+describe('pasos de ayuda: texto del banco tal cual', () => {
+  const conUltimo = (e: EntradaPepe, ultimo: string): EntradaPepe => ({ ...e, ultimo_mensaje_alumno: ultimo });
+
+  it('con una respuesta corta no llama al LLM y manda el paso exacto con sus botones', async () => {
+    const llm = llmFalso({});
+    const r = await redactar(llm.generar, conUltimo(entrada(mate, 2, 0, guiar(2, 0)), 'no'));
+    expect(llm.peticiones).toHaveLength(0);
+    expect(r).toMatchObject({ origen: 'fijo', salida: { mensajes: mate.niveles['2'].pasos[0]!.ejemplo, botones: ['Más', 'Menos'] } });
+  });
+
+  it('el nivel 4 siempre trae los números exactos del banco (no "en 4" en vez de "en 3")', async () => {
+    const llm = llmFalso({ pepe: () => ({ mensajes: ['Si cada mitad la partimos en 4…'] }) });
+    const r = await redactar(llm.generar, conUltimo(entrada(mate, 4, 0, guiar(4, 0)), 'por que'));
+    expect(r.salida.mensajes.join(' ')).toContain('la parto en 3 pedacitos');
+    expect(r.salida.mensajes.join(' ')).not.toContain('en 4');
+  });
+
+  it('si el alumno escribió algo con contenido, el LLM agrega una frase de reacción antes del paso', async () => {
+    const llm = llmFalso({ pepe: () => ({ reaccion: 'Mmm, ya veo lo que dices de los de abajo 🤔' }) });
+    const r = await redactar(llm.generar, conUltimo(entrada(mate, 2, 0, guiar(2, 0, { motivo: 'parcial' })), 'creo que los de abajo no se suman así'));
+    expect(r.origen).toBe('llm');
+    expect(r.salida.mensajes).toEqual(['Mmm, ya veo lo que dices de los de abajo 🤔', ...mate.niveles['2'].pasos[0]!.ejemplo]);
+    expect(llm.de('pepe')[0]!.instrucciones).not.toContain('5/6');
+  });
+
+  it.each([
+    ['pregunta', '¿Seguro que no se suman?'],
+    ['números', 'Ah, dices que da 5/6'],
+    ['frase prohibida', 'Ok, hay que buscar el denominador común'],
+    ['muy larga', 'x'.repeat(200)],
+  ])('descarta una reacción inválida (%s) y manda solo el paso', async (_, reaccion) => {
+    const llm = llmFalso({ pepe: () => ({ reaccion }) });
+    const r = await redactar(llm.generar, conUltimo(entrada(mate, 2, 0, guiar(2, 0)), 'pues no sé bien la verdad'));
+    expect(r.salida.mensajes).toEqual(mate.niveles['2'].pasos[0]!.ejemplo);
+  });
+
+  it('a la reacción se le quita el saludo', async () => {
+    const llm = llmFalso({ pepe: () => ({ reaccion: '¿Qué onda, ya te entendí' }) });
+    const r = await redactar(llm.generar, conUltimo(entrada(mate, 2, 0, guiar(2, 0)), 'pues no sé bien la verdad'));
+    expect(r.salida.mensajes[0]).toBe('Ya te entendí');
+  });
+
+  it('si avanza de paso sin acertar (nivel 4), se quita el "¡Sí!" del principio', async () => {
+    const r = await redactar(llmFalso({}).generar, entrada(mate, 4, 1, guiar(4, 1, { cambio_de_nivel: false, motivo: 'no_se' })));
+    expect(r.salida.mensajes[0]).toBe('Y la media pizza, ¿cuántos de esos 6 pedacitos tiene?');
+  });
+
+  it('si acertó el paso anterior, el "¡Sí!" se queda', async () => {
+    const r = await redactar(llmFalso({}).generar, entrada(mate, 4, 1, guiar(4, 1, { cambio_de_nivel: false, motivo: 'paso_correcto' })));
+    expect(r.salida.mensajes[0]).toBe(mate.niveles['4'].pasos[1]!.ejemplo[0]);
   });
 });

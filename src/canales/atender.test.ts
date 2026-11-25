@@ -118,9 +118,10 @@ describe('conversación por WhatsApp', () => {
     const m = msg('sí, está bien');
     await atenderMensaje(deps, m);
     expect(canal.escribiendo).toContain(m.id_externo);
+    const [primero, segundo] = mate.niveles['1'].pasos[0]!.ejemplo;
     expect(canal.enviados).toEqual([
-      { a: TEL, texto: 'Va 😅' },
-      { a: TEL, texto: '¿Cuál te late?', botones: ['A', 'B', 'Las dos están bien'] },
+      { a: TEL, texto: primero },
+      { a: TEL, texto: segundo, botones: ['A', 'B', 'Las dos están bien'] },
     ]);
   });
 

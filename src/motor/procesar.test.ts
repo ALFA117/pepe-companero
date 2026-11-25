@@ -229,7 +229,7 @@ describe('sin LLM (caído o sin llaves)', () => {
     expect(r.sesion?.nivel).toBe(1);
     expect(r.mensajes).toEqual(mate.niveles['1'].pasos[0]!.ejemplo);
     expect(r.botones).toEqual(['A', 'B', 'Las dos están bien']);
-    expect(r.detalle).toMatchObject({ origen_pepe: 'respaldo', origen_juez: 'respaldo' });
+    expect(r.detalle).toMatchObject({ origen_pepe: 'fijo', origen_juez: 'respaldo' });
   });
 });
 

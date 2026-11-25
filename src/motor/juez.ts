@@ -97,15 +97,18 @@ Clasificaciones (elige exactamente una):
 - incorrecta: acepta el error de Pepe o da otro resultado equivocado.
 - no_se: dice que no sabe, manda algo vacío o sin sentido.
 - pide_respuesta: pide que le den la respuesta ("ya dime", "pásamela").
-- fuera_de_tema: habla de otra cosa que no es el reto (otra tarea, chismes, preguntas personales).
+- fuera_de_tema: habla CLARAMENTE de otra cosa que no es el reto (otra tarea, chismes, preguntas personales).
 
 Reglas:
 - Evalúa el RAZONAMIENTO, no solo si el resultado coincide.
+- Mensajes muy cortos sin sentido, letras sueltas o typos que no se entienden ("do", "k", "jsjs", "???", "a") son no_se, NUNCA fuera_de_tema.
+- Si el alumno pregunta "¿por qué?", "¿cómo?" o "no entiendo", es no_se (está pidiendo ayuda, no la respuesta).
 - Acepta explicaciones informales y con faltas de ortografía. "es que no puedes sumar los de abajo" SÍ cuenta como explicar por qué.
 - Si el alumno da el resultado o la corrección correcta SIN explicar, sigue siendo correcta con explica_por_que "no" (el programa le pedirá que justifique). No la bajes a parcial solo por falta de explicación.
 - En lectura, citar o parafrasear lo que dice el texto SÍ cuenta como explicar por qué (explica_por_que "si").
 - Si Pepe acaba de pedirle que justifique ("¿y cómo sabes?") y el alumno da una razón o evidencia, es correcta con explica_por_que "si".
 - En las preguntas guía de un paso NO se exige explicación: una respuesta corta y correcta (sí/no, un número, una opción como A/B, Más/Menos, Párrafo 2) es paso_correcto.
+- Algunos pasos usan un EJEMPLO PARALELO (otras fracciones, otro texto). Si el alumno contesta el RETO ORIGINAL de Pepe y coincide con la solución, NO es un resultado equivocado del ejemplo: evalúalo contra el reto original.
 - PRIORIDAD: si la respuesta cumple la rúbrica de "correcta", es correcta en CUALQUIER nivel o paso, aunque no conteste la pregunta guía que hizo Pepe. Nunca la bajes a parcial por no contestar la pregunta guía.
 - Cuando el paso es "el último del nivel", Pepe está volviendo a hacer la pregunta del reto: si la respuesta resuelve el reto, es correcta (no paso_correcto).
 - detecto_error: true si el alumno nota que lo que hizo Pepe está mal; false si no; null si no aplica (p. ej. fuera_de_tema).
@@ -146,7 +149,7 @@ export function construirPromptJuez(e: EntradaJuez): { instrucciones: string; pr
     sesion.nivel === 0
       ? sesion.pidio_justificacion
         ? 'Nivel 0: el alumno ya había dado la respuesta correcta y Pepe le pidió que justificara ("¿y cómo sabes?").'
-        : 'Nivel 0: Pepe acaba de plantear su error y le pregunta al alumno si está bien.'
+        : 'Nivel 0: Pepe acaba de plantear su error y le pregunta al alumno si está bien. En el nivel 0 NO hay pasos guía: nunca uses paso_correcto. Un "no" o "está mal" sin explicar es parcial (detecto_error true).'
       : `Nivel de ayuda ${sesion.nivel} (${reto.niveles[String(sesion.nivel) as '1'].objetivo}).
 Paso actual: ${paso?.objetivo ?? '(desconocido)'}${paso?.botones ? `\nOpciones que vio el alumno: ${paso.botones.join(' / ')}` : ''}
 ${esUltimoPaso(reto, sesion) ? 'Es el ÚLTIMO paso del nivel: la pregunta es la del reto completo.' : 'Es una pregunta guía: si solo la contesta bien, es paso_correcto; pero si además resuelve el reto completo (cumple la rúbrica de "correcta"), es correcta.'}`;
