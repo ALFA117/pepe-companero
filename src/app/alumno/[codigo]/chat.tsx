@@ -5,8 +5,12 @@
  * Los botones de Pepe aparecen como chips; el micrófono graba una nota de voz
  * con MediaRecorder que pasa por la misma transcripción que WhatsApp.
  */
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { ArrowLeft, Mic, RotateCcw, SendHorizontal, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import type { RespuestaChat } from '@/app/api/chat/route';
+import { PepeAjolote } from '@/components/pepe-ajolote';
 
 export interface MensajeChat {
   id: string;
@@ -103,7 +107,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
             id,
             rol: 'alumno',
             tipo: cuerpo.tipo,
-            texto: cuerpo.tipo === 'audio' ? '🎤 Nota de voz' : cuerpo.texto,
+            texto: cuerpo.tipo === 'audio' ? 'Nota de voz' : cuerpo.texto,
           },
         ]);
       }
@@ -141,7 +145,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
           {
             id: `${id}-error`,
             rol: 'sistema',
-            texto: `${err instanceof Error && err.message !== 'Error' ? err.message : 'No se pudo enviar'}. Toca para reintentar.`,
+            texto: `${err instanceof Error && err.message !== 'Error' ? err.message : 'No se pudo enviar tu mensaje'}. Revisa tu internet.`,
             reintentar,
           },
         ]);
@@ -208,140 +212,247 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
   }
 
   const mmss = `${Math.floor(segundos / 60)}:${String(segundos % 60).padStart(2, '0')}`;
+  const reduce = useReducedMotion();
+  const entradaBurbuja = reduce
+    ? undefined
+    : { initial: { opacity: 0, y: 10, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 } };
+  const resorte = { type: 'spring' as const, stiffness: 300, damping: 26 };
+  const estado = escribiendo ? 'escribiendo…' : grabando ? 'escuchándote…' : `en línea · hola, ${nombre}`;
 
   return (
-    <div className="flex h-dvh flex-col bg-chat-fondo">
-      <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground shadow-sm">
-        <div
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15 text-xl"
-          aria-hidden
-        >
-          🦎
+    <div className="flex h-dvh flex-col">
+      <header className="z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="tarjeta-clay mx-auto flex max-w-2xl items-center gap-2 rounded-3xl px-2 py-2 sm:gap-3 sm:px-3">
+          <Link
+            href="/"
+            aria-label="Salir al inicio"
+            className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ArrowLeft className="size-5" aria-hidden />
+          </Link>
+          <div className="relative flex size-12 shrink-0 items-center justify-center rounded-2xl bg-ajolote/35">
+            <PepeAjolote vivo cara={escribiendo ? 'pensando' : 'feliz'} className="w-11" />
+            <span className="absolute -right-0.5 -bottom-0.5 size-3.5 rounded-full border-2 border-card bg-exito" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="texto-titulo text-lg leading-none">Pepe</p>
+            <p className="mt-1 truncate text-[13px] text-muted-foreground" aria-live="polite">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={estado}
+                  initial={reduce ? false : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduce ? undefined : { opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                  className={`inline-block ${escribiendo || grabando ? 'font-bold text-primary' : ''}`}
+                >
+                  {estado}
+                </motion.span>
+              </AnimatePresence>
+            </p>
+          </div>
+          <span className="hidden rounded-xl bg-muted px-2.5 py-1 font-mono text-xs font-semibold text-muted-foreground min-[360px]:inline">
+            {codigo}
+          </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold leading-tight">Pepe</p>
-          <p className="text-xs opacity-85" aria-live="polite">
-            {escribiendo ? 'escribiendo…' : grabando ? 'escuchándote…' : `tu compa de 1° · hola, ${nombre}`}
-          </p>
-        </div>
-        <span className="rounded-full bg-primary-foreground/15 px-2 py-0.5 font-mono text-[11px]">{codigo}</span>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-3 py-4" aria-live="polite" aria-label="Conversación con Pepe">
-        <div className="mx-auto flex max-w-xl flex-col gap-1.5">
-          {mensajes.map((m) =>
-            m.rol === 'sistema' ? (
-              <button
-                key={m.id}
-                type="button"
-                onClick={m.reintentar}
-                disabled={!m.reintentar}
-                className="mx-auto my-1 rounded-lg bg-aviso/20 px-3 py-1.5 text-center text-xs text-foreground"
+      <main id="contenido" className="flex-1 overflow-y-auto px-3 py-4" aria-live="polite" aria-label="Conversación con Pepe">
+        <div className="mx-auto flex max-w-2xl flex-col gap-2">
+          <p className="mx-auto mb-2 max-w-xs rounded-2xl bg-card/70 px-3 py-2 text-center text-[13px] text-muted-foreground shadow-clay">
+            Pepe se equivoca a propósito. <strong className="text-foreground">Nunca te va a dar la respuesta</strong>: encuéntrala tú.
+          </p>
+          <AnimatePresence initial={false}>
+            {mensajes.map((m, i) => {
+              if (m.rol === 'sistema') {
+                return (
+                  <motion.div key={m.id} {...entradaBurbuja} transition={resorte} className="mx-auto my-1 flex max-w-sm flex-col items-center gap-2 rounded-2xl border border-peligro/30 bg-card px-4 py-3 text-center shadow-clay" role="alert">
+                    <p className="text-sm">{m.texto}</p>
+                    {m.reintentar && (
+                      <button
+                        type="button"
+                        onClick={m.reintentar}
+                        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                      >
+                        <RotateCcw className="size-4" aria-hidden /> Reintentar
+                      </button>
+                    )}
+                  </motion.div>
+                );
+              }
+              const esPepe = m.rol === 'pepe';
+              const primeroDelGrupo = mensajes[i - 1]?.rol !== m.rol;
+              return (
+                <motion.div
+                  key={m.id}
+                  {...entradaBurbuja}
+                  transition={resorte}
+                  className={`flex items-end gap-2 ${esPepe ? 'self-start' : 'self-end'} max-w-[88%] ${primeroDelGrupo ? 'mt-2' : ''}`}
+                >
+                  {esPepe && (
+                    <span className={`flex size-8 shrink-0 items-center justify-center rounded-xl bg-ajolote/35 ${primeroDelGrupo ? '' : 'invisible'}`} aria-hidden>
+                      <PepeAjolote className="w-7" />
+                    </span>
+                  )}
+                  <div
+                    className={`whitespace-pre-wrap break-words px-4 py-2.5 text-[16px] leading-snug shadow-clay ${
+                      esPepe
+                        ? `rounded-3xl border border-burbuja-pepe-borde bg-burbuja-pepe ${primeroDelGrupo ? 'rounded-bl-md' : ''}`
+                        : `rounded-3xl bg-burbuja-alumno text-burbuja-alumno-texto ${primeroDelGrupo ? 'rounded-br-md' : ''}`
+                    }`}
+                  >
+                    {m.tipo === 'audio' ? (
+                      <span className="flex items-center gap-2 font-semibold">
+                        <Mic className="size-4" aria-hidden />
+                        <span className="flex h-5 items-center gap-[3px]" aria-hidden>
+                          {[6, 12, 18, 10, 16, 8, 14, 6, 11].map((h, k) => (
+                            <span key={k} className="w-[3px] rounded-full bg-current opacity-80" style={{ height: h }} />
+                          ))}
+                        </span>
+                        Nota de voz
+                      </span>
+                    ) : (
+                      conFormato(m.texto)
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+            {escribiendo && (
+              <motion.div
+                key="escribiendo"
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.1 } }}
+                className="mt-2 flex items-end gap-2 self-start"
               >
-                {m.texto}
-              </button>
-            ) : (
-              <div
-                key={m.id}
-                className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-[15px] leading-snug shadow-sm ${
-                  m.rol === 'pepe'
-                    ? 'self-start rounded-tl-sm bg-burbuja-pepe'
-                    : 'self-end rounded-tr-sm bg-burbuja-alumno'
-                }`}
-              >
-                {conFormato(m.texto)}
-              </div>
-            ),
-          )}
-          {escribiendo && (
-            <div className="flex gap-1 self-start rounded-2xl rounded-tl-sm bg-burbuja-pepe px-4 py-3 shadow-sm" aria-label="Pepe está escribiendo">
-              <span className="punto-escribiendo size-2 rounded-full bg-muted-foreground" />
-              <span className="punto-escribiendo size-2 rounded-full bg-muted-foreground" />
-              <span className="punto-escribiendo size-2 rounded-full bg-muted-foreground" />
-            </div>
-          )}
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-ajolote/35" aria-hidden>
+                  <PepeAjolote cara="pensando" className="w-7" />
+                </span>
+                <div className="flex gap-1.5 rounded-3xl rounded-bl-md border border-burbuja-pepe-borde bg-burbuja-pepe px-4 py-3.5 shadow-clay" aria-label="Pepe está escribiendo">
+                  <span className="punto-escribiendo size-2 rounded-full bg-ajolote-branquia" />
+                  <span className="punto-escribiendo size-2 rounded-full bg-ajolote-branquia" />
+                  <span className="punto-escribiendo size-2 rounded-full bg-ajolote-branquia" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div ref={finRef} />
         </div>
       </main>
 
-      <footer className="border-t border-border/60 bg-background/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
-        <div className="mx-auto max-w-xl">
-          {botones.length > 0 && !ocupado && (
-            <div className="mb-2 flex flex-wrap gap-2" role="group" aria-label="Respuestas rápidas">
-              {botones.map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => void enviar({ tipo: 'boton', texto: b })}
-                  className="min-h-11 rounded-full border-2 border-primary bg-background px-4 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
-          )}
+      <footer className="px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="mx-auto max-w-2xl">
+          <AnimatePresence>
+            {botones.length > 0 && !ocupado && (
+              <motion.div
+                key={botones.join('|')}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0, y: 6, transition: { duration: 0.1 } }}
+                transition={resorte}
+                className="mb-2 flex flex-wrap justify-end gap-2"
+                role="group"
+                aria-label="Respuestas rápidas"
+              >
+                {botones.map((b) => (
+                  <motion.button
+                    key={b}
+                    type="button"
+                    whileHover={reduce ? undefined : { scale: 1.03 }}
+                    whileTap={reduce ? undefined : { scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    onClick={() => void enviar({ tipo: 'boton', texto: b })}
+                    className="min-h-11 cursor-pointer rounded-2xl border-2 border-primary bg-card px-4 text-[15px] font-extrabold text-primary shadow-clay transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                  >
+                    {b}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {grabando ? (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => terminarGrabacion(true)}
-                className="min-h-11 rounded-full px-4 text-sm text-muted-foreground hover:bg-muted"
-              >
-                Cancelar
-              </button>
-              <div className="flex flex-1 items-center justify-center gap-2 text-sm" aria-live="polite">
-                <span className="size-2.5 animate-pulse rounded-full bg-peligro" aria-hidden />
-                Grabando {mmss}
-              </div>
-              <button
-                type="button"
-                onClick={() => terminarGrabacion(false)}
-                className="min-h-11 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground"
-              >
-                Enviar
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={alEnviar} className="flex items-end gap-2">
-              <label htmlFor="mensaje" className="sr-only">
-                Mensaje para Pepe
-              </label>
-              <input
-                id="mensaje"
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-                placeholder="Escríbele a Pepe…"
-                autoComplete="off"
-                maxLength={1000}
-                className="min-h-11 flex-1 rounded-full border border-input bg-background px-4 text-[16px] outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-              {texto.trim() || !puedeGrabar ? (
-                <button
-                  type="submit"
-                  disabled={ocupado || !texto.trim()}
-                  aria-label="Enviar"
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-50"
-                >
-                  <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden>
-                    <path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" />
-                  </svg>
-                </button>
-              ) : (
+          <div className="tarjeta-clay rounded-3xl p-2">
+            {grabando ? (
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => void empezarGrabacion()}
-                  disabled={ocupado}
-                  aria-label="Grabar nota de voz"
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-50"
+                  onClick={() => terminarGrabacion(true)}
+                  aria-label="Cancelar grabación"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden>
-                    <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2Z" />
-                  </svg>
+                  <Trash2 className="size-5" aria-hidden />
                 </button>
-              )}
-            </form>
-          )}
+                <div className="flex flex-1 items-center justify-center gap-3" aria-live="polite">
+                  <span className="size-2.5 animate-pulse rounded-full bg-peligro" aria-hidden />
+                  <span className="flex h-6 items-center gap-[3px]" aria-hidden>
+                    {Array.from({ length: 14 }, (_, k) => (
+                      <span key={k} className="barra-voz h-6 w-[3px] rounded-full bg-primary" style={{ animationDelay: `${(k % 7) * 0.11}s` }} />
+                    ))}
+                  </span>
+                  <span className="font-mono text-sm font-semibold tabular-nums">{mmss}</span>
+                </div>
+                <motion.button
+                  type="button"
+                  whileTap={reduce ? undefined : { scale: 0.94 }}
+                  onClick={() => terminarGrabacion(false)}
+                  aria-label="Enviar nota de voz"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                >
+                  <SendHorizontal className="size-5" aria-hidden />
+                </motion.button>
+              </div>
+            ) : (
+              <form onSubmit={alEnviar} className="flex items-center gap-2">
+                <label htmlFor="mensaje" className="sr-only">
+                  Mensaje para Pepe
+                </label>
+                <input
+                  id="mensaje"
+                  value={texto}
+                  onChange={(e) => setTexto(e.target.value)}
+                  placeholder="Escríbele a Pepe…"
+                  autoComplete="off"
+                  maxLength={1000}
+                  className="min-h-11 min-w-0 flex-1 rounded-2xl bg-transparent px-3 text-[16px] outline-none placeholder:text-muted-foreground/80 focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+                <AnimatePresence mode="wait" initial={false}>
+                  {texto.trim() || !puedeGrabar ? (
+                    <motion.button
+                      key="enviar"
+                      type="submit"
+                      initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={reduce ? undefined : { scale: 0.6, opacity: 0 }}
+                      whileTap={reduce ? undefined : { scale: 0.94 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                      disabled={ocupado || !texto.trim()}
+                      aria-label="Enviar"
+                      className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-boton disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                    >
+                      <SendHorizontal className="size-5" aria-hidden />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      key="grabar"
+                      type="button"
+                      initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={reduce ? undefined : { scale: 0.6, opacity: 0 }}
+                      whileTap={reduce ? undefined : { scale: 0.94 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                      onClick={() => void empezarGrabacion()}
+                      disabled={ocupado}
+                      aria-label="Grabar nota de voz"
+                      className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-ajolote-branquia text-white shadow-boton disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                    >
+                      <Mic className="size-5" aria-hidden />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </form>
+            )}
+          </div>
         </div>
       </footer>
     </div>

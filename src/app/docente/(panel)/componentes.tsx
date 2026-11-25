@@ -95,15 +95,15 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-1 rounded-lg bg-muted p-1" role="tablist" aria-label="Filtrar por materia">
+      <div className="flex gap-1 rounded-2xl bg-muted/80 p-1" role="tablist" aria-label="Filtrar por materia">
         {FILTROS.map((f) => (
           <button
             key={f.clave}
             role="tab"
             aria-selected={filtro === f.clave}
             onClick={() => setFiltro(f.clave)}
-            className={`min-h-9 flex-1 rounded-md px-3 text-sm font-medium transition-colors ${
-              filtro === f.clave ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            className={`min-h-11 flex-1 cursor-pointer rounded-xl px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              filtro === f.clave ? 'bg-card text-foreground shadow-clay' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {f.texto}
@@ -112,9 +112,9 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      <div className="tarjeta-clay overflow-x-auto">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-3 py-2.5 font-medium">Alumno</th>
               <th className="px-3 py-2.5 font-medium">Materia</th>
@@ -136,10 +136,10 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
             {lista.map((f) => (
               <tr key={f.alumno_id} className="border-t border-border hover:bg-muted/40">
                 <td className="px-3 py-2.5">
-                  <Link href={`/docente/alumno/${f.alumno_id}`} className="font-medium text-primary hover:underline">
+                  <Link href={`/docente/alumno/${f.alumno_id}`} className="font-bold text-primary hover:underline">
                     {f.nombre}
                   </Link>
-                  <span className="block font-mono text-[11px] text-muted-foreground">{f.codigo}</span>
+                  <span className="block font-mono text-xs text-muted-foreground">{f.codigo}</span>
                 </td>
                 <td className="px-3 py-2.5">{f.materia === 'matematicas' ? 'Matemáticas' : f.materia === 'lectura' ? 'Lectura' : '—'}</td>
                 <td className="px-3 py-2.5">{f.ultimo_reto ?? '—'}</td>

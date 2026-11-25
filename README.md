@@ -109,3 +109,32 @@ Con el plan gratis de Groq hay un límite de 8K tokens por minuto **por modelo**
 - **"Asignar reto" por WhatsApp:** solo escribe dentro de las 24 h desde el último mensaje del alumno (regla de WhatsApp). Fuera de esa ventana la sesión queda pendiente hasta que el alumno escriba.
 - **Códigos de alumno:** funcionan como acceso (web y vinculación de WhatsApp). Para alumnos reales conviene un sufijo aleatorio (p. ej. `PEPE-1B-07-K3F9`) en vez de números seguidos.
 - **Sandbox de Kapso:** solo responde al número registrado. Para el jurado, la web es la puerta principal.
+
+## FIX_NOTES
+
+Arreglos del 24 de noviembre, después de probar con conversaciones reales:
+
+- **Pepe se salía del guion en los pasos de ayuda.** Volvía a saludar ("¿Qué onda?") a media plática, cambiaba números del andamiaje ("la parto en 4" en vez de "en 3") y confundía el ejemplo de la pizza. Ahora los pasos se mandan **tal cual están escritos en el banco** (validados y con los números correctos). El modelo solo agrega, a veces, una frase corta que reacciona a lo que dijo el alumno (sin calificar, sin preguntas, sin números, sin saludo) y pasa por el filtro. Además gasta menos de la mitad de tokens.
+- **El Juez tomaba "do" como fuera de tema.** Los mensajes sin sentido y los "¿por qué?" ahora cuentan como "no sé". En el nivel 0 ya no usa "paso correcto". Tampoco confunde el resultado del reto original con un error del ejemplo paralelo. `pnpm evaluar-juez`: 29/29.
+- **Stickers e imágenes** ya no se califican como respuesta.
+- **Las entradas animadas del inicio podían dejar el contenido invisible** si el navegador congelaba las animaciones, porque empezaban en opacidad 0. Ahora solo deslizan: el contenido siempre se ve.
+
+## DESIGN_NOTES
+
+- **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.
+- **Pepe** es un SVG propio (`src/components/pepe-ajolote.tsx`), no un emoji: 🦎 es una lagartija. Mece las branquias, parpadea y pone cara de "pensando" mientras escribe.
+- **Tipografía:** Baloo 2 para títulos, Nunito para el texto y Geist Mono para los códigos de alumno y las cuentas.
+- **Fondo 3D:** en el dado salió la **receta 2, terreno de ondas**, que encaja perfecto con el tema. Lo adapté como la superficie del canal en malla de ondas (canvas en perspectiva que se inclina con el puntero), con una aurora lejana y burbujas y hojas de lirio flotando cerca. Cada capa tiene su propio parallax con el puntero y con el scroll. La versión completa va en el inicio y la tranquila en el chat y el panel. En móvil lleva menos elementos, `devicePixelRatio` máximo 2, se pausa con la pestaña oculta y queda quieto con *prefers-reduced-motion*.
+- **Modo oscuro:** sigue al sistema (`prefers-color-scheme`), con sus propios tokens y sin una inversión automática.
+- **Detalles propios del proyecto:** la tarea de Pepe con "1/2 + 1/3 = 2/5" encerrado en rojo en el inicio, el aviso "Pepe nunca te va a dar la respuesta" al empezar el chat y la onda de la nota de voz.
+- **Animación (Motion):** las burbujas entran con spring, el estado ("escribiendo…") cambia con crossfade, las respuestas rápidas tienen press con spring y el botón de micrófono/enviar se intercambia con animación.
+
+### Checklist de 2 minutos en el celular
+
+1. Abre el inicio: Pepe se mueve, el agua ondula y no hay scroll horizontal.
+2. Escribe un código mal (`hola`): sale el error debajo del campo, en rojo.
+3. Entra con `PEPE-1B-01`: Pepe saluda y aparece "escribiendo…" con sus puntos rosas.
+4. Contesta `sí, está bien`: salen los botones A / B. Toca uno y revisa que responda.
+5. Mantén el micrófono: graba unos segundos, envía y revisa que Pepe conteste.
+6. Activa el modo oscuro del celular y recarga: todo se lee bien.
+7. Entra a `/docente` con el PIN: indicadores con íconos, gráfica y tabla.

@@ -2,14 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-nunito);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-baloo);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -128,40 +128,195 @@
     @apply font-sans;
   }
 }
-/* ── Marca de Pepe ─────────────────────────────────── */
+/* ══ Sistema de diseño de Pepe ═══════════════════════════════════════
+   Agua de canal (turquesa) = acción principal · rosa ajolote = Pepe ·
+   amarillo trajinera = acentos. Claro y oscuro (sigue al sistema).        */
 :root {
-  --primary: oklch(0.52 0.12 172);
+  --background: oklch(0.975 0.014 185);
+  --foreground: oklch(0.24 0.035 230);
+  --card: oklch(1 0 0 / 0.86);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.5 0.105 188);
   --primary-foreground: oklch(0.99 0 0);
-  --ring: oklch(0.52 0.12 172);
-  --chat-fondo: oklch(0.955 0.018 165);
+  --secondary: oklch(0.94 0.03 185);
+  --secondary-foreground: oklch(0.3 0.05 210);
+  --muted: oklch(0.94 0.02 190);
+  --muted-foreground: oklch(0.45 0.03 225);
+  --accent: oklch(0.93 0.05 5);
+  --accent-foreground: oklch(0.35 0.1 5);
+  --border: oklch(0.88 0.025 195);
+  --input: oklch(0.86 0.03 195);
+  --ring: oklch(0.55 0.12 188);
+  --destructive: oklch(0.55 0.2 25);
+  --radius: 1rem;
+
+  --trajinera: oklch(0.86 0.16 88);
+  --trajinera-tinta: oklch(0.38 0.08 70);
+  --ajolote: oklch(0.83 0.085 5);
+  --ajolote-panza: oklch(0.9 0.05 10);
+  --ajolote-branquia: oklch(0.64 0.17 0);
+  --ajolote-ojo: oklch(0.22 0.03 260);
+
+  --chat-fondo: transparent;
   --burbuja-pepe: oklch(1 0 0);
-  --burbuja-alumno: oklch(0.92 0.07 155);
-  --aviso: oklch(0.75 0.15 75);
-  --peligro: oklch(0.6 0.2 25);
-  --exito: oklch(0.6 0.14 155);
+  --burbuja-pepe-borde: oklch(0.88 0.05 5);
+  --burbuja-alumno: oklch(0.5 0.105 188);
+  --burbuja-alumno-texto: oklch(0.99 0 0);
+  --aviso: oklch(0.78 0.15 75);
+  --peligro: oklch(0.58 0.2 25);
+  --exito: oklch(0.58 0.13 155);
+
+  --sombra-clay: 0 1px 0 oklch(1 0 0 / 0.9) inset, 0 -2px 0 oklch(0.2 0.05 200 / 0.06) inset,
+    0 10px 24px -12px oklch(0.3 0.08 200 / 0.28), 0 2px 6px -2px oklch(0.3 0.08 200 / 0.12);
+  --sombra-boton: 0 1px 0 oklch(1 0 0 / 0.35) inset, 0 -3px 0 oklch(0 0 0 / 0.14) inset,
+    0 8px 18px -8px oklch(0.4 0.1 188 / 0.6);
+
+  --fondo-base: oklch(0.965 0.02 185);
+  --fondo-onda: oklch(0.62 0.1 190);
+  --fondo-aurora-1: oklch(0.86 0.09 175 / 0.55);
+  --fondo-aurora-2: oklch(0.9 0.07 5 / 0.45);
+  --fondo-aurora-3: oklch(0.93 0.1 90 / 0.4);
+  --fondo-lirio: oklch(0.7 0.13 150);
+  --fondo-lirio-vena: oklch(0.55 0.12 150);
+  --fondo-flor: oklch(0.85 0.09 350);
 }
-.dark {
-  --primary: oklch(0.7 0.12 172);
-  --primary-foreground: oklch(0.15 0 0);
-  --chat-fondo: oklch(0.2 0.015 200);
-  --burbuja-pepe: oklch(0.27 0.01 220);
-  --burbuja-alumno: oklch(0.38 0.07 165);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.19 0.03 220);
+    --foreground: oklch(0.95 0.015 190);
+    --card: oklch(0.25 0.035 215 / 0.85);
+    --popover: oklch(0.25 0.035 215);
+    --primary: oklch(0.74 0.11 185);
+    --primary-foreground: oklch(0.16 0.03 220);
+    --secondary: oklch(0.29 0.04 210);
+    --secondary-foreground: oklch(0.92 0.02 190);
+    --muted: oklch(0.28 0.03 215);
+    --muted-foreground: oklch(0.76 0.03 200);
+    --accent: oklch(0.33 0.06 5);
+    --accent-foreground: oklch(0.92 0.04 5);
+    --border: oklch(1 0 0 / 0.12);
+    --input: oklch(1 0 0 / 0.18);
+    --ring: oklch(0.74 0.11 185);
+    --destructive: oklch(0.7 0.19 22);
+    --trajinera-tinta: oklch(0.9 0.12 88);
+    --burbuja-pepe: oklch(0.27 0.035 215);
+    --burbuja-pepe-borde: oklch(0.45 0.08 5);
+    --burbuja-alumno: oklch(0.42 0.08 188);
+    --burbuja-alumno-texto: oklch(0.98 0 0);
+    --sombra-clay: 0 1px 0 oklch(1 0 0 / 0.07) inset, 0 12px 28px -14px oklch(0 0 0 / 0.7);
+    --sombra-boton: 0 1px 0 oklch(1 0 0 / 0.3) inset, 0 -3px 0 oklch(0 0 0 / 0.2) inset,
+      0 8px 20px -8px oklch(0.74 0.11 185 / 0.45);
+    --fondo-base: oklch(0.17 0.03 222);
+    --fondo-onda: oklch(0.6 0.09 190);
+    --fondo-aurora-1: oklch(0.45 0.09 185 / 0.4);
+    --fondo-aurora-2: oklch(0.42 0.1 5 / 0.25);
+    --fondo-aurora-3: oklch(0.5 0.1 90 / 0.15);
+    --fondo-lirio: oklch(0.5 0.1 150);
+    --fondo-lirio-vena: oklch(0.38 0.08 150);
+    --fondo-flor: oklch(0.7 0.1 350);
+  }
 }
 @theme inline {
   --color-chat-fondo: var(--chat-fondo);
   --color-burbuja-pepe: var(--burbuja-pepe);
+  --color-burbuja-pepe-borde: var(--burbuja-pepe-borde);
   --color-burbuja-alumno: var(--burbuja-alumno);
+  --color-burbuja-alumno-texto: var(--burbuja-alumno-texto);
   --color-aviso: var(--aviso);
   --color-peligro: var(--peligro);
   --color-exito: var(--exito);
+  --color-trajinera: var(--trajinera);
+  --color-trajinera-tinta: var(--trajinera-tinta);
+  --color-ajolote: var(--ajolote);
+  --color-ajolote-branquia: var(--ajolote-branquia);
+  --shadow-clay: var(--sombra-clay);
+  --shadow-boton: var(--sombra-boton);
 }
+
+/* Fondo transparente: el fondo del canal se pinta detrás (z-index -10). */
+html { background: var(--fondo-base); }
+body { isolation: isolate; background: transparent; }
+
+/* Utilidades de texto */
+@layer utilities {
+  .texto-display { font-family: var(--font-baloo), var(--font-sans); font-weight: 800; line-height: 1.02; letter-spacing: -0.02em; }
+  .texto-titulo { font-family: var(--font-baloo), var(--font-sans); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+  .eyebrow { font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tarjeta-clay { background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem; box-shadow: var(--sombra-clay); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+}
+
+/* ── Fondo ambiente ─────────────────────────────────────────────── */
+.amb-raiz { position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none; background: var(--fondo-base); }
+.amb-capa { position: absolute; inset: 0; }
+.amb-agua { width: 100%; height: 100%; }
+.amb-tranquilo .amb-agua { opacity: 0.45; }
+.amb-aurora {
+  inset: -20%;
+  background:
+    radial-gradient(40% 35% at 20% 25%, var(--fondo-aurora-1), transparent 70%),
+    radial-gradient(35% 30% at 80% 20%, var(--fondo-aurora-2), transparent 70%),
+    radial-gradient(45% 30% at 60% 75%, var(--fondo-aurora-3), transparent 70%);
+  animation: amb-deriva 24s ease-in-out infinite alternate;
+}
+.amb-tranquilo .amb-aurora { opacity: 0.6; }
+@keyframes amb-deriva {
+  from { transform: translate3d(-3%, -2%, 0) rotate(0deg); }
+  to { transform: translate3d(3%, 2%, 0) rotate(6deg); }
+}
+.amb-flotante { position: absolute; }
+.amb-burbuja {
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, oklch(1 0 0 / 0.9), oklch(1 0 0 / 0.15) 45%, transparent 70%);
+  border: 1px solid oklch(1 0 0 / 0.55);
+  box-shadow: 0 0 12px oklch(0.8 0.1 190 / 0.35);
+  animation: amb-sube 10s ease-in-out infinite;
+}
+.amb-lirio { animation: amb-flota 15s ease-in-out infinite; opacity: 0.85; }
+.amb-tranquilo .amb-flotante { opacity: 0.55; }
+@keyframes amb-sube {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.9; }
+  50% { transform: translate3d(6px, -26px, 0); opacity: 0.55; }
+}
+@keyframes amb-flota {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+  50% { transform: translate3d(8px, -6px, 0) rotate(5deg); }
+}
+.amb-vineta {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 110% 85% at 50% 38%, transparent 40%, color-mix(in oklch, var(--fondo-base) 80%, transparent));
+}
+
+/* ── Pepe vivo ──────────────────────────────────────────────────── */
+.pepe-vivo .pepe-branquias-izq { animation: pepe-branquia-izq 3.2s ease-in-out infinite; }
+.pepe-vivo .pepe-branquias-der { animation: pepe-branquia-der 3.2s ease-in-out infinite; }
+.pepe-vivo .pepe-ojos { animation: pepe-parpadeo 5s infinite; }
+@keyframes pepe-branquia-izq { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-7deg); } }
+@keyframes pepe-branquia-der { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(7deg); } }
+@keyframes pepe-parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+.pepe-flota { animation: pepe-flota 5s ease-in-out infinite; }
+@keyframes pepe-flota { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+
+/* ── Escribiendo… ───────────────────────────────────────────────── */
 @keyframes escribiendo {
-  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-2px); }
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
 }
 .punto-escribiendo { animation: escribiendo 1.2s infinite; }
 .punto-escribiendo:nth-child(2) { animation-delay: 0.15s; }
 .punto-escribiendo:nth-child(3) { animation-delay: 0.3s; }
+
+/* Onda de grabación */
+@keyframes onda-voz { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+.barra-voz { transform-origin: center; animation: onda-voz 0.9s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
+  .amb-aurora, .amb-burbuja, .amb-lirio, .pepe-flota,
+  .pepe-vivo .pepe-branquias-izq, .pepe-vivo .pepe-branquias-der, .pepe-vivo .pepe-ojos,
+  .barra-voz { animation: none; }
   .punto-escribiendo { animation: none; opacity: 0.6; }
+}
+@media (max-width: 767px) {
+  .tarjeta-clay { backdrop-filter: none; -webkit-backdrop-filter: none; }
 }

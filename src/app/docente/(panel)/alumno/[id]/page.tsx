@@ -120,7 +120,7 @@ export default async function DetalleAlumno({
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="space-y-6">
           {sesion ? (
-            <section className="space-y-4 rounded-xl border border-border bg-background p-4">
+            <section className="space-y-4 tarjeta-clay print:shadow-none p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="font-semibold">
                   {info?.titulo ?? sesion.reto_id}{' '}
@@ -220,14 +220,14 @@ export default async function DetalleAlumno({
               </details>
             </section>
           ) : (
-            <p className="rounded-xl border border-border bg-background p-6 text-center text-muted-foreground">
+            <p className="tarjeta-clay print:shadow-none p-6 text-center text-muted-foreground">
               Todavía no ha hecho ningún reto.
             </p>
           )}
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-xl border border-border bg-background p-4">
+          <section className="tarjeta-clay print:shadow-none p-4">
             <h2 className="font-semibold">Asignar reto</h2>
             <p className="mb-3 text-sm text-muted-foreground">Crea una sesión nueva y Pepe le escribe por WhatsApp.</p>
             <form action={asignar} className="space-y-3">
@@ -253,7 +253,7 @@ export default async function DetalleAlumno({
             )}
           </section>
 
-          <section className="rounded-xl border border-border bg-background p-4">
+          <section className="tarjeta-clay print:shadow-none p-4">
             <h2 className="mb-2 font-semibold">Retos</h2>
             <ul className="space-y-1">
               {sesiones.map((s) => (

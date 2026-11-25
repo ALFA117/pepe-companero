@@ -1,29 +1,53 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Baloo_2, Geist_Mono, Nunito } from 'next/font/google';
+import { FondoAmbiente } from '@/components/fondo-ambiente';
+import './globals.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const baloo = Baloo_2({ variable: '--font-baloo', subsets: ['latin'], weight: ['600', '700', '800'] });
+const nunito = Nunito({ variable: '--font-nunito', subsets: ['latin'] });
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const URL_SITIO = process.env.NEXT_PUBLIC_URL_SITIO ?? 'https://pepe-companero.vercel.app';
+const DESCRIPCION =
+  'Pepe es un ajolote de secundaria que siempre se equivoca. Tú le demuestras dónde está su error y tu profe ve cuánta ayuda necesitaste.';
 
 export const metadata: Metadata = {
-  title: "Pepe, el compañero que se equivoca",
-  description: "Reta a Pepe y demuéstrale dónde se equivocó.",
+  metadataBase: new URL(URL_SITIO),
+  title: { default: 'Pepe, el compañero que se equivoca', template: '%s · Pepe' },
+  description: DESCRIPCION,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'es_MX',
+    url: '/',
+    siteName: 'Pepe',
+    title: 'Pepe se equivocó. ¿Le ayudas?',
+    description: DESCRIPCION,
+  },
+  twitter: { card: 'summary_large_image', title: 'Pepe se equivocó. ¿Le ayudas?', description: DESCRIPCION },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#e9f6f4' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f2027' },
+  ],
+  viewportFit: 'cover',
+};
+
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html
-      lang="es-MX"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="es-MX" className={`${baloo.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        <a
+          href="#contenido"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:font-bold focus:text-primary-foreground"
+        >
+          Saltar al contenido
+        </a>
+        <FondoAmbiente />
+        {children}
+      </body>
     </html>
   );
 }

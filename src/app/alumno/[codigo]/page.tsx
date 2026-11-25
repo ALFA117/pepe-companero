@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PepeAjolote } from '@/components/pepe-ajolote';
 import { pasoActual } from '@/motor/maquina';
 import { repositorio } from '@/motor/servidor';
 import { existeReto, obtenerReto } from '@/retos/cargar';
@@ -7,7 +8,7 @@ import { Chat, type MensajeChat } from './chat';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
-  return { title: 'Chat con Pepe' };
+  return { title: 'Chat con Pepe', robots: { index: false, follow: false } };
 }
 
 export default async function PaginaAlumno({ params }: { params: Promise<{ codigo: string }> }) {
@@ -18,15 +19,15 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
 
   if (!alumno) {
     return (
-      <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
-        <p className="text-5xl" aria-hidden>
-          🦎
-        </p>
-        <h1 className="text-xl font-semibold">No encontré el código {codigo}</h1>
-        <p className="text-muted-foreground">Revisa que esté igual que el que te dio tu profe, por ejemplo PEPE-1B-07.</p>
-        <Link href="/" className="font-medium text-primary underline underline-offset-4">
-          Intentar con otro código
-        </Link>
+      <main id="contenido" className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-4 py-10">
+        <div className="tarjeta-clay flex w-full flex-col items-center gap-3 p-6 text-center">
+          <PepeAjolote vivo cara="pensando" className="w-32" />
+          <h1 className="texto-titulo text-2xl">No encontré el código <span className="font-mono text-primary">{codigo}</span></h1>
+          <p className="text-muted-foreground">Revisa que esté igual que el que te dio tu profe, por ejemplo <span className="font-mono">PEPE-1B-07</span>.</p>
+          <Link href="/" className="mt-2 inline-flex min-h-12 items-center rounded-2xl bg-primary px-5 font-extrabold text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40">
+            Intentar con otro código
+          </Link>
+        </div>
       </main>
     );
   }

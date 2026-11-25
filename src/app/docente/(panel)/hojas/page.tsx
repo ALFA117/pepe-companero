@@ -54,12 +54,12 @@ export default async function PaginaHojas({ searchParams }: { searchParams: Prom
       </div>
 
       {brechas.length === 0 && (
-        <p className="rounded-xl border border-border bg-background p-6 text-center text-muted-foreground">
+        <p className="tarjeta-clay print:shadow-none p-6 text-center text-muted-foreground">
           Todavía no hay brechas detectadas para armar hojas.
         </p>
       )}
       {brechas.length > 0 && !hojas && !error && (
-        <div className="rounded-xl border border-border bg-background p-4 print:hidden">
+        <div className="tarjeta-clay print:shadow-none p-4 print:hidden">
           <p className="text-sm font-medium">Se basarán en estas brechas:</p>
           <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
             {brechas.map((b) => (
@@ -80,7 +80,7 @@ export default async function PaginaHojas({ searchParams }: { searchParams: Prom
       {hojas?.hojas.map((h) => (
         <article
           key={h.nivel}
-          className="break-after-page rounded-xl border border-border bg-background p-6 print:rounded-none print:border-0 print:p-0"
+          className="break-after-page tarjeta-clay print:shadow-none p-6 print:rounded-none print:border-0 print:p-0"
         >
           <header className="mb-4 border-b border-border pb-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
