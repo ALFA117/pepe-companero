@@ -136,6 +136,8 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 - **Pestañas de la tabla desbordadas a 320 px** y nombres de la tabla con menos de 44 px de alto para tocarlos. Ya corregido.
 - **Generar hojas mostraba el esqueleto del panel** mientras tardaba unos 20 s. Ahora tiene su propia pantalla de carga ("Pepe está armando las hojas…") y un error con **Reintentar**.
 
+- **No se distinguía qué botón avanzaba ni qué hacía cada uno.** Ahora hay una regla en toda la app: **turquesa sólido = avanzar** (siempre con texto: "Entrar", "Enviar", "Siguiente reto"), **con borde = alternativa** ("Salir", "Cancelar") y **fichas claras = respuestas para Pepe**, con la instrucción encima ("Toca una respuesta o escribe la tuya"). El micrófono dice "Voz", y arriba del teclado hay una pista de qué hacer en cada momento. "Entrar" ya no se ve apagado: si falta el código, explica qué escribir.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.

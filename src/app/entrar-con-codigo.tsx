@@ -41,6 +41,10 @@ export function EntrarConCodigo() {
   function entrar(e: FormEvent) {
     e.preventDefault();
     const c = codigo.trim().toUpperCase().replace(/\s+/g, '');
+    if (!c) {
+      setError('Escribe primero el código que te dio tu profe (por ejemplo PEPE-1B-07).');
+      return;
+    }
     if (!RE_CODIGO.test(c)) {
       setError('El código se ve así: PEPE-1B-07. Revísalo con tu profe.');
       return;
@@ -74,6 +78,14 @@ export function EntrarConCodigo() {
           </motion.button>
         )}
       </AnimatePresence>
+      <ol className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] font-bold text-muted-foreground" aria-label="Cómo empezar">
+        {['Escribe tu código', 'Toca Entrar', 'Ayuda a Pepe'].map((paso, i) => (
+          <li key={paso} className="inline-flex items-center gap-1.5">
+            <span className="inline-flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">{i + 1}</span>
+            {paso}
+          </li>
+        ))}
+      </ol>
       <label htmlFor="codigo" className="block text-base font-extrabold">
         {ultimo ? 'U otro código' : 'Tu código de alumno'}
       </label>
@@ -93,7 +105,7 @@ export function EntrarConCodigo() {
           aria-describedby={error ? 'codigo-error' : 'codigo-ayuda'}
           className="min-h-12 min-w-0 flex-1 rounded-2xl border-2 border-input bg-background/80 px-4 font-mono text-[17px] tracking-wider uppercase outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-ring/25 aria-[invalid]:border-peligro"
         />
-        <Boton type="submit" cargando={yendo} disabled={!codigo.trim()}>
+        <Boton type="submit" cargando={yendo}>
           Entrar <ArrowRight className="size-4" aria-hidden />
         </Boton>
       </div>

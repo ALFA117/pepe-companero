@@ -6,7 +6,7 @@
  * con MediaRecorder que pasa por la misma transcripción que WhatsApp.
  */
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowLeft, ArrowRight, BookOpenText, House, Mic, PartyPopper, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpenText, House, Mic, MousePointerClick, PartyPopper, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
@@ -384,10 +384,14 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduce ? undefined : { opacity: 0, y: 6, transition: { duration: 0.1 } }}
                 transition={resorte}
-                className="mb-2 flex flex-wrap justify-end gap-2"
+                className="mb-2"
                 role="group"
-                aria-label="Respuestas rápidas"
+                aria-labelledby="titulo-respuestas"
               >
+                <p id="titulo-respuestas" className="mb-1.5 flex items-center gap-1.5 px-1 text-[13px] font-bold text-muted-foreground">
+                  <MousePointerClick className="size-4 text-primary" aria-hidden /> Toca una respuesta o escribe la tuya abajo
+                </p>
+                <div className="flex flex-wrap gap-2">
                 {botones.map((b) => (
                   <motion.button
                     key={b}
@@ -396,11 +400,12 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                     whileTap={reduce ? undefined : { scale: 0.96 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                     onClick={() => void enviar({ tipo: 'boton', texto: b })}
-                    className="min-h-11 cursor-pointer rounded-2xl border-2 border-primary bg-card px-4 text-[15px] font-extrabold text-primary shadow-clay transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                    className="min-h-11 cursor-pointer rounded-2xl border-2 border-primary/40 bg-primary/10 px-4 text-[15px] font-extrabold text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
                   >
                     {b}
                   </motion.button>
                 ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -450,17 +455,27 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
-            className="tarjeta-clay rounded-3xl p-2"
           >
+            {botones.length === 0 && (
+              <p className="mb-1.5 px-1 text-[13px] font-bold text-muted-foreground" aria-live="polite">
+                {grabando
+                  ? 'Te estoy escuchando. Toca Enviar cuando termines.'
+                  : ocupado
+                    ? 'Espera a que Pepe conteste…'
+                    : puedeGrabar
+                      ? 'Escribe tu respuesta y toca Enviar, o toca Voz para hablarle.'
+                      : 'Escribe tu respuesta y toca Enviar.'}
+              </p>
+            )}
+            <div className="tarjeta-clay rounded-3xl p-2">
             {grabando ? (
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => terminarGrabacion(true)}
-                  aria-label="Cancelar grabación"
-                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-2xl border-2 border-border px-3 text-sm font-extrabold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <Trash2 className="size-5" aria-hidden />
+                  <Trash2 className="size-4" aria-hidden /> Cancelar
                 </button>
                 <div className="flex flex-1 items-center justify-center gap-3" aria-live="polite">
                   <span className="size-2.5 animate-pulse rounded-full bg-peligro" aria-hidden />
@@ -475,10 +490,9 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                   type="button"
                   whileTap={reduce ? undefined : { scale: 0.94 }}
                   onClick={() => terminarGrabacion(false)}
-                  aria-label="Enviar nota de voz"
-                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                  className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-2xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
                 >
-                  <SendHorizontal className="size-5" aria-hidden />
+                  Enviar <SendHorizontal className="size-4" aria-hidden />
                 </motion.button>
               </div>
             ) : (
@@ -490,7 +504,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                   id="mensaje"
                   value={texto}
                   onChange={(e) => setTexto(e.target.value)}
-                  placeholder="Escríbele a Pepe…"
+                  placeholder="Escribe tu respuesta…"
                   autoComplete="off"
                   maxLength={1000}
                   className="min-h-11 min-w-0 flex-1 rounded-2xl bg-transparent px-3 text-[16px] outline-none placeholder:text-muted-foreground/80 focus-visible:ring-2 focus-visible:ring-ring/40"
@@ -506,10 +520,9 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                       whileTap={reduce ? undefined : { scale: 0.94 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                       disabled={ocupado || !texto.trim()}
-                      aria-label="Enviar"
-                      className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-boton disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                      className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-2xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-boton disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
                     >
-                      <SendHorizontal className="size-5" aria-hidden />
+                      Enviar <SendHorizontal className="size-4" aria-hidden />
                     </motion.button>
                   ) : (
                     <motion.button
@@ -522,15 +535,16 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
                       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                       onClick={() => void empezarGrabacion()}
                       disabled={ocupado}
-                      aria-label="Grabar nota de voz"
-                      className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-ajolote-branquia text-white shadow-boton disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                      aria-label="Voz: grabar una nota de voz"
+                      className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-2xl border-2 border-ajolote-branquia/50 bg-ajolote/30 px-4 text-sm font-extrabold text-foreground disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
                     >
-                      <Mic className="size-5" aria-hidden />
+                      <Mic className="size-4 text-ajolote-branquia" aria-hidden /> Voz
                     </motion.button>
                   )}
                 </AnimatePresence>
               </form>
             )}
+            </div>
           </motion.div>
           )}
           </AnimatePresence>

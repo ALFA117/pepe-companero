@@ -6,7 +6,7 @@
  * adelantar la respuesta de los retos reales.
  */
 import { AnimatePresence, motion } from 'motion/react';
-import { RotateCcw } from 'lucide-react';
+import { MousePointerClick, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { PepeAjolote } from './pepe-ajolote';
 
@@ -55,7 +55,10 @@ export function MiniReto() {
           <p className="text-[15px] text-muted-foreground">Sumé 5 + 25 = 30. ¿Me la va a calificar bien?</p>
         </div>
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label="¿Qué hizo mal Pepe?">
+        <p id="mini-reto-instruccion" className="flex items-center gap-1.5 text-[13px] font-bold text-muted-foreground">
+          <MousePointerClick className="size-4 text-primary" aria-hidden /> Toca la respuesta que creas correcta
+        </p>
+        <div className="flex flex-wrap gap-2" role="group" aria-labelledby="mini-reto-instruccion">
           {OPCIONES.map((o) => {
             const activa = elegida?.id === o.id;
             return (
@@ -73,7 +76,7 @@ export function MiniReto() {
                     ? o.correcta
                       ? 'border-exito bg-exito text-white'
                       : 'border-peligro bg-peligro/10 text-peligro'
-                    : 'border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground'
+                    : 'border-primary/40 bg-primary/10 text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground'
                 }`}
               >
                 {o.texto}
@@ -109,7 +112,7 @@ export function MiniReto() {
               </motion.div>
             ) : (
               <motion.p key="pista" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-muted-foreground">
-                Elige qué hizo mal Pepe. Si te equivocas, te da una pista, nunca la respuesta.
+                Si te equivocas, Pepe te da una pista, nunca la respuesta.
               </motion.p>
             )}
           </AnimatePresence>
