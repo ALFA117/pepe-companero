@@ -6,11 +6,13 @@
  *   - capa lejana: aurora de luz y rayos de sol que entran al agua (CSS);
  *   - capa media: la superficie del canal en malla de ondas (canvas, en perspectiva);
  *   - horizonte: una trajinera que se mece (solo en el inicio);
+ *   - burbuja low-poly en WebGL (Three.js) detrás de Pepe (solo en el inicio);
  *   - capa cercana: burbujas y hojas de lirio flotando (más parallax).
  * Completo en el inicio y tranquilo en el chat y el panel. Solo transform y
  * opacity; el canvas se pausa con la pestaña oculta; con movimiento reducido se
  * dibuja una escena quieta.
  */
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import {
@@ -22,6 +24,9 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
+
+/** Three.js solo se descarga en el inicio y nunca en el servidor. */
+const Burbuja3D = dynamic(() => import('./burbuja-3d'), { ssr: false });
 
 function useCanvasLoop(
   ref: RefObject<HTMLCanvasElement | null>,
@@ -255,6 +260,7 @@ export function FondoAmbiente() {
   const xAurora = useTransform(px, (v) => (reduce ? 0 : v * -12));
   const xTrajinera = useTransform(px, (v) => (reduce ? 0 : v * 10));
   const yTrajinera = useTransform(scroll, (v) => (reduce ? 0 : v * -90));
+  const yBurbuja = useTransform(scroll, (v) => (reduce ? 0 : v * -220));
 
   return (
     <div aria-hidden className={`amb-raiz ${completo ? 'amb-completo' : 'amb-tranquilo'}`}>
@@ -263,6 +269,11 @@ export function FondoAmbiente() {
       <motion.div className="amb-capa" style={{ y: yAgua }}>
         <AguaDelCanal reduce={reduce} completo={completo} px={px} />
       </motion.div>
+      {completo && (
+        <motion.div className="amb-burbuja3d" style={{ y: yBurbuja }}>
+          <Burbuja3D />
+        </motion.div>
+      )}
       {completo && (
         <motion.div className="amb-trajinera-pos" style={{ x: xTrajinera, y: yTrajinera }}>
           <div className="amb-trajinera">

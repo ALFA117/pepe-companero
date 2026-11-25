@@ -287,6 +287,8 @@ body { isolation: isolate; background: transparent; }
 }
 .amb-tranquilo .amb-rayos { opacity: 0.4; }
 @keyframes amb-titila { from { opacity: 0.35; transform: translate3d(-2%, 0, 0); } to { opacity: 0.85; transform: translate3d(2%, 0, 0); } }
+.amb-burbuja3d { position: absolute; right: -6vw; top: 2vh; width: min(62vw, 820px); aspect-ratio: 1; }
+@media (max-width: 767px) { .amb-burbuja3d { right: -30vw; top: -6vh; width: 120vw; opacity: 0.7; } }
 .amb-trajinera-pos { position: absolute; left: 62%; top: calc(58% + 92px); width: clamp(110px, 13vw, 190px); margin-top: -70px; }
 .amb-trajinera { animation: amb-mece 6s ease-in-out infinite; transform-origin: 50% 80%; opacity: 0.9; }
 @keyframes amb-mece { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2.5deg); } 50% { transform: translate3d(0, -5px, 0) rotate(2.5deg); } }
