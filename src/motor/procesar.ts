@@ -170,7 +170,10 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
 
   if (sesion.fase === 'pendiente') {
     const r = transicion(sesion, { tipo: 'iniciar' }, { reto, banco: deps.banco });
-    const guardada = (await repo.actualizarSesion(sesion, r.sesion)) ?? sesion;
+    const guardada = await repo.actualizarSesion(sesion, r.sesion);
+    // Otro mensaje arrancó la sesión al mismo tiempo (doble toque, dos pestañas):
+    // ese ya presentó el reto; este se guarda pero no lo repite.
+    if (!guardada) return { duplicado: false, mensajes: [], sesion: (await repo.sesionPorId(sesion.id)) ?? sesion };
     return responder(deps, { reto, sesion: guardada, accion: r.accion, ultimoMensaje: texto });
   }
 

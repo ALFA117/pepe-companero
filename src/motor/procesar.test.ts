@@ -221,6 +221,18 @@ describe('una sola sesión activa', () => {
   });
 });
 
+describe('sesión pendiente arrancada dos veces a la vez', () => {
+  it('solo un mensaje presenta el reto; el otro no lo repite', async () => {
+    preparar(llmConGuion([]));
+    await empezarEn(mate.id, 'pendiente');
+    const rs = await Promise.all([procesar(deps, texto('hola', 'p1')), procesar(deps, texto('hola', 'p2'))]);
+    expect(rs.filter((r) => r.mensajes.length > 0)).toHaveLength(1);
+    // (empezarEn ya trae un turno de Pepe sembrado)
+    const nuevosDePepe = repo.datos.turnos.filter((t) => t.rol === 'pepe' && t.texto !== 'Planteamiento');
+    expect(nuevosDePepe.map((t) => t.texto)).toEqual(mate.planteamiento_pepe);
+  });
+});
+
 describe('sin LLM (caído o sin llaves)', () => {
   it('Pepe contesta con el ejemplo del paso y la conversación sigue', async () => {
     preparar(llmFalso({ pepe: () => { throw new Error('caído'); }, juez: () => { throw new Error('caído'); } }));
