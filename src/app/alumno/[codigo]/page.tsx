@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { PepeAjolote } from '@/components/pepe-ajolote';
 import { pasoActual } from '@/motor/maquina';
 import { repositorio } from '@/motor/servidor';
-import { existeReto, obtenerReto } from '@/retos/cargar';
+import { infoDeRetos } from '@/panel/calcular';
+import { existeReto, listarRetos, obtenerReto } from '@/retos/cargar';
 import { Chat, type MensajeChat } from './chat';
 
 export const dynamic = 'force-dynamic';
@@ -50,5 +51,18 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
   }
 
   const nombre = alumno.nombre.split(' ')[0] ?? alumno.nombre;
-  return <Chat codigo={codigo} nombre={nombre} historial={historial} botonesIniciales={botones} />;
+  const info = sesion ? infoDeRetos(listarRetos()).get(sesion.reto_id) : undefined;
+  const reto = info ? { titulo: info.titulo, materia: info.materia } : null;
+  // Se vuelve a montar al cambiar de sesión (por ejemplo, al pasar al siguiente reto).
+  return (
+    <Chat
+      key={sesion?.id ?? 'nueva'}
+      codigo={codigo}
+      nombre={nombre}
+      historial={historial}
+      botonesIniciales={botones}
+      reto={reto}
+      terminado={sesion?.fase === 'terminado' && historial.length > 0}
+    />
+  );
 }

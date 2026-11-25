@@ -1,17 +1,42 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowRight, History } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useState, useSyncExternalStore, type FormEvent } from 'react';
 import { Boton } from '@/components/boton';
 
 const RE_CODIGO = /^PEPE-[A-Z0-9]{1,6}-[A-Z0-9]{1,6}$/;
+const LLAVE = 'pepe:ultimo-codigo';
+
+const sinSuscripcion = () => () => {};
+
+function leerUltimo(): string | null {
+  try {
+    const c = localStorage.getItem(LLAVE);
+    return c && RE_CODIGO.test(c) ? c : null;
+  } catch {
+    return null;
+  }
+}
 
 export function EntrarConCodigo() {
   const router = useRouter();
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [yendo, setYendo] = useState(false);
+  // localStorage solo existe en el navegador: en el servidor no hay código recordado.
+  const ultimo = useSyncExternalStore(sinSuscripcion, leerUltimo, () => null);
+
+  function ir(c: string) {
+    try {
+      localStorage.setItem(LLAVE, c);
+    } catch {
+      // sin almacenamiento: no pasa nada, solo no se recuerda
+    }
+    setYendo(true);
+    router.push(`/alumno/${encodeURIComponent(c)}`);
+  }
 
   function entrar(e: FormEvent) {
     e.preventDefault();
@@ -21,14 +46,36 @@ export function EntrarConCodigo() {
       return;
     }
     setError(null);
-    setYendo(true);
-    router.push(`/alumno/${encodeURIComponent(c)}`);
+    ir(c);
   }
 
   return (
     <form onSubmit={entrar} noValidate className="tarjeta-clay space-y-3 p-5">
+      <AnimatePresence initial={false}>
+        {ultimo && (
+          <motion.button
+            key="ultimo"
+            type="button"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+            onClick={() => ir(ultimo)}
+            className="flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-2xl border-2 border-primary/30 bg-primary/10 px-4 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+          >
+            <History className="size-5 shrink-0 text-primary" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-extrabold">Seguir donde me quedé</span>
+              <span className="block truncate font-mono text-xs text-muted-foreground">{ultimo}</span>
+            </span>
+            <ArrowRight className="size-4 shrink-0 text-primary" aria-hidden />
+          </motion.button>
+        )}
+      </AnimatePresence>
       <label htmlFor="codigo" className="block text-base font-extrabold">
-        Tu código de alumno
+        {ultimo ? 'U otro código' : 'Tu código de alumno'}
       </label>
       <div className="flex flex-col gap-2 min-[400px]:flex-row">
         <input

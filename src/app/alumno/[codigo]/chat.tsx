@@ -6,8 +6,9 @@
  * con MediaRecorder que pasa por la misma transcripción que WhatsApp.
  */
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowLeft, Mic, RotateCcw, SendHorizontal, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpenText, House, Mic, PartyPopper, RotateCcw, SendHorizontal, Sigma, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import type { RespuestaChat } from '@/app/api/chat/route';
 import { PepeAjolote } from '@/components/pepe-ajolote';
@@ -26,6 +27,10 @@ interface Props {
   nombre: string;
   historial: MensajeChat[];
   botonesIniciales: string[];
+  /** El reto en curso, para mostrarlo arriba. */
+  reto: { titulo: string; materia: 'matematicas' | 'lectura' } | null;
+  /** La sesión ya terminó: se ofrece el siguiente reto en vez del teclado. */
+  terminado: boolean;
 }
 
 const MAX_GRABACION_S = 180;
@@ -62,7 +67,9 @@ function tipoDeGrabacion(): string {
   return '';
 }
 
-export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
+export function Chat({ codigo, nombre, historial, botonesIniciales, reto, terminado: terminadoInicial }: Props) {
+  const router = useRouter();
+  const [terminado, setTerminado] = useState(terminadoInicial);
   const [mensajes, setMensajes] = useState<MensajeChat[]>(historial);
   const [botones, setBotones] = useState<string[]>(botonesIniciales);
   const [texto, setTexto] = useState('');
@@ -95,6 +102,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
       setMensajes((xs) => [...xs, { id: nuevoId(), rol: 'pepe', texto: m }]);
     }
     setBotones(r.botones ?? []);
+    if (r.fase === 'terminado') setTerminado(true);
   }, []);
 
   const enviar = useCallback(
@@ -163,6 +171,16 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
       void enviar({ tipo: 'texto', texto: 'hola' }, false);
     }
   }, [historial.length, enviar]);
+
+  const [pasando, setPasando] = useState(false);
+  async function siguienteReto() {
+    setPasando(true);
+    setTerminado(false);
+    await enviar({ tipo: 'texto', texto: 'hola' }, false);
+    setPasando(false);
+    // Recarga los datos del servidor: el título del reto nuevo y su conversación.
+    router.refresh();
+  }
 
   function alEnviar(e: FormEvent) {
     e.preventDefault();
@@ -255,6 +273,20 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
             {codigo}
           </span>
         </div>
+        {reto && (
+          <div className="mx-auto mt-2 flex max-w-2xl justify-center">
+            <p className="inline-flex max-w-full items-center gap-2 rounded-full border-2 border-border bg-card/90 px-3 py-1 text-[13px] font-bold shadow-clay">
+              {reto.materia === 'lectura' ? (
+                <BookOpenText className="size-4 shrink-0 text-ajolote-branquia" aria-hidden />
+              ) : (
+                <Sigma className="size-4 shrink-0 text-primary" aria-hidden />
+              )}
+              <span className="text-muted-foreground">{reto.materia === 'lectura' ? 'Lectura' : 'Matemáticas'}</span>
+              <span aria-hidden className="text-muted-foreground">·</span>
+              <span className="truncate">{reto.titulo}</span>
+            </p>
+          </div>
+        )}
       </header>
 
       <main id="contenido" className="flex-1 overflow-y-auto px-3 py-4" aria-live="polite" aria-label="Conversación con Pepe">
@@ -372,7 +404,53 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
             )}
           </AnimatePresence>
 
-          <div className="tarjeta-clay rounded-3xl p-2">
+          <AnimatePresence mode="wait" initial={false}>
+          {terminado ? (
+            <motion.div
+              key="terminado"
+              initial={{ opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, transition: { duration: 0.12 } }}
+              transition={resorte}
+              className="tarjeta-clay flex flex-col items-center gap-3 rounded-3xl p-5 text-center"
+              role="status"
+            >
+              <div className="flex items-center gap-2">
+                <PepeAjolote vivo className="w-16" />
+                <PartyPopper className="size-7 text-trajinera-tinta" aria-hidden />
+              </div>
+              <div>
+                <p className="texto-titulo text-xl">¡Reto terminado!</p>
+                <p className="text-[15px] text-muted-foreground">Gracias por ayudar a Pepe. ¿Le entras a otro?</p>
+              </div>
+              <div className="flex w-full flex-col gap-2 min-[440px]:flex-row">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  onClick={() => void siguienteReto()}
+                  disabled={pasando}
+                  className="inline-flex min-h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-5 font-extrabold text-primary-foreground shadow-boton disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                >
+                  Siguiente reto <ArrowRight className="size-4" aria-hidden />
+                </motion.button>
+                <Link
+                  href="/"
+                  className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card px-5 font-extrabold shadow-clay focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+                >
+                  <House className="size-4" aria-hidden /> Salir
+                </Link>
+              </div>
+            </motion.div>
+          ) : (
+          <motion.div
+            key="teclado"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            className="tarjeta-clay rounded-3xl p-2"
+          >
             {grabando ? (
               <div className="flex items-center gap-2">
                 <button
@@ -452,7 +530,9 @@ export function Chat({ codigo, nombre, historial, botonesIniciales }: Props) {
                 </AnimatePresence>
               </form>
             )}
-          </div>
+          </motion.div>
+          )}
+          </AnimatePresence>
         </div>
       </footer>
     </div>
