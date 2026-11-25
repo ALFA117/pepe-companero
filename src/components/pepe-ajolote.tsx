@@ -15,57 +15,57 @@ interface Props {
   /** Cara: normal o pensando (cejas y boca de duda). */
   cara?: 'feliz' | 'pensando';
   titulo?: string;
-  /** Contorno grueso para el logo y los íconos (se lee mejor en tamaño chico). */
+  /** Contorno más marcado para el logo y los íconos (se lee mejor en tamaño chico). */
   marcado?: boolean;
+  /** Sin cuerpo ni patitas (el logo es solo la cabeza). */
+  soloCabeza?: boolean;
 }
 
-/** Una branquia: tallo curvo que se adelgaza con flecos (fimbrias) a los lados. */
+/**
+ * Una branquia esponjosa: tallo curvo con "bolitas" redondas a los lados que
+ * forman la fronda suave del ajolote (sin puntas), y una vena clara.
+ */
 function Branquia({ x0, y0, cx, cy, x1, y1, grosor, flecos }: { x0: number; y0: number; cx: number; cy: number; x1: number; y1: number; grosor: number; flecos: number }) {
   const punto = (t: number) => ({
     x: (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1,
     y: (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t ** 2 * y1,
   });
-  const tangente = (t: number) => ({
-    x: 2 * (1 - t) * (cx - x0) + 2 * t * (x1 - cx),
-    y: 2 * (1 - t) * (cy - y0) + 2 * t * (y1 - cy),
-  });
-  const lineas: { x1: number; y1: number; x2: number; y2: number; w: number }[] = [];
-  for (let i = 0; i < flecos; i++) {
-    const t = 0.18 + (i / (flecos - 1)) * 0.78;
+  const normal = (t: number) => {
+    const dx = 2 * (1 - t) * (cx - x0) + 2 * t * (x1 - cx);
+    const dy = 2 * (1 - t) * (cy - y0) + 2 * t * (y1 - cy);
+    const l = Math.hypot(dx, dy) || 1;
+    return { x: -dy / l, y: dx / l };
+  };
+  const bolitas: { x: number; y: number; r: number }[] = [];
+  for (let k = 0; k < flecos; k++) {
+    const t = 0.2 + (k / (flecos - 1)) * 0.78;
     const p = punto(t);
-    const d = tangente(t);
-    const l = Math.hypot(d.x, d.y) || 1;
-    const ux = d.x / l;
-    const uy = d.y / l;
-    const largo = grosor * (2.5 - t * 1.1);
-    for (const lado of [1, -1]) {
-      // Los flecos salen inclinados hacia la punta, como plumas.
-      lineas.push({
-        x1: p.x,
-        y1: p.y,
-        x2: p.x + (-uy * lado * 0.82 + ux * 0.58) * largo,
-        y2: p.y + (ux * lado * 0.82 + uy * 0.58) * largo,
-        w: Math.max(0.9, grosor * 0.42 * (1 - t * 0.4)),
-      });
-    }
+    const n = normal(t);
+    const r = grosor * (1.05 - t * 0.45);
+    const sep = grosor * (0.95 - t * 0.35);
+    bolitas.push({ x: p.x + n.x * sep, y: p.y + n.y * sep, r }, { x: p.x - n.x * sep, y: p.y - n.y * sep, r });
   }
-  const camino = `M${x0} ${y0} Q${cx} ${cy} ${x1} ${y1}`;
+  const fin = punto(1);
+  const vena = `M${x0} ${y0} Q${cx} ${cy} ${x1} ${y1}`;
   return (
     <g>
-      {lineas.map((f, i) => (
-        <line key={i} x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2} stroke="url(#pepe-branquia)" strokeWidth={f.w} strokeLinecap="round" />
-      ))}
-      <path d={camino} stroke="url(#pepe-branquia)" strokeWidth={grosor} strokeLinecap="round" fill="none" />
-      <path d={camino} stroke="var(--ajolote-panza)" strokeOpacity="0.3" strokeWidth={grosor * 0.25} strokeLinecap="round" fill="none" />
+      <g fill="url(#pepe-branquia)" stroke="var(--ajolote-branquia-oscura)" strokeOpacity="0.15" strokeWidth="0.4">
+        {bolitas.map((b, i) => (
+          <circle key={i} cx={b.x.toFixed(2)} cy={b.y.toFixed(2)} r={b.r.toFixed(2)} />
+        ))}
+        <circle cx={fin.x} cy={fin.y} r={grosor * 0.62} />
+      </g>
+      <path d={vena} stroke="url(#pepe-branquia)" strokeWidth={grosor * 0.9} strokeLinecap="round" fill="none" />
+      <path d={vena} stroke="var(--ajolote-panza)" strokeOpacity="0.5" strokeWidth={grosor * 0.22} strokeLinecap="round" fill="none" />
     </g>
   );
 }
 
 /** Lado izquierdo; el derecho es su espejo. Salen de atrás de la cabeza y suben como corona. */
 const BRANQUIAS = [
-  { x0: 28, y0: 44, cx: 23, cy: 25, x1: 27, y1: 9, grosor: 4, flecos: 12 },
-  { x0: 24, y0: 48, cx: 13, cy: 33, x1: 8, y1: 20, grosor: 4, flecos: 12 },
-  { x0: 22, y0: 54, cx: 10, cy: 48, x1: 4, y1: 38, grosor: 3.8, flecos: 11 },
+  { x0: 32, y0: 42, cx: 28, cy: 26, x1: 31, y1: 11, grosor: 3.3, flecos: 8 },
+  { x0: 27, y0: 46, cx: 17, cy: 34, x1: 11, y1: 22, grosor: 3.3, flecos: 8 },
+  { x0: 24, y0: 53, cx: 13, cy: 49, x1: 6, y1: 40, grosor: 3.1, flecos: 7 },
 ];
 
 /** Patita delantera con cuatro dedos (lado izquierdo). */
@@ -86,9 +86,9 @@ function Pata() {
   );
 }
 
-export function PepeAjolote({ className, vivo = false, cara = 'feliz', titulo, marcado = false }: Props) {
+export function PepeAjolote({ className, vivo = false, cara = 'feliz', titulo, marcado = false, soloCabeza = false }: Props) {
   const contorno = marcado
-    ? { stroke: 'var(--ajolote-contorno)', strokeOpacity: 0.85, strokeWidth: 2.2 }
+    ? { stroke: 'var(--ajolote-contorno)', strokeOpacity: 0.55, strokeWidth: 1.4 }
     : { stroke: 'var(--ajolote-branquia)', strokeOpacity: 0.4, strokeWidth: 1.1 };
   return (
     <svg
@@ -115,19 +115,23 @@ export function PepeAjolote({ className, vivo = false, cara = 'feliz', titulo, m
       </defs>
 
       {/* Cuerpo y patitas delanteras (detrás de la cabeza) */}
-      <ellipse cx="60" cy="88" rx="20" ry="11" fill="var(--ajolote-sombra)" />
-      <ellipse cx="60" cy="86" rx="17" ry="9" fill="var(--ajolote)" />
-      <Pata />
-      <g transform="translate(120 0) scale(-1 1)">
-        <Pata />
-      </g>
+      {!soloCabeza && (
+        <>
+          <ellipse cx="60" cy="88" rx="20" ry="11" fill="var(--ajolote-sombra)" />
+          <ellipse cx="60" cy="86" rx="17" ry="9" fill="var(--ajolote)" />
+          <Pata />
+          <g transform="translate(120 0) scale(-1 1)">
+            <Pata />
+          </g>
+        </>
+      )}
 
-      <g className="pepe-branquias-izq" style={{ transformOrigin: '25px 48px' }}>
+      <g className="pepe-branquias-izq" style={{ transformOrigin: '28px 47px' }}>
         {BRANQUIAS.map((b, i) => (
           <Branquia key={i} {...b} />
         ))}
       </g>
-      <g className="pepe-branquias-der" style={{ transformOrigin: '95px 48px' }}>
+      <g className="pepe-branquias-der" style={{ transformOrigin: '92px 47px' }}>
         <g transform="translate(120 0) scale(-1 1)">
           {BRANQUIAS.map((b, i) => (
             <Branquia key={i} {...b} />
@@ -137,12 +141,12 @@ export function PepeAjolote({ className, vivo = false, cara = 'feliz', titulo, m
 
       {/* Cabeza ancha y plana, como pala redondeada */}
       <path
-        d="M60 37 C80 37 99 40 101 54 C103 68 92 82 60 82 C28 82 17 68 19 54 C21 40 40 37 60 37 Z"
+        d="M60 33 C80 33 96 39 98 54 C100 69 88 82 60 82 C32 82 20 69 22 54 C24 39 40 33 60 33 Z"
         fill="url(#pepe-piel)"
         {...contorno}
       />
       {/* Brillo de la piel */}
-      <ellipse cx="54" cy="44" rx="20" ry="4" fill="#fff" opacity="0.35" />
+      <ellipse cx="54" cy="41" rx="18" ry="4.5" fill="#fff" opacity="0.35" />
       {/* Manchitas */}
       <g fill="var(--ajolote-branquia)" opacity="0.2">
         <circle cx="48" cy="47" r="0.9" />
@@ -154,30 +158,31 @@ export function PepeAjolote({ className, vivo = false, cara = 'feliz', titulo, m
 
       {/* Ojos pequeños y muy separados */}
       <g className="pepe-ojos" style={{ transformOrigin: '60px 53px' }}>
-        {[33, 87].map((x) => (
+        {[37, 83].map((x) => (
           <g key={x}>
-            <circle cx={x} cy="53" r="4.6" fill="var(--ajolote-panza)" opacity="0.7" />
-            <circle cx={x} cy="53" r="3.4" fill="var(--ajolote-ojo)" />
-            <circle cx={x + 1.1} cy="51.8" r="1.1" fill="#fff" />
+            <circle cx={x} cy="53" r="5.4" fill="var(--ajolote-panza)" opacity="0.7" />
+            <circle cx={x} cy="53" r="4.1" fill="var(--ajolote-ojo)" />
+            <circle cx={x + 1.4} cy="51.5" r="1.4" fill="#fff" />
+            <circle cx={x - 1.3} cy="54.6" r="0.6" fill="#fff" opacity="0.8" />
           </g>
         ))}
       </g>
       {cara === 'pensando' && (
         <>
-          <path d="M28 45.5 Q33 44 38 46" stroke="var(--ajolote-ojo)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-          <path d="M82 46 Q87 43.5 92 45" stroke="var(--ajolote-ojo)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          <path d="M32 45 Q37 43.5 42 45.5" stroke="var(--ajolote-ojo)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          <path d="M78 45.5 Q83 43 88 44.5" stroke="var(--ajolote-ojo)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
         </>
       )}
 
       {/* Cachetes y fosas nasales */}
-      <ellipse cx="30" cy="63" rx="7" ry="3.5" fill="url(#pepe-cachete)" />
-      <ellipse cx="90" cy="63" rx="7" ry="3.5" fill="url(#pepe-cachete)" />
+      <ellipse cx="33" cy="63" rx="7" ry="3.8" fill="url(#pepe-cachete)" />
+      <ellipse cx="87" cy="63" rx="7" ry="3.8" fill="url(#pepe-cachete)" />
       <circle cx="55.5" cy="57" r="0.8" fill="var(--ajolote-ojo)" opacity="0.4" />
       <circle cx="64.5" cy="57" r="0.8" fill="var(--ajolote-ojo)" opacity="0.4" />
 
       {/* Boca ancha: la "sonrisa" natural del ajolote */}
       {cara === 'feliz' ? (
-        <path d="M30 64 Q60 76 90 64" stroke="var(--ajolote-ojo)" strokeWidth="1.9" fill="none" strokeLinecap="round" />
+        <path d="M40 64 Q60 77 80 64" stroke="var(--ajolote-ojo)" strokeWidth="2.1" fill="none" strokeLinecap="round" />
       ) : (
         <path d="M36 67 Q48 64 60 67 T84 66" stroke="var(--ajolote-ojo)" strokeWidth="1.9" fill="none" strokeLinecap="round" />
       )}

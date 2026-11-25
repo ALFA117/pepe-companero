@@ -144,7 +144,7 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 
 - **El jurado no podía probar el chat sin un código.** Ahora el inicio tiene **"Probar sin código"**: crea un alumno visitante (`PEPE-VIS-XXXXX`, sin letras confusas) en el grupo "Visitantes (prueba)", separado de los grupos reales, y abre el chat. `pnpm reiniciar-pruebas` también borra a los visitantes.
 
-- **Pepe no parecía ajolote** (era una cabeza redonda con antenas). Lo redibujé a partir de fotos reales de ajolote: cabeza ancha y plana como pala, ojos pequeños y muy separados, boca ancha con la "sonrisa" natural, tres pares de branquias tupidas que suben como corona, y cuerpo con patitas de cuatro dedos.
+- **Pepe no parecía ajolote** (era una cabeza redonda con antenas). Lo redibujé a partir de fotos reales de ajolote: cabeza ancha y plana como pala, ojos pequeños y muy separados, boca ancha con la "sonrisa" natural, tres pares de branquias que suben como corona, y cuerpo con patitas de cuatro dedos. En una segunda vuelta las branquias pasaron de rayitas (parecían cepillos) y de hojas con puntas (se podían confundir con otra cosa) a **frondas esponjosas de bolitas redondas**, la forma típica de las ilustraciones de ajolote. El logo es solo la cabeza, con contorno fino y fondo turquesa limpio.
 
 ## DESIGN_NOTES
 

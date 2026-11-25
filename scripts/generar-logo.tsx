@@ -31,20 +31,21 @@ function conColores(svg: string) {
 
 /** Solo el contenido interno del SVG del componente (sin la etiqueta raíz). */
 function cabeza(cara: 'feliz' | 'pensando' = 'feliz') {
-  const svg = conColores(renderToStaticMarkup(<PepeAjolote cara={cara} marcado />));
+  const svg = conColores(renderToStaticMarkup(<PepeAjolote cara={cara} marcado soloCabeza />));
   return svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
 }
 
 const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <radialGradient id="fondo" cx="40%" cy="30%" r="80%"><stop offset="0%" stop-color="#3cc2b4"/><stop offset="100%" stop-color="#147a74"/></radialGradient>
-    <radialGradient id="agua" cx="50%" cy="100%" r="70%"><stop offset="0%" stop-color="#bff3ec" stop-opacity=".45"/><stop offset="100%" stop-color="#bff3ec" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2bb3a7"/><stop offset="100%" stop-color="#16857d"/></linearGradient>
+    <radialGradient id="brillo" cx="30%" cy="22%" r="60%"><stop offset="0%" stop-color="#ffffff" stop-opacity=".22"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
   </defs>
-  <circle cx="256" cy="256" r="248" fill="url(#fondo)"/>
-  <circle cx="256" cy="256" r="248" fill="url(#agua)"/>
-  <circle cx="256" cy="256" r="232" fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="6"/>
-  <g fill="#ffffff" opacity=".35"><circle cx="402" cy="148" r="10"/><circle cx="428" cy="186" r="6"/><circle cx="112" cy="372" r="7"/></g>
-  <svg x="20" y="60" width="472" height="393" viewBox="0 0 120 100">${cabeza()}</svg>
+  <circle cx="256" cy="256" r="250" fill="url(#fondo)"/>
+  <circle cx="256" cy="256" r="250" fill="url(#brillo)"/>
+  <ellipse cx="256" cy="412" rx="132" ry="16" fill="#0d5f59" opacity=".35"/>
+  <circle cx="404" cy="146" r="9" fill="#ffffff" opacity=".35"/>
+  <circle cx="424" cy="178" r="5" fill="#ffffff" opacity=".3"/>
+  <svg x="36" y="93" width="440" height="367" viewBox="0 0 120 100">${cabeza()}</svg>
 </svg>`;
 
 mkdirSync('docs/logo', { recursive: true });
