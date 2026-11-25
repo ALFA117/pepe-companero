@@ -97,6 +97,12 @@ Después corre `pnpm seed-demo`, cambia `BASE_DATOS=auto` y verifica con `pnpm p
    - Buffering: apagado (si está prendido también funciona).
 4. Desde el celular registrado en el sandbox, manda tu código (por ejemplo `PEPE-1B-01`) por WhatsApp.
 
+**Ojo con el sandbox de Kapso (lo que aprendimos al probar):**
+- El número del sandbox es **compartido** entre proyectos. La sesión de tu celular (*Phone numbers → Sandbox WhatsApp → Sessions → Add session* y mandar el código de 6 letras), el webhook (pestaña *Webhooks* de ese mismo panel) y la `KAPSO_API_KEY` tienen que ser **del mismo proyecto**. Si no, los mensajes llegan pero Kapso rechaza las respuestas con *"Active sandbox session required to send messages"*.
+- Los webhooks de *Integrations → Platform webhooks* son del proyecto y **nunca** reciben mensajes.
+- Cada celular de prueba se activa desde ese celular. Los mensajes del sandbox gastan créditos del proyecto.
+- Los celulares de México llegan como `521…` o `52…`. La app los trata como el mismo número.
+
 ## Modelos
 
 Se configuran con `MODEL_PEPE`, `MODEL_JUEZ` y `MODEL_RESPALDO`, en formato `proveedor:modelo` (`groq`, `google` o `anthropic`).

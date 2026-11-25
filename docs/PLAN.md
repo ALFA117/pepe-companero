@@ -16,7 +16,7 @@ Las 8 fases están hechas y desplegadas en **https://pepe-companero.vercel.app**
 | 1 Motor | ✅ | — (puro) |
 | 2 Juez + Pepe | ✅ | Groq: conversación completa; Juez 23/23 en `pnpm evaluar-juez` |
 | 3 Chat web | ✅ | Navegador (móvil), con Groq |
-| 4 WhatsApp | ✅ | `pnpm probar-whatsapp` contra Supabase y el LLM real; webhook en producción responde. ❌ Falta configurarlo en Kapso y mandar un mensaje real |
+| 4 WhatsApp | ✅ | `pnpm probar-whatsapp` contra Supabase y el LLM real; webhook en producción responde. ✅ Probado con WhatsApp real (sandbox de Kapso, proyecto ALFA) |
 | 5 Voz | ✅ | Groq whisper con notas de voz reales |
 | 6 Panel | ✅ | Navegador, con los datos de demo en Supabase |
 | 7 Contenido + demo | ✅ | — |
@@ -28,7 +28,7 @@ Las 8 fases están hechas y desplegadas en **https://pepe-companero.vercel.app**
 **Pendientes para la noche:**
 1. ~~Supabase: permisos, índice único y seed de demo~~ ✅ hecho (23-nov, verificado con `pnpm probar-supabase`).
 2. ~~Identidad de git personal, push y deploy en Vercel~~ ✅ hecho (24-nov). Cada push a `main` despliega solo.
-3. Crear el webhook de Kapso apuntando al dominio de producción, con `KAPSO_WEBHOOK_SECRET`.
+3. ~~Webhook de Kapso~~ ✅ hecho y probado con WhatsApp real (24-nov, proyecto ALFA).
 4. La llave de Google no tiene créditos: el respaldo final no sirve hasta que se recargue o se cambie de modelo.
 5. Decidir si los códigos de alumno reales llevan sufijo aleatorio (hoy son adivinables: PEPE-1B-01, -02…).
 6. Groq gratis: 8K tokens por minuto por modelo. Con varios alumnos a la vez se va a llegar al límite; Pepe cae al `ejemplo` y el Juez a `parcial`.
