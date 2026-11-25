@@ -3,8 +3,9 @@
 /**
  * Fondo animado: el agua de un canal de Xochimilco, donde vive Pepe.
  * Receta "terreno de ondas" adaptada:
- *   - capa lejana: aurora de luz sobre el agua (CSS, deriva lenta);
+ *   - capa lejana: aurora de luz y rayos de sol que entran al agua (CSS);
  *   - capa media: la superficie del canal en malla de ondas (canvas, en perspectiva);
+ *   - horizonte: una trajinera que se mece (solo en el inicio);
  *   - capa cercana: burbujas y hojas de lirio flotando (más parallax).
  * Completo en el inicio y tranquilo en el chat y el panel. Solo transform y
  * opacity; el canvas se pausa con la pestaña oculta; con movimiento reducido se
@@ -202,6 +203,27 @@ function FlotanteItem({
   );
 }
 
+/** Trajinera de Xochimilco en el horizonte: arco de colores y casco, se mece. */
+function Trajinera() {
+  return (
+    <svg viewBox="0 0 160 90" className="w-full" aria-hidden>
+      <path d="M14 58 L146 58 L134 74 Q80 82 26 74 Z" fill="var(--trajinera-casco)" />
+      <path d="M18 58 L142 58" stroke="var(--trajinera-borde)" strokeWidth="3" />
+      <rect x="34" y="34" width="4" height="24" fill="var(--trajinera-casco)" />
+      <rect x="122" y="34" width="4" height="24" fill="var(--trajinera-casco)" />
+      <path d="M28 36 Q80 6 132 36 L132 44 Q80 16 28 44 Z" fill="var(--trajinera-arco)" />
+      <g fill="var(--trajinera-flor)">
+        <circle cx="44" cy="30" r="3.5" />
+        <circle cx="62" cy="22" r="3.5" />
+        <circle cx="80" cy="19" r="3.5" />
+        <circle cx="98" cy="22" r="3.5" />
+        <circle cx="116" cy="30" r="3.5" />
+      </g>
+      <rect x="40" y="46" width="80" height="12" rx="2" fill="var(--trajinera-toldo)" opacity="0.9" />
+    </svg>
+  );
+}
+
 export function FondoAmbiente() {
   const completo = usePathname() === '/';
   const reduce = useReducedMotion() ?? false;
@@ -231,13 +253,23 @@ export function FondoAmbiente() {
   const scroll = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
   const yAgua = useTransform(scroll, (v) => (reduce ? 0 : v * -60));
   const xAurora = useTransform(px, (v) => (reduce ? 0 : v * -12));
+  const xTrajinera = useTransform(px, (v) => (reduce ? 0 : v * 10));
+  const yTrajinera = useTransform(scroll, (v) => (reduce ? 0 : v * -90));
 
   return (
     <div aria-hidden className={`amb-raiz ${completo ? 'amb-completo' : 'amb-tranquilo'}`}>
       <motion.div className="amb-capa amb-aurora" style={{ x: xAurora }} />
+      <div className="amb-capa amb-rayos" />
       <motion.div className="amb-capa" style={{ y: yAgua }}>
         <AguaDelCanal reduce={reduce} completo={completo} px={px} />
       </motion.div>
+      {completo && (
+        <motion.div className="amb-trajinera-pos" style={{ x: xTrajinera, y: yTrajinera }}>
+          <div className="amb-trajinera">
+            <Trajinera />
+          </div>
+        </motion.div>
+      )}
       <CapaFlotantes
         items={completo ? FLOTANTES_COMPLETO : FLOTANTES_TRANQUILO}
         movil={movil}

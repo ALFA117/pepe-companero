@@ -119,12 +119,28 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 - **Stickers e imágenes** ya no se califican como respuesta.
 - **Las entradas animadas del inicio podían dejar el contenido invisible** si el navegador congelaba las animaciones, porque empezaban en opacidad 0. Ahora solo deslizan: el contenido siempre se ve.
 
+- **Pepe planteaba el reto dos veces** si llegaban dos mensajes al mismo tiempo a una sesión pendiente (doble toque o dos pestañas). Ahora el que pierde la carrera se guarda pero no responde. Hay una prueba para esto.
+- **Flujo del alumno al terminar un reto.** Pepe decía "cuando quieras me escribes" y el alumno no sabía qué hacer. Ahora aparece una tarjeta de **"¡Reto terminado!"** con **Siguiente reto** y **Salir**.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.
 - **Pepe** es un SVG propio (`src/components/pepe-ajolote.tsx`), no un emoji: 🦎 es una lagartija. Mece las branquias, parpadea y pone cara de "pensando" mientras escribe.
-- **Tipografía:** Baloo 2 para títulos, Nunito para el texto y Geist Mono para los códigos de alumno y las cuentas.
+- **Sistema de diseño (UI/UX Pro Max, `--design-system`):** está en `design-system/pepe/MASTER.md`, con la adaptación anotada arriba. Del buscador salen el estilo *Claymorphism* (bordes de 2 px y sombra doble con relieve), Fredoka para títulos y la regla de repetir la acción principal al final. No se usó su paleta índigo y naranja genérica: la de Xochimilco es más propia del proyecto.
+- **Tipografía:** Fredoka para títulos, Nunito para el texto y Geist Mono para los códigos de alumno y las cuentas.
 - **Fondo 3D:** en el dado salió la **receta 2, terreno de ondas**, que encaja perfecto con el tema. Lo adapté como la superficie del canal en malla de ondas (canvas en perspectiva que se inclina con el puntero), con una aurora lejana y burbujas y hojas de lirio flotando cerca. Cada capa tiene su propio parallax con el puntero y con el scroll. La versión completa va en el inicio y la tranquila en el chat y el panel. En móvil lleva menos elementos, `devicePixelRatio` máximo 2, se pausa con la pestaña oculta y queda quieto con *prefers-reduced-motion*.
+- **Segunda vuelta del fondo:** el dado volvió a dar la receta 2, igual a la que ya teníamos, así que en vez de cambiarla le subí el nivel. Agregué rayos de sol que entran al agua y una **trajinera** de colores que se mece en el horizonte, con su propia profundidad de parallax.
+- **Flujo:**
+  - El inicio recuerda el último código ("Seguir donde me quedé").
+  - El chat muestra en qué reto vas y su materia.
+  - Al terminar un reto se ofrece el siguiente.
+  - Hay esqueletos de carga con la forma real del chat y del panel, una pantalla de error con **Reintentar** y un 404 con Pepe.
+- **Motion:**
+  - `MotionConfig reducedMotion="user"` en toda la app.
+  - El hero entra escalonado y solo con desplazamiento, sin opacity 0, así se ve aunque no cargue JavaScript.
+  - Los pasos de "¿Cómo funciona?" aparecen con `whileInView`.
+  - Las pestañas de materia del panel usan un indicador con `layoutId`.
+  - El teclado y la tarjeta de fin de reto se intercambian con `AnimatePresence mode="wait"`.
 - **Modo oscuro:** sigue al sistema (`prefers-color-scheme`), con sus propios tokens y sin una inversión automática.
 - **Detalles propios del proyecto:** la tarea de Pepe con "1/2 + 1/3 = 2/5" encerrado en rojo en el inicio, el aviso "Pepe nunca te va a dar la respuesta" al empezar el chat y la onda de la nota de voz.
 - **Animación (Motion):** las burbujas entran con spring, el estado ("escribiendo…") cambia con crossfade, las respuestas rápidas tienen press con spring y el botón de micrófono/enviar se intercambia con animación.
@@ -137,4 +153,6 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 4. Contesta `sí, está bien`: salen los botones A / B. Toca uno y revisa que responda.
 5. Mantén el micrófono: graba unos segundos, envía y revisa que Pepe conteste.
 6. Activa el modo oscuro del celular y recarga: todo se lee bien.
-7. Entra a `/docente` con el PIN: indicadores con íconos, gráfica y tabla.
+7. Entra a `/docente` con el PIN: indicadores con íconos, gráfica y tabla. Cambia entre Todos / Matemáticas / Lectura: el indicador se desliza.
+8. Termina un reto: aparece "¡Reto terminado!". Toca **Siguiente reto** y revisa que arriba cambie el nombre del reto.
+9. Regresa al inicio: aparece "Seguir donde me quedé" con tu código.

@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Bar, BarChart, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -102,12 +103,21 @@ export function TablaAlumnos({ filas }: { filas: ResumenPanel['filas'] }) {
             role="tab"
             aria-selected={filtro === f.clave}
             onClick={() => setFiltro(f.clave)}
-            className={`min-h-11 flex-1 cursor-pointer rounded-xl px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              filtro === f.clave ? 'bg-card text-foreground shadow-clay' : 'text-muted-foreground hover:text-foreground'
+            className={`relative min-h-11 flex-1 cursor-pointer rounded-xl px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              filtro === f.clave ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {f.texto}
-            <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">{filas[f.clave].length}</span>
+            {filtro === f.clave && (
+              <motion.span
+                layoutId="filtro-materia"
+                className="absolute inset-0 rounded-xl bg-card shadow-clay"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span className="relative">
+              {f.texto}
+              <span className="ml-1.5 text-xs tabular-nums text-muted-foreground">{filas[f.clave].length}</span>
+            </span>
           </button>
         ))}
       </div>

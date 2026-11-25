@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-nunito);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-baloo);
+  --font-heading: var(--font-fredoka);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -168,10 +168,10 @@
   --peligro: oklch(0.58 0.2 25);
   --exito: oklch(0.58 0.13 155);
 
-  --sombra-clay: 0 1px 0 oklch(1 0 0 / 0.9) inset, 0 -2px 0 oklch(0.2 0.05 200 / 0.06) inset,
-    0 10px 24px -12px oklch(0.3 0.08 200 / 0.28), 0 2px 6px -2px oklch(0.3 0.08 200 / 0.12);
-  --sombra-boton: 0 1px 0 oklch(1 0 0 / 0.35) inset, 0 -3px 0 oklch(0 0 0 / 0.14) inset,
-    0 8px 18px -8px oklch(0.4 0.1 188 / 0.6);
+  --sombra-clay: 0 2px 0 oklch(1 0 0 / 0.95) inset, 0 -4px 0 oklch(0.3 0.06 200 / 0.07) inset,
+    0 4px 0 oklch(0.55 0.06 195 / 0.18), 0 14px 28px -14px oklch(0.3 0.08 200 / 0.35);
+  --sombra-boton: 0 2px 0 oklch(1 0 0 / 0.35) inset, 0 -4px 0 oklch(0 0 0 / 0.16) inset,
+    0 4px 0 oklch(0.38 0.09 190), 0 10px 20px -8px oklch(0.4 0.1 188 / 0.55);
 
   --fondo-base: oklch(0.965 0.02 185);
   --fondo-onda: oklch(0.62 0.1 190);
@@ -181,6 +181,12 @@
   --fondo-lirio: oklch(0.7 0.13 150);
   --fondo-lirio-vena: oklch(0.55 0.12 150);
   --fondo-flor: oklch(0.85 0.09 350);
+  --fondo-rayo: oklch(1 0.03 90 / 0.5);
+  --trajinera-casco: oklch(0.55 0.13 30);
+  --trajinera-borde: oklch(0.82 0.15 88);
+  --trajinera-arco: oklch(0.62 0.2 350);
+  --trajinera-flor: oklch(0.86 0.16 88);
+  --trajinera-toldo: oklch(0.6 0.12 160);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -206,8 +212,8 @@
     --burbuja-alumno: oklch(0.42 0.08 188);
     --burbuja-alumno-texto: oklch(0.98 0 0);
     --sombra-clay: 0 1px 0 oklch(1 0 0 / 0.07) inset, 0 12px 28px -14px oklch(0 0 0 / 0.7);
-    --sombra-boton: 0 1px 0 oklch(1 0 0 / 0.3) inset, 0 -3px 0 oklch(0 0 0 / 0.2) inset,
-      0 8px 20px -8px oklch(0.74 0.11 185 / 0.45);
+    --sombra-boton: 0 2px 0 oklch(1 0 0 / 0.3) inset, 0 -4px 0 oklch(0 0 0 / 0.2) inset,
+      0 4px 0 oklch(0.5 0.09 188), 0 10px 22px -8px oklch(0.74 0.11 185 / 0.4);
     --fondo-base: oklch(0.17 0.03 222);
     --fondo-onda: oklch(0.6 0.09 190);
     --fondo-aurora-1: oklch(0.45 0.09 185 / 0.4);
@@ -216,6 +222,12 @@
     --fondo-lirio: oklch(0.5 0.1 150);
     --fondo-lirio-vena: oklch(0.38 0.08 150);
     --fondo-flor: oklch(0.7 0.1 350);
+    --fondo-rayo: oklch(0.85 0.05 190 / 0.12);
+    --trajinera-casco: oklch(0.42 0.1 30);
+    --trajinera-borde: oklch(0.65 0.12 88);
+    --trajinera-arco: oklch(0.5 0.15 350);
+    --trajinera-flor: oklch(0.7 0.13 88);
+    --trajinera-toldo: oklch(0.45 0.09 160);
   }
 }
 @theme inline {
@@ -241,10 +253,10 @@ body { isolation: isolate; background: transparent; }
 
 /* Utilidades de texto */
 @layer utilities {
-  .texto-display { font-family: var(--font-baloo), var(--font-sans); font-weight: 800; line-height: 1.02; letter-spacing: -0.02em; }
-  .texto-titulo { font-family: var(--font-baloo), var(--font-sans); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+  .texto-display { font-family: var(--font-fredoka), var(--font-sans); font-weight: 700; line-height: 1.02; letter-spacing: -0.015em; }
+  .texto-titulo { font-family: var(--font-fredoka), var(--font-sans); font-weight: 600; line-height: 1.15; letter-spacing: -0.005em; }
   .eyebrow { font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-  .tarjeta-clay { background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem; box-shadow: var(--sombra-clay); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .tarjeta-clay { background: var(--card); border: 2px solid var(--border); border-radius: 1.5rem; box-shadow: var(--sombra-clay); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 }
 
 /* ── Fondo ambiente ─────────────────────────────────────────────── */
@@ -266,6 +278,19 @@ body { isolation: isolate; background: transparent; }
   to { transform: translate3d(3%, 2%, 0) rotate(6deg); }
 }
 .amb-flotante { position: absolute; }
+.amb-rayos {
+  inset: -10% -20% 30% -20%;
+  background: repeating-linear-gradient(105deg, transparent 0 9%, var(--fondo-rayo) 10% 12%, transparent 13% 22%);
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 85%);
+  animation: amb-titila 9s ease-in-out infinite alternate;
+}
+.amb-tranquilo .amb-rayos { opacity: 0.4; }
+@keyframes amb-titila { from { opacity: 0.35; transform: translate3d(-2%, 0, 0); } to { opacity: 0.85; transform: translate3d(2%, 0, 0); } }
+.amb-trajinera-pos { position: absolute; left: 62%; top: calc(58% + 92px); width: clamp(110px, 13vw, 190px); margin-top: -70px; }
+.amb-trajinera { animation: amb-mece 6s ease-in-out infinite; transform-origin: 50% 80%; opacity: 0.9; }
+@keyframes amb-mece { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2.5deg); } 50% { transform: translate3d(0, -5px, 0) rotate(2.5deg); } }
+@media (max-width: 767px) { .amb-trajinera-pos { left: 58%; top: calc(58% + 70px); width: 96px; } }
 .amb-burbuja {
   border-radius: 9999px;
   background: radial-gradient(circle at 30% 30%, oklch(1 0 0 / 0.9), oklch(1 0 0 / 0.15) 45%, transparent 70%);
@@ -312,7 +337,7 @@ body { isolation: isolate; background: transparent; }
 .barra-voz { transform-origin: center; animation: onda-voz 0.9s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .amb-aurora, .amb-burbuja, .amb-lirio, .pepe-flota,
+  .amb-aurora, .amb-burbuja, .amb-lirio, .pepe-flota, .amb-rayos, .amb-trajinera,
   .pepe-vivo .pepe-branquias-izq, .pepe-vivo .pepe-branquias-der, .pepe-vivo .pepe-ojos,
   .barra-voz { animation: none; }
   .punto-escribiendo { animation: none; opacity: 0.6; }

@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Baloo_2, Geist_Mono, Nunito } from 'next/font/google';
+import { Fredoka, Geist_Mono, Nunito } from 'next/font/google';
 import { FondoAmbiente } from '@/components/fondo-ambiente';
+import { ProveedorMovimiento } from '@/components/proveedor-movimiento';
 import './globals.css';
 
-const baloo = Baloo_2({ variable: '--font-baloo', subsets: ['latin'], weight: ['600', '700', '800'] });
+const fredoka = Fredoka({ variable: '--font-fredoka', subsets: ['latin'], weight: ['500', '600', '700'] });
 const nunito = Nunito({ variable: '--font-nunito', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
@@ -37,7 +38,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="es-MX" className={`${baloo.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="es-MX" className={`${fredoka.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#contenido"
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           Saltar al contenido
         </a>
         <FondoAmbiente />
-        {children}
+        <ProveedorMovimiento>{children}</ProveedorMovimiento>
       </body>
     </html>
   );

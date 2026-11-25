@@ -1,9 +1,15 @@
 import { BookOpenText, GraduationCap, MessageCircleQuestion, Mic, ShieldCheck, Sigma } from 'lucide-react';
 import Link from 'next/link';
+import * as motion from 'motion/react-client';
 import { PepeAjolote } from '@/components/pepe-ajolote';
 import { EntrarConCodigo } from './entrar-con-codigo';
 
-const entrada = 'animate-in slide-in-from-bottom-4 fill-mode-both duration-500 ease-out motion-reduce:animate-none';
+/* Entrada escalonada solo con desplazamiento: sin opacity 0, el contenido se ve aunque no cargue JS. */
+const contenedor = { oculto: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } } };
+const pieza = {
+  oculto: { y: 18 },
+  visible: { y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 24 } },
+};
 
 /** La "tarea" de Pepe con su error, como hoja de cuaderno. */
 function TareaDePepe() {
@@ -50,31 +56,31 @@ export default function Inicio() {
   return (
     <main id="contenido" className="flex min-h-dvh flex-col overflow-x-clip">
       <section className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-6 px-4 pt-6 pb-12 md:gap-10 sm:px-6 md:grid-cols-[1.1fr_0.9fr] md:pt-16">
-        <div className="min-w-0 space-y-6">
-          <p className={`${entrada} eyebrow inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 text-primary shadow-clay`}>
+        <motion.div className="min-w-0 space-y-6" variants={contenedor} initial="oculto" animate="visible">
+          <motion.p variants={pieza} className={`eyebrow inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 text-primary shadow-clay`}>
             <span className="size-2 rounded-full bg-ajolote-branquia" aria-hidden />
             Tu compa de 1° de secundaria
-          </p>
-          <h1 className={`${entrada} texto-display text-[2.75rem] text-balance delay-75 sm:text-6xl lg:text-7xl`}>
+          </motion.p>
+          <motion.h1 variants={pieza} className="texto-display text-[2.75rem] text-balance sm:text-6xl lg:text-7xl">
             Pepe se equivocó.{' '}
             <span className="text-primary">¿Le ayudas?</span>
-          </h1>
-          <p className={`${entrada} max-w-xl text-lg text-pretty text-muted-foreground delay-150`}>
+          </motion.h1>
+          <motion.p variants={pieza} className="max-w-xl text-lg text-pretty text-muted-foreground">
             Pepe es un ajolote de Xochimilco que hizo su tarea con un error. Demuéstrale dónde se equivocó. No te va a dar
             la respuesta: la tienes que encontrar tú.
-          </p>
-          <div className={`${entrada} max-w-xl delay-200`}>
+          </motion.p>
+          <motion.div variants={pieza} className="max-w-xl">
             <EntrarConCodigo />
-          </div>
-          <p className={`${entrada} text-sm text-muted-foreground delay-300`}>
+          </motion.div>
+          <motion.p variants={pieza} className="text-sm text-muted-foreground">
             ¿Eres maestro?{' '}
             <Link href="/docente" className="inline-flex min-h-11 items-center rounded font-bold text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Entra al panel
             </Link>
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className={`${entrada} relative order-first mx-auto flex w-full max-w-md flex-row items-center justify-center delay-150 md:order-none md:flex-col md:gap-4`}>
+        <motion.div initial={{ y: 24, rotate: -2 }} animate={{ y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 180, damping: 20, delay: 0.1 }} className={`relative order-first mx-auto flex w-full max-w-md flex-row items-center justify-center md:order-none md:flex-col md:gap-4`}>
           <div className="pepe-flota relative shrink-0">
             <div className="absolute inset-x-4 bottom-0 h-5 rounded-full bg-primary/20 blur-md" aria-hidden />
             <PepeAjolote vivo cara="feliz" titulo="Pepe, el ajolote" className="relative w-20 min-[380px]:w-28 sm:w-44 md:w-72" />
@@ -82,7 +88,7 @@ export default function Inicio() {
           <div className="-ml-2 min-w-0 md:-mt-6 md:mr-[-1rem] md:ml-0 md:self-end">
             <TareaDePepe />
           </div>
-        </div>
+        </motion.div>
       </section>
 
       <section aria-labelledby="como-funciona" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
@@ -91,7 +97,11 @@ export default function Inicio() {
         </h2>
         <ol className="grid gap-4 md:grid-cols-3">
           {PASOS.map((p, i) => (
-            <li
+            <motion.li
+              initial={{ y: 24 }}
+              whileInView={{ y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ type: 'spring', stiffness: 260, damping: 24, delay: i * 0.05 }}
               key={p.titulo}
               className={`tarjeta-clay flex gap-4 p-5 transition-transform duration-200 hover:-translate-y-1 motion-reduce:hover:translate-y-0 ${i === 1 ? 'md:translate-y-4' : ''}`}
             >
@@ -103,7 +113,7 @@ export default function Inicio() {
                 <h3 className="texto-titulo text-xl">{p.titulo}</h3>
                 <p className="mt-1 text-[15px] text-muted-foreground">{p.texto}</p>
               </div>
-            </li>
+            </motion.li>
           ))}
         </ol>
         <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
@@ -117,6 +127,22 @@ export default function Inicio() {
             <ShieldCheck className="size-4 text-primary" aria-hidden /> Tu teléfono nunca se guarda en claro
           </li>
         </ul>
+      </section>
+
+      <section aria-labelledby="le-entras" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <div className="tarjeta-clay flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:text-left">
+          <PepeAjolote vivo cara="pensando" className="w-24 shrink-0" />
+          <div className="flex-1">
+            <h2 id="le-entras" className="texto-titulo text-2xl">Pepe sigue esperando tu ayuda</h2>
+            <p className="text-muted-foreground">Cada reto toma unos 5 minutos. Ten a la mano el código que te dio tu profe.</p>
+          </div>
+          <a
+            href="#codigo"
+            className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-extrabold text-primary-foreground shadow-boton transition-transform active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+          >
+            Escribir mi código
+          </a>
+        </div>
       </section>
     </main>
   );
