@@ -9,8 +9,7 @@ const nunito = Nunito({ variable: '--font-nunito', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 const URL_SITIO = process.env.NEXT_PUBLIC_URL_SITIO ?? 'https://pepe-companero.vercel.app';
-const DESCRIPCION =
-  'Pepe es un ajolote de secundaria que siempre se equivoca. Tú le demuestras dónde está su error y tu profe ve cuánta ayuda necesitaste.';
+const DESCRIPCION = 'Corrige a Pepe por WhatsApp o en la web. Nunca te da la respuesta: la encuentras tú.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(URL_SITIO),
