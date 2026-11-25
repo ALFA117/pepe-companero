@@ -1,6 +1,8 @@
 import { CircleCheckBig, LifeBuoy, TriangleAlert, Users, type LucideIcon } from 'lucide-react';
 import { exigirDocente } from '@/lib/docente';
 import Link from 'next/link';
+import * as motion from 'motion/react-client';
+import { Contador } from '@/components/contador';
 import { GraficaBrechas, TablaAlumnos } from './componentes';
 import { grupoElegido, resumenDelGrupo } from './datos';
 
@@ -27,7 +29,7 @@ function Indicador({
           <Icono className="size-[18px]" aria-hidden />
         </span>
       </div>
-      <p className="texto-display mt-2 text-4xl tabular-nums">{valor}</p>
+      <p className="texto-display mt-2 text-4xl tabular-nums">{/^\d+(\.\d)?$/.test(valor) ? <Contador valor={Number(valor)} decimales={valor.includes('.') ? 1 : 0} /> : valor}</p>
       {detalle && <p className="mt-1 text-xs text-muted-foreground">{detalle}</p>}
     </div>
   );
@@ -105,8 +107,15 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
             <p className="py-8 text-center text-sm text-muted-foreground">Nadie necesita atención especial esta semana.</p>
           ) : (
             <ul className="mt-2 divide-y divide-border">
-              {r.atencion.map((a) => (
-                <li key={a.alumno_id} className="flex items-start gap-3 py-2.5">
+              {r.atencion.map((a, idx) => (
+                <motion.li
+                  key={a.alumno_id}
+                  initial={{ x: -10 }}
+                  whileInView={{ x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: Math.min(idx, 8) * 0.04 }}
+                  className="flex items-start gap-3 py-2.5"
+                >
                   <span aria-hidden className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-peligro/15 text-peligro">
                     <TriangleAlert className="size-4" />
                   </span>
@@ -116,7 +125,7 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
                     </Link>
                     <p className="text-sm text-muted-foreground">{a.motivos.join(' · ')}</p>
                   </div>
-                </li>
+                </motion.li>
               ))}
             </ul>
           )}

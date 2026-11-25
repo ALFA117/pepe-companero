@@ -1,6 +1,9 @@
 import { BookOpenText, GraduationCap, MessageCircleQuestion, Mic, ShieldCheck, Sigma } from 'lucide-react';
 import Link from 'next/link';
 import * as motion from 'motion/react-client';
+import { Contador } from '@/components/contador';
+import { EscaleraAyuda } from '@/components/escalera-ayuda';
+import { MiniReto } from '@/components/mini-reto';
 import { PepeAjolote } from '@/components/pepe-ajolote';
 import { EntrarConCodigo } from './entrar-con-codigo';
 
@@ -91,6 +94,14 @@ export default function Inicio() {
         </motion.div>
       </section>
 
+      <section aria-labelledby="pruebalo" className="mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6">
+        <p className="eyebrow text-primary">Sin registrarte</p>
+        <h2 id="pruebalo" className="texto-titulo mb-5 text-2xl sm:text-3xl">
+          Pruébalo tú: ¿qué hizo mal Pepe?
+        </h2>
+        <MiniReto />
+      </section>
+
       <section aria-labelledby="como-funciona" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
         <h2 id="como-funciona" className="texto-titulo mb-6 text-2xl sm:text-3xl">
           ¿Cómo funciona?
@@ -127,6 +138,54 @@ export default function Inicio() {
             <ShieldCheck className="size-4 text-primary" aria-hidden /> Tu teléfono nunca se guarda en claro
           </li>
         </ul>
+      </section>
+
+      <section aria-labelledby="escalera" className="mx-auto grid w-full max-w-6xl gap-8 px-4 pb-16 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+        <div className="space-y-3">
+          <p className="eyebrow text-primary">El diagnóstico</p>
+          <h2 id="escalera" className="texto-titulo text-2xl sm:text-3xl">
+            La escalera de ayuda
+          </h2>
+          <p className="text-muted-foreground">
+            Si el alumno se atora, Pepe baja un escalón: pistas cada vez más concretas, nunca la respuesta. El escalón donde lo
+            resolvió es su nivel real, y eso es lo que ve el maestro.
+          </p>
+        </div>
+        <EscaleraAyuda />
+      </section>
+
+      <section aria-labelledby="importa" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <h2 id="importa" className="texto-titulo mb-5 text-2xl sm:text-3xl">
+          ¿Por qué importa?
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="tarjeta-clay p-5">
+            <p className="texto-display text-6xl text-peligro">
+              <Contador valor={34} sufijo="%" />
+            </p>
+            <p className="mt-2 font-bold">de los jóvenes de 15 años en México alcanza el nivel mínimo en matemáticas.</p>
+            <p className="text-sm text-muted-foreground">Promedio de la OCDE: 69 %.</p>
+          </div>
+          <div className="tarjeta-clay p-5">
+            <p className="texto-display text-6xl text-trajinera-tinta">
+              <Contador valor={53} sufijo="%" />
+            </p>
+            <p className="mt-2 font-bold">alcanza el nivel mínimo en lectura.</p>
+            <p className="text-sm text-muted-foreground">Promedio de la OCDE: 74 %.</p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Fuente:{' '}
+          <a
+            href="https://www.oecd.org/pisa/publications/Countrynote_MEX_Spanish.pdf"
+            className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-primary"
+            target="_blank"
+            rel="noreferrer"
+          >
+            OCDE, PISA 2022, nota de país de México
+          </a>
+          .
+        </p>
       </section>
 
       <section aria-labelledby="le-entras" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">

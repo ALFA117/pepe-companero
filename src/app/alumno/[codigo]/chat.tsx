@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import type { RespuestaChat } from '@/app/api/chat/route';
 import { PepeAjolote } from '@/components/pepe-ajolote';
+import { Toast } from '@/components/toast';
 
 export interface MensajeChat {
   id: string;
@@ -70,6 +71,8 @@ function tipoDeGrabacion(): string {
 export function Chat({ codigo, nombre, historial, botonesIniciales, reto, terminado: terminadoInicial }: Props) {
   const router = useRouter();
   const [terminado, setTerminado] = useState(terminadoInicial);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const cerrarAviso = useCallback(() => setAviso(null), []);
   const [mensajes, setMensajes] = useState<MensajeChat[]>(historial);
   const [botones, setBotones] = useState<string[]>(botonesIniciales);
   const [texto, setTexto] = useState('');
@@ -217,10 +220,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
         });
       }, 1000);
     } catch {
-      setMensajes((xs) => [
-        ...xs,
-        { id: nuevoId(), rol: 'sistema', texto: 'No pude usar el micrófono. Revisa el permiso del navegador o escríbele a Pepe.' },
-      ]);
+      setAviso('No pude usar el micrófono. Dale permiso en tu navegador o escríbele a Pepe.');
     }
   }
 
@@ -239,6 +239,7 @@ export function Chat({ codigo, nombre, historial, botonesIniciales, reto, termin
 
   return (
     <div className="flex h-dvh flex-col">
+      <Toast mensaje={aviso} alCerrar={cerrarAviso} />
       <header className="z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="tarjeta-clay mx-auto flex max-w-2xl items-center gap-2 rounded-3xl px-2 py-2 sm:gap-3 sm:px-3">
           <Link

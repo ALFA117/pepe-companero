@@ -130,6 +130,8 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 - **Pepe planteaba el reto dos veces** si llegaban dos mensajes al mismo tiempo a una sesión pendiente (doble toque o dos pestañas). Ahora el que pierde la carrera se guarda pero no responde. Hay una prueba para esto.
 - **Flujo del alumno al terminar un reto.** Pepe decía "cuando quieras me escribes" y el alumno no sabía qué hacer. Ahora aparece una tarjeta de **"¡Reto terminado!"** con **Siguiente reto** y **Salir**.
 
+- **Cifras animadas que podían mostrar un dato falso.** Un contador que sube de 0 a 34 se quedaba congelado a medias (13 %) si el navegador frenaba la animación. Ahora el número siempre es el real y solo se anima su tamaño.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.
@@ -149,6 +151,14 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
   - Los pasos de "¿Cómo funciona?" aparecen con `whileInView`.
   - Las pestañas de materia del panel usan un indicador con `layoutId`.
   - El teclado y la tarjeta de fin de reto se intercambian con `AnimatePresence mode="wait"`.
+- **Tercera vuelta:**
+  - **Fondo:** el dado dio la receta 3 (globo de puntos). Choca con el tema del canal, así que tiré otra vez y salió la 6 (malla low-poly con Three.js). La adapté como una gran **burbuja de agua low-poly** detrás de Pepe, con burbujitas alrededor. Solo carga en el inicio, sin SSR (`next/dynamic`), para no pesar en el chat ni en celulares de gama baja; si no hay WebGL, queda el canal.
+  - **Componentes nuevos:**
+    - **"Pruébalo tú":** un mini reto interactivo de decimales. No está en el banco, para no adelantar respuestas reales.
+    - **La escalera de ayuda:** pestañas del 0 al 4 con indicador `layoutId` y crossfade.
+    - **"¿Por qué importa?":** las cifras de PISA con su fuente.
+    - **Toast:** para errores como el permiso del micrófono.
+    - **Panel:** cifras con "pop" y la lista de atención escalonada.
 - **Modo oscuro:** sigue al sistema (`prefers-color-scheme`), con sus propios tokens y sin una inversión automática.
 - **Detalles propios del proyecto:** la tarea de Pepe con "1/2 + 1/3 = 2/5" encerrado en rojo en el inicio, el aviso "Pepe nunca te va a dar la respuesta" al empezar el chat y la onda de la nota de voz.
 - **Animación (Motion):** las burbujas entran con spring, el estado ("escribiendo…") cambia con crossfade, las respuestas rápidas tienen press con spring y el botón de micrófono/enviar se intercambia con animación.
@@ -164,3 +174,5 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 7. Entra a `/docente` con el PIN: indicadores con íconos, gráfica y tabla. Cambia entre Todos / Matemáticas / Lectura: el indicador se desliza.
 8. Termina un reto: aparece "¡Reto terminado!". Toca **Siguiente reto** y revisa que arriba cambie el nombre del reto.
 9. Regresa al inicio: aparece "Seguir donde me quedé" con tu código.
+10. En "Pruébalo tú", toca una respuesta equivocada (Pepe da una pista) y luego la correcta.
+11. En "La escalera de ayuda", toca los niveles 0 a 4: el indicador se desliza y cambia el ejemplo.
