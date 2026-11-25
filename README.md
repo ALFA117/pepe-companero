@@ -6,6 +6,8 @@ MVP para el hackathon UniconHub. Pepe es un compañero de secundaria que **siemp
 - **Lectura:** el alumno le lee el texto a Pepe en una nota de voz (se mide su fluidez) y luego corrige una conclusión equivocada citando el texto.
 - **Canales:** WhatsApp (Kapso, con Twilio de respaldo) y web. Los dos usan el mismo motor.
 
+**En producción:** https://pepe-companero.vercel.app (alumno: código `PEPE-DEMO-01` a `45` o `PEPE-1B-01` a `03`; maestro: `/docente`).
+
 El plan del proyecto está en [docs/PLAN.md](docs/PLAN.md) y el guion de la demo en [docs/DEMO.md](docs/DEMO.md).
 
 ## Arquitectura

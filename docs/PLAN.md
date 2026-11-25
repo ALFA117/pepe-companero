@@ -6,9 +6,9 @@
 
 ---
 
-## 0. Estado (lunes 23 de noviembre, tarde)
+## 0. Estado (martes 24 de noviembre)
 
-Las 8 fases están hechas y cada una tiene su commit. Pasan 295 tests, la revisión de tipos, lint y `pnpm build`.
+Las 8 fases están hechas y desplegadas en **https://pepe-companero.vercel.app** (repo: https://github.com/ALFA117/pepe-companero). Pasan 302 tests, la revisión de tipos, lint y `pnpm build`.
 
 | Fase | Estado | Probado contra servicios reales |
 |---|---|---|
@@ -16,9 +16,9 @@ Las 8 fases están hechas y cada una tiene su commit. Pasan 295 tests, la revisi
 | 1 Motor | ✅ | — (puro) |
 | 2 Juez + Pepe | ✅ | Groq: conversación completa; Juez 23/23 en `pnpm evaluar-juez` |
 | 3 Chat web | ✅ | Navegador (móvil), con Groq |
-| 4 WhatsApp | ✅ código + tests | ❌ falta el webhook en Kapso (necesita la URL de producción) |
+| 4 WhatsApp | ✅ | `pnpm probar-whatsapp` contra Supabase y el LLM real; webhook en producción responde. ❌ Falta configurarlo en Kapso y mandar un mensaje real |
 | 5 Voz | ✅ | Groq whisper con notas de voz reales |
-| 6 Panel | ✅ | Navegador, con datos de demo en memoria |
+| 6 Panel | ✅ | Navegador, con los datos de demo en Supabase |
 | 7 Contenido + demo | ✅ | — |
 
 **Cambios al plan original:**
@@ -27,7 +27,7 @@ Las 8 fases están hechas y cada una tiene su commit. Pasan 295 tests, la revisi
 
 **Pendientes para la noche:**
 1. ~~Supabase: permisos, índice único y seed de demo~~ ✅ hecho (23-nov, verificado con `pnpm probar-supabase`).
-2. Cambiar la identidad de git por la personal, hacer el push y el deploy en Vercel con las variables.
+2. ~~Identidad de git personal, push y deploy en Vercel~~ ✅ hecho (24-nov). Cada push a `main` despliega solo.
 3. Crear el webhook de Kapso apuntando al dominio de producción, con `KAPSO_WEBHOOK_SECRET`.
 4. La llave de Google no tiene créditos: el respaldo final no sirve hasta que se recargue o se cambie de modelo.
 5. Decidir si los códigos de alumno reales llevan sufijo aleatorio (hoy son adivinables: PEPE-1B-01, -02…).
