@@ -76,7 +76,7 @@ function conFormato(texto: string): ReactNode[] {
     if (parte.startsWith('*') && parte.endsWith('*') && parte.length > 2) return <strong key={i}>{parte.slice(1, -1)}</strong>;
     if (/^800 ?\d{3} ?\d{4}$/.test(parte)) {
       return (
-        <a key={i} href={`tel:${parte.replace(/\s/g, '')}`} className="-my-3 inline-block py-3 font-extrabold whitespace-nowrap text-primary underline underline-offset-2">
+        <a key={i} href={`tel:${parte.replace(/\s/g, '')}`} className="py-3 font-extrabold whitespace-nowrap text-primary underline underline-offset-2">
           {parte}
         </a>
       );

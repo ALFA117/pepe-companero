@@ -34,7 +34,7 @@ Web del alumno ──────► POST /api/chat ─────┤
 
 | Carpeta | Qué hay |
 |---|---|
-| `src/motor/` | Contrato (`tipos.ts`), máquina de estados, Juez, Pepe, filtro, fluidez y orquestador |
+| `src/motor/` | Contrato (`tipos.ts`), máquina de estados, Juez, Pepe, filtro, fluidez, intenciones (`intencion.ts`: saludos, atajos y riesgo, sin LLM) y orquestador |
 | `src/retos/banco/` | 10 retos en JSON (5 de matemáticas y 5 de lectura), validados con zod al cargar |
 | `src/canales/` | Kapso, Twilio y la lógica común de WhatsApp (vinculación por código) |
 | `src/ia/` | Modelos configurables (`proveedor:modelo`), cadena de respaldo y transcripción |

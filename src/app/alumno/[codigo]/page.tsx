@@ -13,6 +13,11 @@ export async function generateMetadata() {
   return { title: 'Chat con Pepe', robots: { index: false, follow: false } };
 }
 
+/** Terminó hace menos de media hora: la tarjeta dice "¡Reto terminado!" en vez de "qué gusto verte". */
+function terminoHacePoco(iso: string): boolean {
+  return Date.now() - Date.parse(iso) < 30 * 60 * 1000;
+}
+
 export default async function PaginaAlumno({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo: crudo } = await params;
   const codigo = decodeURIComponent(crudo).trim().toUpperCase();
@@ -35,8 +40,20 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
   }
 
   // Conversación de la sesión más reciente, para que al recargar no se pierda.
-  const sesion = (await repo.sesionActiva(alumno.id)) ?? (await repo.ultimaSesion(alumno.id));
-  const turnos = sesion ? await repo.ultimosTurnos(sesion.id, 60) : [];
+  const activa = await repo.sesionActiva(alumno.id);
+  const sesion = activa ?? (await repo.ultimaSesion(alumno.id));
+
+  // Regresa después de terminar un reto (el siguiente quedó pendiente): se ve la
+  // conversación que acaba de terminar y se le pregunta si quiere otro, en vez
+  // de arrancarlo por sorpresa o mostrar un chat vacío.
+  const anterior = activa?.fase === 'pendiente' ? await repo.ultimaSesionTerminada(alumno.id) : null;
+  const entreRetos = Boolean(anterior);
+  const recienTerminado = anterior ? terminoHacePoco(anterior.actualizado_en) : false;
+  const mostrada = anterior ?? sesion;
+  const turnos = [
+    ...(anterior ? await repo.ultimosTurnos(anterior.id, 60) : []),
+    ...(sesion ? await repo.ultimosTurnos(sesion.id, 60) : []),
+  ];
   const historial: MensajeChat[] = turnos.map((t) => ({
     id: t.id,
     rol: t.rol,
@@ -52,13 +69,9 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
     if (sesion.fase === 'leyendo_texto') botones = [BOTON_NO_PUEDO_GRABAR];
   }
 
-  // Regresa después de terminar un reto (el siguiente quedó pendiente): se le
-  // pregunta si quiere otro, en vez de arrancarlo por sorpresa.
-  const entreRetos = sesion?.fase === 'pendiente' && (await repo.retosHechos(alumno.id)).length > 1;
-
   const nombre = alumno.nombre.split(' ')[0] ?? alumno.nombre;
-  const info = sesion ? infoDeRetos(listarRetos()).get(sesion.reto_id) : undefined;
-  const reto = info && !entreRetos ? { titulo: info.titulo, materia: info.materia } : null;
+  const info = mostrada ? infoDeRetos(listarRetos()).get(mostrada.reto_id) : undefined;
+  const reto = info ? { titulo: info.titulo, materia: info.materia } : null;
   // Se vuelve a montar al cambiar de sesión (por ejemplo, al pasar al siguiente reto).
   return (
     <Chat
@@ -69,9 +82,9 @@ export default async function PaginaAlumno({ params }: { params: Promise<{ codig
       botonesIniciales={botones}
       reto={reto}
       terminado={(sesion?.fase === 'terminado' && historial.length > 0) || entreRetos}
-      entreRetos={entreRetos}
-      faseInicial={sesion?.fase ?? null}
-      nivelInicial={sesion?.nivel ?? 0}
+      entreRetos={entreRetos && !recienTerminado}
+      faseInicial={mostrada?.fase ?? null}
+      nivelInicial={mostrada?.nivel ?? 0}
     />
   );
 }

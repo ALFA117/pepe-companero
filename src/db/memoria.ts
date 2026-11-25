@@ -125,6 +125,10 @@ export class RepositorioMemoria implements Repositorio {
     return structuredClone(this.sesionesDe(alumnoId).find((s) => s.fase !== 'terminado') ?? null);
   }
 
+  async ultimaSesionTerminada(alumnoId: string) {
+    return structuredClone(this.sesionesDe(alumnoId).find((s) => s.fase === 'terminado') ?? null);
+  }
+
   async ultimaSesion(alumnoId: string) {
     return structuredClone(this.sesionesDe(alumnoId)[0] ?? null);
   }

@@ -30,6 +30,14 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 
 - **Pepe no parecía ajolote** (era una cabeza redonda con antenas). Lo redibujé a partir de fotos reales de ajolote: cabeza ancha y plana como pala, ojos pequeños y muy separados, boca ancha con la "sonrisa" natural, tres pares de branquias que suben como corona, y cuerpo con patitas de cuatro dedos. En una segunda vuelta las branquias pasaron de rayitas (parecían cepillos) y de hojas con puntas (se podían confundir con otra cosa) a **frondas esponjosas de bolitas redondas**, la forma típica de las ilustraciones de ajolote. El logo es solo la cabeza, con contorno fino y fondo turquesa limpio.
 
+- **Un "hola", "jaja", "ok" o "espera" subía el nivel de ayuda** (el Juez los tomaba como "no sé"): con dos saludos el alumno ya estaba en el nivel 2 y el maestro veía un diagnóstico falso. Ahora `src/motor/intencion.ts` los reconoce con reglas fijas antes del Juez: Pepe saluda y repite su pregunta sin tocar el nivel. Solo intercepta si el mensaje COMPLETO es eso ("hola, no se suman los de abajo" sí va al Juez).
+- **Un mensaje de riesgo ("me quiero morir") se calificaba como "no sé".** Ahora Pepe deja la tarea, responde con cuidado, da la Línea de la Vida (800 911 2000, se puede tocar para llamar) y el alumno aparece primero en "Necesitan atención hoy". No se cuenta como brecha.
+- **Atajos:** menú, repetir (o "?"), mi progreso, otro reto (a media tarea: "primero terminemos este"), dame una pista y no sé (sin gastar una llamada al Juez). Insultos cortos: un límite amable sin cambiar el nivel.
+- **Si la IA fallaba (límite por minuto) el alumno subía de nivel.** Ahora se le pide repetir una vez; si vuelve a fallar, sigue el flujo.
+- **Al terminar un reto, un "gracias" arrancaba el siguiente por sorpresa** y al recargar se perdía la conversación. Ahora hay botones **Otro reto** y **Mi progreso**, y al regresar se ve la conversación que terminó con la tarjeta para seguir.
+- **Chat web:** atajos **Dame una pista** / **Repetir pregunta**, medidor de pistas junto al nombre del reto (visible desde el primer mensaje) y sin botones duplicados al terminar.
+- **Pestañas de la escalera y del filtro del panel:** la pastilla activa (con `layoutId`) se desfasaba si la sección estaba entrando o se desplazaba, y los nombres se salían a 320 px. Ahora son una cuadrícula con indicador calculado por CSS. Una auditoría automática a 320/375/768/1280 px en claro y oscuro (desbordes, texto recortado, etiquetas partidas, áreas táctiles) quedó sin hallazgos.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.

@@ -126,6 +126,19 @@ export class RepositorioSupabase implements Repositorio {
     return data as SesionGuardada | null;
   }
 
+  async ultimaSesionTerminada(alumnoId: string) {
+    const { data, error } = await this.sb
+      .from('sesiones')
+      .select('*')
+      .eq('alumno_id', alumnoId)
+      .eq('fase', 'terminado')
+      .order('actualizado_en', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) falla('ultimaSesionTerminada', error);
+    return data as SesionGuardada | null;
+  }
+
   async ultimaSesion(alumnoId: string) {
     const { data, error } = await this.sb
       .from('sesiones')

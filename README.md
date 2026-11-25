@@ -61,7 +61,8 @@ Los tutores con IA le dan la respuesta al alumno. **Pepe hace lo contrario:** es
 Si el alumno se atora, Pepe le da **pistas cada vez más concretas, pero nunca la respuesta**: no la conoce. **El escalón donde lo resolvió es su nivel real**, y eso es lo que ve el maestro.
 
 <div align="center">
-<img src="docs/img/tres.jpg" alt="Tres celulares: la página de inicio, el chat con Pepe con botones de respuesta y la tarjeta de reto terminado" width="100%" />
+<img src="docs/img/tres.jpg" alt="Tres celulares: la página de inicio, el chat con Pepe con botones de respuesta, atajos de pista y medidor de pistas, y la tarjeta de reto terminado" width="100%" />
+<br/><sub>Inicio · el chat con respuestas en botones, atajos <b>Dame una pista</b> / <b>Repetir pregunta</b> y el medidor de pistas (●○○○) · la tarjeta al terminar.</sub>
 </div>
 
 ## 🪜 La escalera de ayuda
@@ -97,6 +98,11 @@ Un niño de secundaria no siempre responde la pregunta. Pepe distingue lo que **
 | La IA no responde (límite, caída) | Pide repetir en vez de subirle el nivel por un error nuestro | No |
 
 Todo esto funciona igual en **WhatsApp** (con botones) y en la **web** (con atajos), sin gastar una llamada a la IA.
+
+<div align="center">
+<img src="docs/img/casos.jpg" alt="Dos celulares: a la izquierda Pepe contesta un 'ok' y un 'menú' sin subir el nivel; a la derecha responde con cuidado a un mensaje de riesgo y da la Línea de la Vida" width="100%" />
+<br/><sub>Izquierda: un "ok" y un "menú" no cuentan como respuesta. Derecha: ante un mensaje de riesgo, Pepe deja la tarea, da ayuda real y avisa al maestro.</sub>
+</div>
 
 ## 📚 Dos materias, un mismo motor
 
@@ -142,6 +148,7 @@ flowchart LR
 2. **Pepe nunca ve la solución.** Además, un filtro revisa cada mensaje; si algo se escapa, se cambia por el texto del paso escrito a mano.
 3. **Pepe solo habla del reto.** Es pedagógico y cumple la política de WhatsApp Business de 2026, que prohíbe los chatbots de propósito general.
 4. **Privacidad de menores desde el diseño:** el audio no se guarda y el teléfono se guarda con hash y cifrado.
+5. **Primero el alumno, luego la tarea.** Un mensaje de riesgo nunca se califica: Pepe da la Línea de la Vida y el maestro lo ve primero en su panel.
 
 ## 🇲🇽 Hecho para México
 
@@ -151,6 +158,7 @@ flowchart LR
 | ⚡ **Rápido en celulares sencillos** | Lighthouse móvil: **97** en rendimiento y **100** en accesibilidad |
 | 📶 **Con mala señal** | El chat avisa "sin conexión" y reenvía solo cuando vuelve la señal |
 | 🖨️ **Salones sin internet** | Hojas de práctica imprimibles |
+| 🆘 **Cuida al alumno** | Ante un mensaje de riesgo da la **Línea de la Vida (800 911 2000)** y avisa al maestro |
 | 💸 **Barato** | Unos **10 centavos de peso de IA por reto** (~US$0.55 por alumno al año); la web es gratis |
 | 🧩 **Sin depender de un proveedor** | Modelos abiertos (*gpt-oss*); el modelo se cambia con una variable |
 

@@ -112,6 +112,8 @@ export interface Repositorio {
   /** La sesión no terminada más reciente (incluye `pendiente`). */
   sesionActiva(alumnoId: string): Promise<SesionGuardada | null>;
   ultimaSesion(alumnoId: string): Promise<SesionGuardada | null>;
+  /** El último reto que terminó (para mostrar su conversación al regresar). */
+  ultimaSesionTerminada(alumnoId: string): Promise<SesionGuardada | null>;
   sesionPorId(id: string): Promise<SesionGuardada | null>;
   /** Lanza `SesionActivaDuplicadaError` si el alumno ya tiene una sesión no terminada. */
   insertarSesion(s: Sesion): Promise<SesionGuardada>;
