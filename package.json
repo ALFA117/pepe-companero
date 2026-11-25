@@ -15,7 +15,8 @@
     "seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts",
     "probar-supabase": "tsx --conditions=react-server scripts/probar-supabase.ts",
     "probar-whatsapp": "tsx --conditions=react-server scripts/probar-whatsapp.ts",
-    "reiniciar-pruebas": "tsx --conditions=react-server scripts/reiniciar-pruebas.ts"
+    "reiniciar-pruebas": "tsx --conditions=react-server scripts/reiniciar-pruebas.ts",
+    "logo": "tsx scripts/generar-logo.tsx"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.107",

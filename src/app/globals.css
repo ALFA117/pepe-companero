@@ -158,6 +158,10 @@
   --ajolote-panza: oklch(0.9 0.05 10);
   --ajolote-branquia: oklch(0.64 0.17 0);
   --ajolote-ojo: oklch(0.22 0.03 260);
+  --ajolote-sombra: oklch(0.74 0.11 4);
+  --ajolote-branquia-oscura: oklch(0.52 0.19 358);
+  --ajolote-iris: oklch(0.38 0.07 300);
+  --ajolote-contorno: oklch(0.36 0.12 355);
 
   --chat-fondo: transparent;
   --burbuja-pepe: oklch(1 0 0);

@@ -144,6 +144,8 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
 
 - **El jurado no podía probar el chat sin un código.** Ahora el inicio tiene **"Probar sin código"**: crea un alumno visitante (`PEPE-VIS-XXXXX`, sin letras confusas) en el grupo "Visitantes (prueba)", separado de los grupos reales, y abre el chat. `pnpm reiniciar-pruebas` también borra a los visitantes.
 
+- **Pepe no parecía ajolote** (era una cabeza redonda con antenas). Lo redibujé a partir de fotos reales de ajolote: cabeza ancha y plana como pala, ojos pequeños y muy separados, boca ancha con la "sonrisa" natural, tres pares de branquias tupidas que suben como corona, y cuerpo con patitas de cuatro dedos.
+
 ## DESIGN_NOTES
 
 - **Concepto:** Pepe es un ajolote de Xochimilco, así que la marca sale de su hábitat. Agua de canal (turquesa) para la acción principal, rosa ajolote para Pepe y amarillo trajinera para los acentos. Estilo *claymorphism* suave (relieve, esquinas grandes) por ser una app educativa para secundaria, sin caer en lo infantil.
@@ -179,6 +181,7 @@ Arreglos del 24 de noviembre, después de probar con conversaciones reales:
   - **Ficha del alumno:** encabezado con avatar, lectura en recuadros con íconos y conversación como chat.
   - **Hojas:** barras por brecha y vista previa de las tres hojas.
   - **Entrada del maestro:** dos columnas ("qué vas a ver") y PIN con mostrar u ocultar.
+- **Logo e íconos:** la cabeza de ajolote sobre un círculo turquesa. Se generan desde el mismo componente de la app con `pnpm logo` (`scripts/generar-logo.tsx`) en `src/app/icon.svg` (pestaña) y `docs/logo/`. Los PNG son: `apple-icon.png` (180), `public/icon-192.png`, `public/icon-512.png` e `opengraph-image.png` / `twitter-image.png` (1200×630, la vista previa al compartir en WhatsApp y X). Usé FLUX.2 Klein (local, con mflux) solo como referencia de estilo de ícono (contorno marcado, ojos brillantes, círculo de fondo). Su anatomía estaba mal (orejas de gato), así que el logo final es vectorial y está dibujado a mano.
 - **Modo oscuro:** sigue al sistema (`prefers-color-scheme`), con sus propios tokens y sin una inversión automática.
 - **Detalles propios del proyecto:** la tarea de Pepe con "1/2 + 1/3 = 2/5" encerrado en rojo en el inicio, el aviso "Pepe nunca te va a dar la respuesta" al empezar el chat y la onda de la nota de voz.
 - **Animación (Motion):** las burbujas entran con spring, el estado ("escribiendo…") cambia con crossfade, las respuestas rápidas tienen press con spring y el botón de micrófono/enviar se intercambia con animación.
