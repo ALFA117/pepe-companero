@@ -1,5 +1,7 @@
 import { exigirDocente } from '@/lib/docente';
+import { ArrowLeft, FileText, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { PepeAjolote } from '@/components/pepe-ajolote';
 import { dependenciasMotor } from '@/motor/servidor';
 import { generarHojas, type Hojas } from '@/panel/hojas';
 import { grupoElegido, resumenDelGrupo } from '../datos';
@@ -32,10 +34,14 @@ export default async function PaginaHojas({ searchParams }: { searchParams: Prom
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
         <div>
-          <Link href="/docente" className="text-sm text-primary hover:underline">
-            ← Volver al grupo
+          <Link
+            href="/docente"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl text-sm font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ArrowLeft className="size-4" aria-hidden /> Volver al grupo
           </Link>
-          <h1 className="mt-2 text-2xl font-bold">Hojas de práctica por nivel</h1>
+          <p className="eyebrow mt-1 text-primary">Para imprimir</p>
+          <h1 className="texto-display text-4xl">Hojas de práctica</h1>
           <p className="text-sm text-muted-foreground">
             Tres hojas (básico, medio y avanzado) según dónde se atora {resumen?.grupo.nombre ?? 'el grupo'}.
           </p>
@@ -45,8 +51,9 @@ export default async function PaginaHojas({ searchParams }: { searchParams: Prom
           {brechas.length > 0 && (
             <Link
               href={`/docente/hojas?generar=1${grupoId ? `&grupo=${grupoId}` : ''}`}
-              className="min-h-11 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+              className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-extrabold text-primary-foreground shadow-boton transition-transform active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
             >
+              <FileText className="size-4" aria-hidden />
               {hojas ? 'Generar otras' : 'Generar hojas'}
             </Link>
           )}
@@ -59,22 +66,63 @@ export default async function PaginaHojas({ searchParams }: { searchParams: Prom
         </p>
       )}
       {brechas.length > 0 && !hojas && !error && (
-        <div className="tarjeta-clay print:shadow-none p-4 print:hidden">
-          <p className="text-sm font-medium">Se basarán en estas brechas:</p>
-          <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
-            {brechas.map((b) => (
-              <li key={b.brecha}>
-                {b.etiqueta} ({b.alumnos} alumnos)
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-muted-foreground">Generarlas tarda unos 20 segundos.</p>
+        <div className="grid gap-6 print:hidden lg:grid-cols-[1fr_1.1fr]">
+          <section className="tarjeta-clay p-5">
+            <h2 className="texto-titulo text-xl">Se basarán en estas brechas</h2>
+            <p className="mb-4 text-sm text-muted-foreground">Lo que más le cuesta al grupo esta semana</p>
+            <ul className="space-y-3">
+              {brechas.map((b) => {
+                const max = Math.max(...brechas.map((x) => x.alumnos));
+                return (
+                  <li key={b.brecha}>
+                    <div className="flex items-baseline justify-between gap-2 text-sm">
+                      <span className="font-bold">{b.etiqueta}</span>
+                      <span className="tabular-nums text-muted-foreground">{b.alumnos} alumnos</span>
+                    </div>
+                    <div className="mt-1 h-3 overflow-hidden rounded-full bg-muted">
+                      <div className="h-full origin-left rounded-full bg-primary" style={{ width: `${(b.alumnos / max) * 100}%` }} />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-4 text-xs text-muted-foreground">Generarlas tarda unos 20 segundos.</p>
+          </section>
+          <section aria-label="Vista previa" className="space-y-3">
+            <p className="text-sm font-bold text-muted-foreground">Así se van a ver: tres hojas, una por nivel</p>
+            <div className="flex items-end justify-center gap-3 py-2">
+              {(['basico', 'medio', 'avanzado'] as const).map((n, k) => (
+                <div
+                  key={n}
+                  className={`tarjeta-clay w-1/3 max-w-[11rem] space-y-2 p-3 transition-transform hover:-translate-y-1 motion-reduce:hover:translate-y-0 ${k === 1 ? '-translate-y-3' : ''} ${k === 0 ? '-rotate-3' : k === 2 ? 'rotate-3' : ''}`}
+                >
+                  <p className="eyebrow text-[11px] text-primary">{NOMBRE_NIVEL[n]}</p>
+                  <div className="h-2 w-3/4 rounded bg-foreground/70" aria-hidden />
+                  {[0, 1, 2, 3].map((x) => (
+                    <div key={x} className="flex items-center gap-1.5" aria-hidden>
+                      <span className="size-2 rounded-full bg-primary/50" />
+                      <span className="h-1.5 flex-1 rounded bg-muted-foreground/25" />
+                    </div>
+                  ))}
+                  <div className="h-8 rounded-md border border-dashed border-muted-foreground/40" aria-hidden />
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       )}
       {error && (
-        <p role="alert" className="rounded-xl bg-peligro/10 p-4 text-sm">
-          No se pudieron generar las hojas ahorita (el modelo no respondió). Intenta de nuevo en un minuto.
-        </p>
+        <div role="alert" className="tarjeta-clay flex flex-col items-center gap-3 p-6 text-center">
+          <PepeAjolote vivo cara="pensando" className="w-24" />
+          <p className="font-bold">No se pudieron generar las hojas ahorita.</p>
+          <p className="text-sm text-muted-foreground">El modelo de IA no respondió (puede ser el límite por minuto). Espera un minuto y vuelve a intentar.</p>
+          <Link
+            href={`/docente/hojas?generar=1${grupoId ? `&grupo=${grupoId}` : ''}`}
+            className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-boton focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+          >
+            <RotateCcw className="size-4" aria-hidden /> Reintentar
+          </Link>
+        </div>
       )}
 
       {hojas?.hojas.map((h) => (

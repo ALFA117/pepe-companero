@@ -7,7 +7,8 @@ import { dependenciasMotor, repositorio } from '@/motor/servidor';
 import { asignarReto } from '@/panel/asignar';
 import { humanizar, infoDeRetos } from '@/panel/calcular';
 import { listarRetos } from '@/retos/cargar';
-import { EtiquetaEstado, PuntosAyuda } from '../../componentes';
+import { ArrowLeft, Gauge, MessageCircle, MessagesSquare, Mic, Pause, Target, Timer } from 'lucide-react';
+import { Avatar, EtiquetaEstado, PuntosAyuda } from '../../componentes';
 
 export const metadata = { title: 'Alumno · Panel de Pepe' };
 
@@ -99,16 +100,37 @@ export default async function DetalleAlumno({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/docente" className="text-sm text-primary hover:underline">
-          ← Volver al grupo
+      <div className="space-y-3">
+        <Link
+          href="/docente"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl text-sm font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden /> Volver al grupo
         </Link>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold">{alumno.nombre}</h1>
-          <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-xs">{alumno.codigo}</span>
-          <EtiquetaEstado estado={estado} />
-          <span className="text-sm text-muted-foreground">{alumno.tel_hash ? 'WhatsApp vinculado' : 'Sin WhatsApp'}</span>
-        </div>
+        <section className="tarjeta-clay flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <Avatar nombre={alumno.nombre} grande />
+          <div className="min-w-0 flex-1">
+            <h1 className="texto-display text-3xl sm:text-4xl">{alumno.nombre}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="rounded-xl bg-muted px-2.5 py-1 font-mono text-xs font-semibold">{alumno.codigo}</span>
+              <EtiquetaEstado estado={estado} />
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${alumno.tel_hash ? 'bg-exito/15' : 'bg-muted text-muted-foreground'}`}
+              >
+                <MessageCircle className="size-3.5" aria-hidden />
+                {alumno.tel_hash ? 'WhatsApp vinculado' : 'Sin WhatsApp'}
+              </span>
+            </div>
+          </div>
+          {sesion && (
+            <div className="rounded-2xl bg-muted/60 px-4 py-3 text-center">
+              <p className="text-xs font-bold text-muted-foreground">Ayuda en el último reto</p>
+              <div className="mt-1 flex justify-center">
+                <PuntosAyuda nivel={sesion.nivel_max} />
+              </div>
+            </div>
+          )}
+        </section>
       </div>
 
       {asignado && MENSAJES_ASIGNAR[asignado] && (
@@ -122,7 +144,7 @@ export default async function DetalleAlumno({
           {sesion ? (
             <section className="space-y-4 tarjeta-clay print:shadow-none p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="font-semibold">
+                <h2 className="texto-titulo text-lg">
                   {info?.titulo ?? sesion.reto_id}{' '}
                   <span className="font-normal text-muted-foreground">
                     · {info?.materia === 'lectura' ? 'Lectura' : 'Matemáticas'} · {FASES[sesion.fase]}
@@ -173,27 +195,24 @@ export default async function DetalleAlumno({
               )}
 
               {fluidez && (
-                <div className="rounded-lg border border-border p-3 text-sm">
-                  <p className="font-medium">Lectura en voz alta</p>
-                  <dl className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Velocidad</dt>
-                      <dd className="tabular-nums">{Math.round(fluidez.ppm)} ppm</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Precisión (estimada)</dt>
-                      <dd className="tabular-nums">
-                        {fluidez.precision_est === null ? '—' : `${Math.round(fluidez.precision_est * 100)} %`}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Pausas largas</dt>
-                      <dd className="tabular-nums">{fluidez.pausas_largas}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Duración</dt>
-                      <dd className="tabular-nums">{Math.round(fluidez.duracion_voz_s)} s</dd>
-                    </div>
+                <div className="rounded-2xl border-2 border-border p-4 text-sm">
+                  <p className="flex items-center gap-2 font-extrabold">
+                    <Mic className="size-4 text-ajolote-branquia" aria-hidden /> Lectura en voz alta
+                  </p>
+                  <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[
+                      { t: 'Velocidad', v: `${Math.round(fluidez.ppm)} ppm`, I: Gauge },
+                      { t: 'Precisión (estimada)', v: fluidez.precision_est === null ? '—' : `${Math.round(fluidez.precision_est * 100)} %`, I: Target },
+                      { t: 'Pausas largas', v: String(fluidez.pausas_largas), I: Pause },
+                      { t: 'Duración', v: `${Math.round(fluidez.duracion_voz_s)} s`, I: Timer },
+                    ].map(({ t, v, I }) => (
+                      <div key={t} className="rounded-xl bg-muted/60 p-3">
+                        <dt className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                          <I className="size-3.5" aria-hidden /> {t}
+                        </dt>
+                        <dd className="texto-titulo mt-1 text-xl tabular-nums">{v}</dd>
+                      </div>
+                    ))}
                   </dl>
                   <p className="mt-2 text-xs text-muted-foreground">
                     La precisión es estimada: la transcripción automática tiende a corregir algunos errores de lectura.
@@ -202,17 +221,21 @@ export default async function DetalleAlumno({
               )}
 
               <details className="group" open={!final}>
-                <summary className="cursor-pointer text-sm font-medium text-primary">Conversación completa ({turnos.length} mensajes)</summary>
-                <ol className="mt-3 flex flex-col gap-1.5 rounded-lg bg-chat-fondo p-3">
+                <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm font-extrabold text-primary">
+                  <MessagesSquare className="size-4" aria-hidden /> Conversación completa ({turnos.length} mensajes)
+                </summary>
+                <ol className="mt-3 flex max-h-[32rem] flex-col gap-2 overflow-y-auto rounded-2xl bg-muted/50 p-3">
                   {turnos.map((t) => (
                     <li
                       key={t.id}
-                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-1.5 text-sm ${
-                        t.rol === 'pepe' ? 'self-start bg-burbuja-pepe' : 'self-end bg-burbuja-alumno'
+                      className={`max-w-[85%] whitespace-pre-wrap rounded-3xl px-4 py-2 text-sm shadow-clay ${
+                        t.rol === 'pepe'
+                          ? 'self-start rounded-bl-md border border-burbuja-pepe-borde bg-burbuja-pepe'
+                          : 'self-end rounded-br-md bg-burbuja-alumno text-burbuja-alumno-texto'
                       }`}
                     >
                       <span className="sr-only">{t.rol === 'pepe' ? 'Pepe: ' : 'Alumno: '}</span>
-                      {t.tipo === 'audio' && <span aria-hidden>🎤 </span>}
+                      {t.tipo === 'audio' && <Mic className="mr-1 inline size-3.5 align-[-2px]" aria-label="Nota de voz:" />}
                       {t.texto}
                     </li>
                   ))}
@@ -228,7 +251,7 @@ export default async function DetalleAlumno({
 
         <aside className="space-y-6">
           <section className="tarjeta-clay print:shadow-none p-4">
-            <h2 className="font-semibold">Asignar reto</h2>
+            <h2 className="texto-titulo text-lg">Asignar reto</h2>
             <p className="mb-3 text-sm text-muted-foreground">Crea una sesión nueva y Pepe le escribe por WhatsApp.</p>
             <form action={asignar} className="space-y-3">
               <input type="hidden" name="alumno_id" value={alumno.id} />
