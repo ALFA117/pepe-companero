@@ -146,7 +146,7 @@ describe('conversación por WhatsApp', () => {
     deps.motor.repo.ultimosTurnos = async () => {
       throw new Error('base caída');
     };
-    await atenderMensaje(deps, msg('hola'));
+    await atenderMensaje(deps, msg('creo que está mal'));
     expect(canal.enviados.at(-1)?.texto).toContain('se me trabó');
   });
 });

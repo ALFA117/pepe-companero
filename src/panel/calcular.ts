@@ -3,6 +3,7 @@
  * los datos crudos del grupo, para probarlas sin base de datos.
  */
 import type { DatosPanel, FluidezGuardada, SesionGuardada } from '@/db/repositorio';
+import { BRECHA_ALERTA } from '@/motor/intencion';
 import type { Reto } from '@/motor/tipos';
 
 export const DIAS_SEMANA = 7;
@@ -128,8 +129,14 @@ export function calcularPanel(d: DatosPanel, retos: Map<string, InfoReto>, ahora
   // ── Necesitan atención ──
   const nombre = new Map(d.alumnos.map((a) => [a.id, a.nombre]));
   const atencion: MotivoAtencion[] = [];
+  // Mensajes de riesgo (ver motor/intencion.ts): van primero y no cuentan como brecha.
+  const alumnoDeSesion = new Map(d.sesiones.map((s) => [s.id, s.alumno_id]));
+  const conAlerta = new Set(
+    d.brechas_turno.filter((b) => b.brecha === BRECHA_ALERTA).map((b) => alumnoDeSesion.get(b.sesion_id)),
+  );
   for (const a of d.alumnos) {
     const motivos: string[] = [];
+    if (conAlerta.has(a.id)) motivos.push('⚠️ Escribió algo que preocupa sobre su bienestar: lee su conversación hoy');
     const ss = porAlumno.get(a.id) ?? [];
     const atorada = ss.find((s) => deLaSemana(s) && s.requiere_docente);
     if (atorada) {
@@ -147,13 +154,14 @@ export function calcularPanel(d: DatosPanel, retos: Map<string, InfoReto>, ahora
     }
     if (motivos.length > 0) atencion.push({ alumno_id: a.id, nombre: nombre.get(a.id) ?? a.codigo, motivos });
   }
+  atencion.sort((x, y) => Number(conAlerta.has(y.alumno_id)) - Number(conAlerta.has(x.alumno_id)));
 
   // ── Dónde se atora el grupo: brechas contadas por alumno ──
   const alumnosPorBrecha = new Map<string, Set<string>>();
   const sumar = (sesionId: string, brecha: string) => {
     const s = sesionPorId.get(sesionId);
     const clave = brecha.trim().toLowerCase();
-    if (!s || !clave || !deLaSemana(s)) return;
+    if (!s || !clave || clave === BRECHA_ALERTA || !deLaSemana(s)) return;
     alumnosPorBrecha.set(clave, (alumnosPorBrecha.get(clave) ?? new Set()).add(s.alumno_id));
   };
   for (const f of d.finales) for (const b of f.brechas_detectadas) sumar(f.sesion_id, b);

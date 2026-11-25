@@ -112,7 +112,7 @@ describe('mensajes fijos (sin LLM)', () => {
         entrada(mate, 0, 0, { tipo: 'despedir', resuelto, requiere_docente, siguiente_reto_id: siguiente }),
       )?.mensajes.join(' ');
     expect(d(true, false, 'x')).toContain('me salvaste');
-    expect(d(true, false, 'x')).toContain('otro reto');
+    expect(d(true, false, 'x')).toContain('¿Le seguimos?');
     expect(d(true, false, null)).toContain('Por hoy ya quedamos');
     expect(d(false, true, 'x')).toContain('profe');
   });

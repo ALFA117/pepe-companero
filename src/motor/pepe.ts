@@ -70,6 +70,12 @@ export interface ResultadoPepe {
 // Mensajes fijos (sin LLM)
 // ─────────────────────────────────────────────────────────────
 
+export const BOTON_NO_PUEDO_GRABAR = 'No puedo grabar';
+export const BOTON_OTRO_RETO = 'Otro reto';
+export const BOTON_PROGRESO = 'Mi progreso';
+export const BOTON_PISTA = 'Dame una pista';
+export const BOTON_REPETIR = 'Repetir pregunta';
+
 export const FRASE_NO_SE_LA_RESPUESTA = '¡Yo tampoco la sé, por eso te pregunto! 😅';
 
 export function mensajesFijos(e: EntradaPepe): SalidaPepe | null {
@@ -88,6 +94,7 @@ export function mensajesFijos(e: EntradaPepe): SalidaPepe | null {
           ...resto,
           '¿Me lo lees en una nota de voz? 🎙️',
         ],
+        botones: [BOTON_NO_PUEDO_GRABAR],
       };
     }
     case 'insistir_lectura':
@@ -96,6 +103,7 @@ export function mensajesFijos(e: EntradaPepe): SalidaPepe | null {
           '¡Gracias! Pero me ayuda muchísimo escucharlo 🙏',
           '¿Me mandas una nota de voz leyéndolo? Si no puedes grabar, dime y seguimos así.',
         ],
+        botones: [BOTON_NO_PUEDO_GRABAR],
       };
     case 'plantear':
       return { mensajes: reto.planteamiento_pepe };
@@ -106,18 +114,20 @@ export function mensajesFijos(e: EntradaPepe): SalidaPepe | null {
             'Uf, este nos costó mucho a los dos 😅',
             'Le voy a pedir a la profe que nos eche la mano y luego intentamos uno más tranqui. ¡Gracias por no rendirte!',
           ],
+          ...(accion.siguiente_reto_id ? { botones: [BOTON_OTRO_RETO] } : {}),
         };
       }
       return {
         mensajes: [
           accion.resuelto ? '¡Gracias, me salvaste la tarea! 🙌' : '¡Gracias por ayudarme! 🙌',
           accion.siguiente_reto_id
-            ? 'Cuando quieras me escribes y te paso otro reto.'
+            ? '¿Le seguimos? Tengo otra tarea en la que seguro también me equivoqué 😅'
             : 'Por hoy ya quedamos. ¡Nos vemos!',
         ],
+        ...(accion.siguiente_reto_id ? { botones: [BOTON_OTRO_RETO, BOTON_PROGRESO] } : {}),
       };
     case 'sesion_terminada':
-      return { mensajes: ['¡Ya acabamos ese reto! 🙌 Escríbeme cuando quieras otro.'] };
+      return { mensajes: ['¡Ya acabamos ese reto! 🙌 ¿Quieres otro?'], botones: [BOTON_OTRO_RETO, BOTON_PROGRESO] };
     default:
       return null;
   }
@@ -154,6 +164,30 @@ export function cuerpoDelPaso(e: EntradaPepe): SalidaPepe {
     // Burbuja aparte si cabe; si ya hay 3, se pega a la primera.
     if (mensajes.length < 3) mensajes.unshift(FRASE_NO_SE_LA_RESPUESTA);
     else mensajes[0] = `${FRASE_NO_SE_LA_RESPUESTA} ${mensajes[0]}`;
+  }
+  return paso?.botones ? { mensajes, botones: paso.botones } : { mensajes };
+}
+
+/**
+ * La pregunta que está "en la mesa" ahora mismo, completa y con sus botones,
+ * para repetirla cuando el alumno manda algo que no es respuesta (un saludo,
+ * "repite", un sticker). Sale del banco, sin LLM.
+ */
+export function preguntaVigente(reto: Reto, sesion: Sesion): SalidaPepe {
+  if (sesion.fase === 'leyendo_texto') {
+    return {
+      mensajes: ['¿Me lo lees en una nota de voz? 🎙️ Si no puedes grabar, toca el botón y seguimos así.'],
+      botones: [BOTON_NO_PUEDO_GRABAR],
+    };
+  }
+  if (sesion.fase === 'cierre') {
+    return { mensajes: ['Para que no se me olvide: ¿me explicas con tus palabras qué estaba mal en lo que hice?'] };
+  }
+  const paso = pasoActual(reto, sesion);
+  const mensajes = [...(paso?.ejemplo ?? reto.planteamiento_pepe)];
+  if (paso && mensajes[0]) {
+    const sin = mensajes[0].replace(RE_AFIRMACION, '').trim();
+    if (sin) mensajes[0] = sin.charAt(0).toUpperCase() + sin.slice(1);
   }
   return paso?.botones ? { mensajes, botones: paso.botones } : { mensajes };
 }

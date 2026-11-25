@@ -23,8 +23,19 @@ import {
 } from '@/db/repositorio';
 import { calcularFluidez } from './fluidez';
 import { evaluarCierre, evaluarTurno, TURNOS_DE_CONTEXTO, type OrigenEvaluacion } from './juez';
-import { crearSesion, transicion } from './maquina';
-import { redactar, type OrigenSalida } from './pepe';
+import { BRECHA_ALERTA, detectarIntencion, MENSAJES_RIESGO, type Intencion } from './intencion';
+import { crearSesion, NIVEL_MAXIMO, transicion } from './maquina';
+import {
+  BOTON_NO_PUEDO_GRABAR,
+  BOTON_OTRO_RETO,
+  BOTON_PISTA,
+  BOTON_PROGRESO,
+  BOTON_REPETIR,
+  mensajesFijos,
+  preguntaVigente,
+  redactar,
+  type OrigenSalida,
+} from './pepe';
 import type {
   AccionPepe,
   Clasificacion,
@@ -77,6 +88,9 @@ const RE_NO_PUEDE_GRABAR =
 
 const NO_ESCUCHE: SalidaPepe = {
   mensajes: ['Uy, no alcancé a escuchar tu audio 😅 ¿Lo intentas otra vez o me lo escribes?'],
+};
+export const REINTENTO_JUEZ: SalidaPepe = {
+  mensajes: ['Uy, se me fue la onda un segundo 😅 ¿Me lo repites, porfa?'],
 };
 const SIN_RETOS: SalidaPepe = {
   mensajes: ['¡Ya me ayudaste con todas mis tareas! 🙌 Pronto te traigo más.'],
@@ -138,6 +152,8 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
     texto = p.entrada.texto.trim();
   }
 
+  const intencion = transcripcion || p.entrada.tipo !== 'audio' ? detectarIntencion(texto) : null;
+
   // 2. Sesión activa (o una nueva).
   let sesion = await repo.sesionActiva(p.alumno_id);
 
@@ -145,7 +161,9 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
     const [ultima, hechos] = await Promise.all([repo.ultimaSesion(p.alumno_id), repo.retosHechos(p.alumno_id)]);
     const reto = elegirRetoInicial(deps.banco, ultima, hechos);
     if (!reto) return { duplicado: false, ...SIN_RETOS, sesion: null };
-    const inicio = crearSesion({ id: nuevoId(), alumno_id: p.alumno_id, reto, canal: p.canal });
+    // Un mensaje de riesgo no arranca la tarea: la sesión queda pendiente.
+    const retener = intencion === 'riesgo';
+    const inicio = crearSesion({ id: nuevoId(), alumno_id: p.alumno_id, reto, canal: p.canal, pendiente: retener });
     try {
       sesion = await repo.insertarSesion(inicio.sesion);
     } catch (err) {
@@ -156,6 +174,10 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
     }
     const turno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
     if (!turno) return { duplicado: true, mensajes: [], sesion };
+    if (retener && sesion.id === inicio.sesion.id) {
+      const r = await atenderIntencion(deps, { reto, sesion, intencion: 'riesgo', turnoId: turno, alumnoId: p.alumno_id });
+      if (r !== null && r !== 'no_se') return r;
+    }
     if (sesion.id === inicio.sesion.id) {
       return responder(deps, { reto, sesion, accion: inicio.accion, ultimoMensaje: texto });
     }
@@ -167,6 +189,15 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
   const reto = retoDe(deps.banco, sesion.reto_id);
   const turnoAlumno = await registrarAlumno(repo, sesion.id, tipoTurno, texto, p.mensaje_externo_id);
   if (!turnoAlumno) return { duplicado: true, mensajes: [], sesion };
+
+  // Lo que no es una respuesta (saludo, "repite", menú, riesgo…) no pasa por el
+  // Juez ni cambia el nivel. La lectura en voz alta de un texto no se revisa.
+  let forzarNoSe = false;
+  if (intencion && !(p.entrada.tipo === 'audio' && sesion.fase === 'leyendo_texto')) {
+    const r = await atenderIntencion(deps, { reto, sesion, intencion, turnoId: turnoAlumno, alumnoId: p.alumno_id });
+    if (r === 'no_se') forzarNoSe = true;
+    else if (r) return r;
+  }
 
   if (sesion.fase === 'pendiente') {
     const r = transicion(sesion, { tipo: 'iniciar' }, { reto, banco: deps.banco });
@@ -196,7 +227,15 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
       transcripcion,
       esAudio: p.entrada.tipo === 'audio',
       previos,
+      forzarNoSe,
     });
+
+    // Todos los modelos fallaron (límite por minuto, caída): no se sube el nivel
+    // por un error nuestro. Se pide repetir una vez; a la segunda, sigue el flujo.
+    if (origenJuez === 'respaldo' && previos.at(-1)?.texto !== REINTENTO_JUEZ.mensajes[0]) {
+      await guardarPepe(repo, sesion.id, REINTENTO_JUEZ);
+      return { duplicado: false, mensajes: REINTENTO_JUEZ.mensajes, sesion };
+    }
 
     const r = transicion(sesion, evento, { reto, banco: deps.banco, ya_hechos: yaHechos });
     const guardada = await repo.actualizarSesion(sesion, r.sesion);
@@ -252,6 +291,160 @@ export async function procesar(deps: DependenciasMotor, p: EntradaProcesar): Pro
   const ocupado: SalidaPepe = { mensajes: ['Dame un segundito, se me cruzaron los cables 😅 ¿Me lo repites?'] };
   await guardarPepe(repo, sesion.id, ocupado);
   return { duplicado: false, mensajes: ocupado.mensajes, sesion };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Intenciones (lo que no es una respuesta al reto)
+// ─────────────────────────────────────────────────────────────
+
+const MENU = [
+  'Así funciona: yo hice mi tarea con un error y tú me ayudas a encontrarlo 🕵️',
+  'Si te atoras, toca *Dame una pista* y te la pongo más fácil. Yo no sé la respuesta, ¡por eso te pregunto!',
+];
+const SIGUE_DESPUES = 'Cuando quieras otro reto, toca el botón o escríbeme "otro reto" 🦎';
+
+async function textoProgreso(repo: Repositorio, alumnoId: string, sesion: Sesion): Promise<string> {
+  // retosHechos incluye la sesión en curso (activa o pendiente), que aún no cuenta.
+  const hechos = new Set(await repo.retosHechos(alumnoId)).size - 1;
+  const total =
+    hechos === 0 ? 'Este es tu primer reto conmigo 💪' : `Ya me ayudaste con ${hechos} ${hechos === 1 ? 'reto' : 'retos'} 🙌`;
+  if (sesion.fase !== 'nivel') return total;
+  const pistas =
+    sesion.nivel === 0
+      ? 'En este vas sin pistas, ¡puro talento!'
+      : `En este llevamos ${sesion.nivel} de ${NIVEL_MAXIMO} pistas.`;
+  return `${total} ${pistas}`;
+}
+
+/**
+ * Responde una intención sin LLM. Devuelve la respuesta, `'no_se'` si hay que
+ * tratarla como "no sé" (pista) sin preguntarle al Juez, o `null` si el mensaje
+ * debe seguir el flujo normal.
+ */
+async function atenderIntencion(
+  deps: DependenciasMotor,
+  c: { reto: Reto; sesion: SesionGuardada; intencion: Intencion; turnoId: string; alumnoId: string },
+): Promise<RespuestaMotor | 'no_se' | null> {
+  const { repo } = deps;
+  const { reto, sesion, intencion } = c;
+  const responderFijo = async (salida: SalidaPepe): Promise<RespuestaMotor> => {
+    await guardarPepe(repo, sesion.id, salida);
+    return {
+      duplicado: false,
+      mensajes: salida.mensajes,
+      ...(salida.botones?.length ? { botones: salida.botones } : {}),
+      sesion,
+      detalle: { accion: 'ninguna', origen_pepe: 'fijo', clasificacion: `intencion:${intencion}` },
+    };
+  };
+
+  if (intencion === 'riesgo') {
+    // Le llega al maestro como alerta en "Necesitan atención hoy" (no es una brecha).
+    await repo.guardarEvaluacion({
+      turno_id: c.turnoId,
+      sesion_id: sesion.id,
+      clasificacion: 'fuera_de_tema',
+      nivel: sesion.nivel,
+      paso: sesion.paso,
+      juez: {
+        clasificacion: 'fuera_de_tema',
+        clasificacion_juez: 'fuera_de_tema',
+        detecto_error: null,
+        explica_por_que: null,
+        usa_evidencia_textual: null,
+        conceptos_demostrados: [],
+        brecha_probable: BRECHA_ALERTA,
+        comentario_docente: 'Escribió algo que puede indicar un riesgo para su bienestar. Lee la conversación y platica hoy con el alumno.',
+        confianza: 1,
+      },
+    });
+    return responderFijo({ mensajes: MENSAJES_RIESGO });
+  }
+
+  // Entre un reto y otro: solo "otro reto" (o un mensaje nuevo) arranca el siguiente.
+  if (sesion.fase === 'pendiente') {
+    switch (intencion) {
+      case 'gracias':
+      case 'despedida':
+      case 'espera':
+      case 'enterado':
+      case 'risa':
+        return responderFijo({
+          mensajes: [intencion === 'gracias' ? '¡De nada, gracias a ti! 🙌' : intencion === 'despedida' ? '¡Va, nos vemos! 👋' : '¡Va!', SIGUE_DESPUES],
+          botones: [BOTON_OTRO_RETO, BOTON_PROGRESO],
+        });
+      case 'progreso':
+        return responderFijo({ mensajes: [await textoProgreso(repo, c.alumnoId, sesion)], botones: [BOTON_OTRO_RETO] });
+      case 'menu':
+        return responderFijo({ mensajes: [...MENU], botones: [BOTON_OTRO_RETO, BOTON_PROGRESO] });
+      default:
+        return null;
+    }
+  }
+  if (sesion.fase === 'terminado') return null;
+
+  const q = preguntaVigente(reto, sesion);
+  const pregunta = q.mensajes.at(-1)!;
+  const conPregunta = (antes: string[]): Promise<RespuestaMotor> =>
+    responderFijo({ mensajes: [...antes, pregunta], ...(q.botones ? { botones: q.botones } : {}) });
+  const enNivel = sesion.fase === 'nivel';
+
+  switch (intencion) {
+    case 'saludo':
+      return conPregunta(['¡Qué onda! 👋 Aquí seguimos con mi tarea:']);
+    case 'risa':
+      return conPregunta(['Jaja 😅 Ya en serio, ayúdame:']);
+    case 'enterado':
+      return conPregunta(['Va 👌 Pero dime qué piensas tú:']);
+    case 'gracias':
+      return conPregunta(['¡De nada! Pero todavía no acabamos 😅']);
+    case 'groseria':
+      return conPregunta(['Va, sin insultos porfa 🙏 Aquí nos echamos la mano.']);
+    case 'espera':
+      return responderFijo({ mensajes: ['¡Va, tómate tu tiempo! Aquí te espero 🦎'], ...(q.botones ? { botones: q.botones } : {}) });
+    case 'despedida':
+      return responderFijo({ mensajes: ['¡Va! Te guardo el reto: cuando regreses, seguimos donde nos quedamos 👋'] });
+    case 'menu':
+      return responderFijo({
+        mensajes: [...MENU],
+        botones:
+          sesion.fase === 'leyendo_texto'
+            ? [BOTON_NO_PUEDO_GRABAR, BOTON_REPETIR]
+            : enNivel
+              ? [BOTON_PISTA, BOTON_REPETIR, BOTON_PROGRESO]
+              : [BOTON_REPETIR, BOTON_PROGRESO],
+      });
+    case 'repetir': {
+      if (sesion.fase === 'leyendo_texto') {
+        const lectura = mensajesFijos({ reto, sesion, accion: { tipo: 'presentar_lectura' }, historial: [] });
+        if (lectura) return responderFijo(lectura);
+      }
+      return responderFijo({ mensajes: ['Va, otra vez 👇', ...q.mensajes], ...(q.botones ? { botones: q.botones } : {}) });
+    }
+    case 'progreso':
+      return conPregunta([await textoProgreso(repo, c.alumnoId, sesion)]);
+    case 'cambiar':
+      if (sesion.fase === 'leyendo_texto') return conPregunta(['Primero ayúdame con esta lectura, porfa 🙏']);
+      return responderFijo({
+        mensajes: [
+          enNivel ? 'Primero terminemos este, porfa 🙏 Si está difícil, toca *Dame una pista*.' : '¡Ya casi acabamos! 🙏',
+          pregunta,
+        ],
+        botones: q.botones ?? (enNivel ? [BOTON_PISTA] : undefined),
+      });
+    case 'pista':
+    case 'no_se':
+      if (enNivel) return 'no_se';
+      if (sesion.fase === 'cierre') {
+        const ultimaDePepe = (await repo.ultimosTurnos(sesion.id, 3)).filter((t) => t.rol === 'pepe').at(-1)?.texto;
+        const reAnimo = 'Aunque sea con pocas palabras: ¿qué estaba mal en lo que hice yo? 🙏';
+        if (ultimaDePepe === reAnimo) return null;
+        return responderFijo({ mensajes: ['Tú me ayudaste a encontrarlo, ¡sí sabes! 💪', reAnimo] });
+      }
+      return null;
+    default:
+      return null;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -311,6 +504,8 @@ async function construirEvento(
     transcripcion: Transcripcion | null;
     esAudio: boolean;
     previos: Turno[];
+    /** "No sé" o "dame una pista": se sabe sin preguntarle al Juez. */
+    forzarNoSe?: boolean;
   },
 ): Promise<EventoConstruido> {
   const { reto, sesion } = c;
@@ -326,6 +521,19 @@ async function construirEvento(
       };
     }
     case 'nivel': {
+      if (c.forzarNoSe) {
+        const evaluacion: EvaluacionTurno = {
+          clasificacion: 'no_se',
+          detecto_error: false,
+          explica_por_que: null,
+          usa_evidencia_textual: null,
+          conceptos_demostrados: [],
+          brecha_probable: null,
+          comentario_docente: 'Pidió una pista.',
+          confianza: 1,
+        };
+        return { evento: { tipo: 'evaluacion', evaluacion }, evaluacion, clasificacionJuez: 'no_se' };
+      }
       const { evaluacion, origen } = await evaluarTurno(deps.generar, {
         reto,
         sesion,

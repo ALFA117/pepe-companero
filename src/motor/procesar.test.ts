@@ -5,7 +5,7 @@ import { listarRetos, obtenerReto } from '@/retos/cargar';
 import { retoSintetico } from '@/test/fabricas';
 import { finalCrudo, juezCrudo, llmFalso, type LLMFalso } from '@/test/llm-falso';
 import { palabrasNormalizadas } from './fluidez';
-import { elegirRetoInicial, procesar, type DependenciasMotor, type EntradaProcesar } from './procesar';
+import { elegirRetoInicial, procesar, type DependenciasMotor, type EntradaProcesar, REINTENTO_JUEZ } from './procesar';
 import type { Sesion } from './tipos';
 
 const mate = obtenerReto('mate-suma-fracciones-01');
@@ -122,7 +122,8 @@ describe('reto 1 de punta a punta', () => {
   });
 
   it('no sabe nada: recorre los niveles 0 a 4 y lo resuelve en el 4', async () => {
-    preparar(llmConGuion(['incorrecta', 'no_se', 'no_se', 'no_se', 'paso_correcto', 'paso_correcto', 'paso_correcto', 'correcta']));
+    // "no sé" se reconoce sin preguntarle al Juez.
+    preparar(llmConGuion(['incorrecta', 'paso_correcto', 'paso_correcto', 'paso_correcto', 'correcta']));
     await procesar(deps, texto('hola'));
     const niveles: number[] = [];
     for (const t of ['sí está bien', 'no sé', 'no sé', 'no sé', '6', '3', '2', '5/6 porque ya son del mismo tamaño']) {
@@ -160,7 +161,7 @@ describe('reto 1 de punta a punta', () => {
   it('cuando el Juez duda (confianza baja), sube de nivel sin atajo', async () => {
     preparar(llmConGuion([['correcta', { confianza: 0.2 }]]));
     await procesar(deps, texto('hola'));
-    const r = await procesar(deps, texto('mmm'));
+    const r = await procesar(deps, texto('mmm creo que sí'));
     expect(r.sesion).toMatchObject({ fase: 'nivel', nivel: 1 });
     expect(repo.datos.evaluaciones[0]).toMatchObject({ clasificacion: 'parcial', juez: { clasificacion_juez: 'correcta' } });
   });
@@ -201,7 +202,7 @@ describe('carreras (bloqueo optimista)', () => {
       }
       return original(anterior, nueva);
     };
-    const r = await procesar(deps, texto('no sé'));
+    const r = await procesar(deps, texto('creo que la B'));
     expect(llm.de('juez')).toHaveLength(2);
     expect(r.sesion).toMatchObject({ nivel: 2, version: 2 });
   });
@@ -237,6 +238,11 @@ describe('sin LLM (caído o sin llaves)', () => {
   it('Pepe contesta con el ejemplo del paso y la conversación sigue', async () => {
     preparar(llmFalso({ pepe: () => { throw new Error('caído'); }, juez: () => { throw new Error('caído'); } }));
     await procesar(deps, texto('hola'));
+    // Primero pide que lo repita (no sube el nivel por una falla nuestra)…
+    const r0 = await procesar(deps, texto('sí'));
+    expect(r0.mensajes).toEqual(REINTENTO_JUEZ.mensajes);
+    expect(r0.sesion?.nivel).toBe(0);
+    // …y si vuelve a fallar, la conversación sigue con el ejemplo del paso.
     const r = await procesar(deps, texto('sí'));
     expect(r.sesion?.nivel).toBe(1);
     expect(r.mensajes).toEqual(mate.niveles['1'].pasos[0]!.ejemplo);
@@ -314,5 +320,118 @@ describe('elegirRetoInicial', () => {
 
   it('si ya hizo todos, repite en vez de quedarse sin reto', () => {
     expect(elegirRetoInicial(banco, null, banco.map((r) => r.id))).not.toBeNull();
+  });
+});
+
+describe('lo que no es una respuesta no sube el nivel', () => {
+  it('saludos, risas, "ok" y "espera" no pasan por el Juez ni cambian la sesión', async () => {
+    preparar(llmConGuion([]));
+    await procesar(deps, texto('hola'));
+    for (const t of ['hola', 'jajaja', 'ok', '👍', 'espera', 'gracias']) {
+      const r = await procesar(deps, texto(t));
+      expect(r.sesion).toMatchObject({ nivel: 0, nivel_max: 0, fase: 'nivel' });
+      expect(r.mensajes.length).toBeGreaterThan(0);
+    }
+    expect(llm.de('juez')).toHaveLength(0);
+    expect(repo.datos.evaluaciones).toHaveLength(0);
+  });
+
+  it('el saludo repite la pregunta en la que iban', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('holaaa'));
+    expect(r.mensajes.at(-1)).toBe(mate.planteamiento_pepe.at(-1));
+  });
+
+  it('"repite" manda la pregunta completa con sus botones', async () => {
+    preparar(llmConGuion(['incorrecta']));
+    await procesar(deps, texto('hola'));
+    await procesar(deps, texto('sí está bien'));
+    const r = await procesar(deps, texto('repite'));
+    expect(r.mensajes.slice(1)).toEqual(mate.niveles['1'].pasos[0]!.ejemplo);
+    expect(r.botones).toEqual(['A', 'B', 'Las dos están bien']);
+  });
+
+  it('"dame una pista" sube un nivel sin llamar al Juez', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('Dame una pista'));
+    expect(r.sesion).toMatchObject({ nivel: 1 });
+    expect(llm.de('juez')).toHaveLength(0);
+    expect(repo.datos.evaluaciones[0]).toMatchObject({ clasificacion: 'no_se' });
+  });
+
+  it('el menú explica y ofrece botones', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('menú'));
+    expect(r.botones).toEqual(['Dame una pista', 'Repetir pregunta', 'Mi progreso']);
+    expect(r.sesion?.nivel).toBe(0);
+  });
+
+  it('"otro reto" a media tarea no la abandona', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('otro reto'));
+    expect(r.sesion).toMatchObject({ reto_id: mate.id, fase: 'nivel', nivel: 0 });
+    expect(r.mensajes[0]).toContain('Primero terminemos');
+  });
+
+  it('un insulto corto recibe un límite amable y no cuenta', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('eres un idiota'));
+    expect(r.mensajes[0]).toContain('sin insultos');
+    expect(r.sesion?.nivel).toBe(0);
+  });
+});
+
+describe('mensaje de riesgo', () => {
+  it('responde con ayuda real, no evalúa el reto y le avisa al maestro', async () => {
+    await procesar(deps, texto('hola'));
+    const r = await procesar(deps, texto('ya no quiero vivir'));
+    expect(r.mensajes.join(' ')).toContain('800 911 2000');
+    expect(r.sesion).toMatchObject({ nivel: 0, nivel_max: 0 });
+    expect(llm.de('juez')).toHaveLength(0);
+    expect(repo.datos.evaluaciones[0]).toMatchObject({ juez: { brecha_probable: 'alerta_bienestar' } });
+  });
+
+  it('si es el primer mensaje, no arranca la tarea', async () => {
+    const r = await procesar(deps, texto('me quiero morir'));
+    expect(r.mensajes.join(' ')).toContain('Línea de la Vida');
+    expect(r.sesion?.fase).toBe('pendiente');
+    // El siguiente mensaje sí arranca el reto.
+    const r2 = await procesar(deps, texto('hola'));
+    expect(r2.mensajes).toEqual(mate.planteamiento_pepe);
+  });
+});
+
+describe('entre un reto y otro', () => {
+  async function terminarUno() {
+    const masDificil = retoSintetico({ id: 'mate-suma-fracciones-02', concepto: mate.concepto, dificultad: 2 });
+    preparar(llmConGuion(['correcta']), { banco: [...listarRetos(), masDificil] });
+    await procesar(deps, texto('hola'));
+    await procesar(deps, texto('No, los de abajo no se suman, da 5/6'));
+    return procesar(deps, texto('porque los pedazos son de distinto tamaño'));
+  }
+
+  it('la despedida ofrece "Otro reto" y "Mi progreso"', async () => {
+    const r = await terminarUno();
+    expect(r.botones).toEqual(['Otro reto', 'Mi progreso']);
+  });
+
+  it('"gracias" no arranca otro reto por sorpresa', async () => {
+    await terminarUno();
+    const r = await procesar(deps, texto('gracias'));
+    expect(r.sesion?.fase).toBe('pendiente');
+    expect(r.botones).toContain('Otro reto');
+  });
+
+  it('"Mi progreso" cuenta los retos hechos', async () => {
+    await terminarUno();
+    const r = await procesar(deps, texto('Mi progreso'));
+    expect(r.mensajes[0]).toContain('1 reto');
+  });
+
+  it('"Otro reto" arranca el siguiente', async () => {
+    await terminarUno();
+    const r = await procesar(deps, texto('Otro reto'));
+    expect(r.sesion).toMatchObject({ reto_id: 'mate-suma-fracciones-02' });
+    expect(r.sesion?.fase).not.toBe('pendiente');
   });
 });
