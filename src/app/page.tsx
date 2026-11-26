@@ -80,6 +80,10 @@ export default function Inicio() {
             <Link href="/docente" className="inline-flex min-h-11 items-center rounded font-bold text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Entra al panel
             </Link>
+            {' · '}
+            <Link href="/demo" className="inline-flex min-h-11 items-center rounded font-bold text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Ver los videos
+            </Link>
           </motion.p>
         </motion.div>
 
