@@ -1,4 +1,4 @@
-import { BookOpenText, GraduationCap, MessageCircleQuestion, Mic, ShieldCheck, Sigma } from 'lucide-react';
+import { BookOpenText, GraduationCap, MessageCircleQuestion, Mic, Play, ShieldCheck, Sigma } from 'lucide-react';
 import Link from 'next/link';
 import * as motion from 'motion/react-client';
 import { Contador } from '@/components/contador';
@@ -58,6 +58,28 @@ const PASOS = [
 export default function Inicio() {
   return (
     <main id="contenido" className="flex min-h-dvh flex-col overflow-x-clip">
+      <nav aria-label="Principal" className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 pt-3 sm:px-6">
+        <Link href="/" className="flex min-h-11 items-center gap-2 rounded-xl pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-ajolote/35" aria-hidden>
+            <PepeAjolote className="w-9" />
+          </span>
+          <span className="texto-titulo text-lg max-[359px]:sr-only">Pepe</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/demo"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-2xl border-2 border-primary/50 bg-card/90 px-3 text-sm font-extrabold shadow-clay transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+          >
+            <Play className="size-4 fill-current text-ajolote-branquia" aria-hidden /> Videos
+          </Link>
+          <Link
+            href="/docente"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-2xl border-2 border-primary/50 bg-card/90 px-3 text-sm font-extrabold shadow-clay transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+          >
+            <GraduationCap className="size-4 text-primary" aria-hidden /> Maestros
+          </Link>
+        </div>
+      </nav>
       <section className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-6 px-4 pt-6 pb-12 md:gap-10 sm:px-6 md:grid-cols-[1.1fr_0.9fr] md:pt-16">
         <motion.div className="min-w-0 space-y-6" variants={contenedor} initial="oculto" animate="visible">
           <motion.p variants={pieza} className={`eyebrow inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 whitespace-nowrap text-primary shadow-clay max-[359px]:tracking-normal`}>
@@ -75,16 +97,32 @@ export default function Inicio() {
           <motion.div variants={pieza} className="max-w-xl">
             <EntrarConCodigo />
           </motion.div>
-          <motion.p variants={pieza} className="text-sm text-muted-foreground">
-            ¿Eres maestro?{' '}
-            <Link href="/docente" className="inline-flex min-h-11 items-center rounded font-bold text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              Entra al panel
+          <motion.div variants={pieza} className="grid max-w-xl gap-3 min-[420px]:grid-cols-2">
+            <Link
+              href="/demo"
+              className="group flex min-h-14 items-center gap-3 rounded-2xl border-2 border-primary/50 bg-card/90 px-4 py-2.5 shadow-clay transition-transform hover:-translate-y-0.5 hover:border-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40 motion-reduce:hover:translate-y-0"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ajolote/40 text-ajolote-branquia" aria-hidden>
+                <Play className="ml-0.5 size-5 fill-current" />
+              </span>
+              <span className="leading-tight">
+                <span className="block font-extrabold">Ver los videos</span>
+                <span className="block text-sm text-muted-foreground">Reel, proyecto y demo</span>
+              </span>
             </Link>
-            {' · '}
-            <Link href="/demo" className="inline-flex min-h-11 items-center rounded font-bold text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              Ver los videos
+            <Link
+              href="/docente"
+              className="group flex min-h-14 items-center gap-3 rounded-2xl border-2 border-primary/50 bg-card/90 px-4 py-2.5 shadow-clay transition-transform hover:-translate-y-0.5 hover:border-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40 motion-reduce:hover:translate-y-0"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary" aria-hidden>
+                <GraduationCap className="size-5" />
+              </span>
+              <span className="leading-tight">
+                <span className="block font-extrabold">Entrar al panel</span>
+                <span className="block text-sm text-muted-foreground">Si eres maestro</span>
+              </span>
             </Link>
-          </motion.p>
+          </motion.div>
         </motion.div>
 
         <motion.div initial={{ y: 24, rotate: -2 }} animate={{ y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 180, damping: 20, delay: 0.1 }} className={`relative order-first mx-auto flex w-full max-w-md flex-row items-center justify-center md:order-none md:flex-col md:gap-4`}>
