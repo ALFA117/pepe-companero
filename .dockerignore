@@ -1,0 +1,33 @@
+# Dependencias y salida del build (se generan dentro de la imagen)
+node_modules
+.next
+out
+build
+coverage
+*.tsbuildinfo
+
+# Secretos locales: nunca dentro de la imagen
+.env*
+!.env.example
+*.pem
+
+# Git, CI y herramientas
+.git
+.github
+.claude
+.vercel
+
+# Logs
+*.log
+npm-debug.log*
+.pnpm-debug.log*
+
+# Lo que el servidor no usa
+docs
+design-system
+supabase
+scripts
+README.md
+AGENTS.md
+/*.mp4
+.DS_Store

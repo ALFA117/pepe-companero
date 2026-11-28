@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Servidor autocontenido en .next/standalone (node server.js) para la imagen
+  // de Docker de Foundathyon. Vercel lo ignora y despliega igual.
+  output: "standalone",
   // Sin el indicador "N" en desarrollo (estorbaba en capturas y demos).
   devIndicators: false,
   // Sin cacheComponents: casi todas las páginas leen la base en cada petición
